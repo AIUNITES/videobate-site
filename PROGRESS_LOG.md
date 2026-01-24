@@ -5,6 +5,83 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 2: Expanded Fallacy Library with ASCII Art (January 23, 2026)
+
+### Changes Made
+- Expanded from 12 to **36 fallacy types** across 6 categories
+- Added **ASCII art illustrations** for every fallacy
+- Organized into color-coded categories:
+  - 👤 Attack the Person (red)
+  - 🐟 Misdirection (orange)
+  - 🎓 False Authority (purple)
+  - 🧠 Logic Errors (cyan)
+  - 🎭 Manipulation (pink)
+  - 🗳️ Political Tactics (green)
+
+### Complete Fallacy List (36 types)
+
+#### Attack the Person (Ad Hominem)
+| Code | Name | Description |
+|------|------|-------------|
+| CHAR | Character Assassination | Attacking character to discredit argument |
+| SHTM | Shooting the Messenger | Dismissing info based on who delivers it |
+| WELL | Poisoning the Well | Preemptive discrediting before argument |
+| MOTV | Appeal to Motive | Dismissing based on assumed motives |
+| ASSOC | Association Fallacy | Guilt/credit by association |
+| CRED | Credibility Attack | Undermining credibility on unrelated matters |
+
+#### Misdirection (Red Herring)
+| Code | Name | Description |
+|------|------|-------------|
+| RHER | Red Herring | Introducing irrelevant topic |
+| STRW | Straw Man | Misrepresenting argument to attack |
+| WHAT | Whataboutism | Deflecting with "what about..." |
+| GOAL | Moving Goalposts | Changing criteria after met |
+| DISC | Discrediting Tactic | Undermining without engaging |
+| FAIR | Fair Game Fallacy | "They deserve it" justification |
+
+#### False Authority
+| Code | Name | Description |
+|------|------|-------------|
+| AUTH | Appeal to Authority | Citing unqualified authority |
+| POPUL | Appeal to Popularity | "Everyone believes it" |
+| CHRY | Cherry Picking | Selective evidence |
+| ANEC | Anecdotal Evidence | Personal stories as proof |
+| HOST | Hostile Witness | Treating opposition as bad faith |
+| TRAD | Appeal to Tradition | "Always done this way" |
+
+#### Logic Errors
+| Code | Name | Description |
+|------|------|-------------|
+| COMP | Comparing Inequivalents | False equivalence |
+| FLSD | False Dilemma | Only 2 options presented |
+| SLIP | Slippery Slope | Extreme consequences claimed |
+| CIRC | Circular Reasoning | Conclusion as premise |
+| LOAD | Loaded Question | Built-in assumption trap |
+| IGNR | Argument from Ignorance | "Can't prove it false" |
+
+#### Manipulation
+| Code | Name | Description |
+|------|------|-------------|
+| GASL | Gaslighting | Making someone doubt reality |
+| FEAR | Appeal to Fear | Using fear to persuade |
+| EMOT | Appeal to Emotion | Emotional manipulation |
+| GAMB | Gambler's Fallacy | Past affects future random events |
+| PROJ | Projection | Accusing others of your behavior |
+| BAND | Bandwagon Effect | "Everyone's doing it" |
+
+#### Political Tactics
+| Code | Name | Description |
+|------|------|-------------|
+| NEGC | Negative Campaigning | Only attacking, no positions |
+| CARD | Playing a Card | Identity to deflect criticism |
+| REPU | Reputation Attack | Damaging reputation vs arguing |
+| SPCT | Appeal to Spectacle | Drama over substance |
+| SILC | Silencing Tactic | Preventing speech vs rebutting |
+| VIRT | Virtue Signaling | Positions for approval, not belief |
+
+---
+
 ## Session 1: Fallacies Game Feature Spec (January 23, 2026)
 
 ### Background

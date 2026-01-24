@@ -19,6 +19,8 @@
       --accent-cyan: #00d4ff;
       --accent-green: #22c55e;
       --accent-purple: #8b5cf6;
+      --accent-orange: #f97316;
+      --accent-pink: #ec4899;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -90,9 +92,130 @@
     }
     .hero-cta { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
     
-    /* Fallacy Categories */
-    .categories {
+    /* Category Sections */
+    .category-section {
+      padding: 60px 0;
+    }
+    .category-section:nth-child(even) {
+      background: var(--bg-card);
+    }
+    .category-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+    }
+    .category-badge.attack { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+    .category-badge.misdirect { background: rgba(249,115,22,0.2); color: var(--accent-orange); }
+    .category-badge.authority { background: rgba(139,92,246,0.2); color: var(--accent-purple); }
+    .category-badge.logic { background: rgba(0,212,255,0.2); color: var(--accent-cyan); }
+    .category-badge.manipulate { background: rgba(236,72,153,0.2); color: var(--accent-pink); }
+    .category-badge.political { background: rgba(34,197,94,0.2); color: var(--accent-green); }
+    
+    .category-header h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .category-header p {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .fallacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+    
+    .fallacy-card {
+      background: var(--bg-dark);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s;
+    }
+    .category-section:nth-child(even) .fallacy-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .fallacy-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .fallacy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    .fallacy-icon {
+      font-size: 2rem;
+    }
+    .fallacy-code {
+      background: rgba(239,68,68,0.2);
+      color: var(--accent-red);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .fallacy-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent-gold);
+    }
+    .fallacy-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 15px;
+    }
+    
+    /* ASCII Art Box */
+    .ascii-art {
+      background: #0a0a0f;
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--accent-cyan);
+      white-space: pre;
+      overflow-x: auto;
+      margin-bottom: 15px;
+    }
+    
+    .fallacy-example {
+      padding: 12px;
+      background: rgba(139,92,246,0.1);
+      border-radius: 8px;
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-left: 3px solid var(--accent-purple);
+    }
+    .fallacy-example strong {
+      color: var(--accent-gold);
+      font-style: normal;
+    }
+    
+    /* Game Modes */
+    .modes {
       padding: 80px 0;
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-card) 100%);
     }
     .section-header {
       text-align: center;
@@ -120,62 +243,6 @@
       margin: 0 auto;
     }
     
-    .fallacy-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-    }
-    .fallacy-card {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 25px;
-      border: 1px solid rgba(255,255,255,0.05);
-      transition: all 0.3s;
-    }
-    .fallacy-card:hover {
-      border-color: var(--accent-red);
-      transform: translateY(-5px);
-    }
-    .fallacy-icon {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-    }
-    .fallacy-name {
-      font-size: 1.2rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--accent-gold);
-    }
-    .fallacy-code {
-      display: inline-block;
-      background: rgba(239,68,68,0.2);
-      color: var(--accent-red);
-      padding: 3px 10px;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-    .fallacy-desc {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-    }
-    .fallacy-example {
-      margin-top: 15px;
-      padding: 12px;
-      background: rgba(0,0,0,0.3);
-      border-radius: 8px;
-      font-style: italic;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      border-left: 3px solid var(--accent-purple);
-    }
-    
-    /* Game Modes */
-    .modes {
-      padding: 80px 0;
-      background: var(--bg-card);
-    }
     .modes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -188,18 +255,9 @@
       text-align: center;
       border: 1px solid rgba(255,255,255,0.05);
     }
-    .mode-icon {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
-    .mode-name {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-    .mode-desc {
-      color: var(--text-secondary);
-    }
+    .mode-icon { font-size: 3rem; margin-bottom: 20px; }
+    .mode-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; }
+    .mode-desc { color: var(--text-secondary); }
     .mode-badge {
       display: inline-block;
       margin-top: 15px;
@@ -213,9 +271,7 @@
     .mode-badge.pvp { background: rgba(239,68,68,0.2); color: var(--accent-red); }
     
     /* Scoring */
-    .scoring {
-      padding: 80px 0;
-    }
+    .scoring { padding: 80px 0; }
     .scoring-table {
       max-width: 600px;
       margin: 0 auto;
@@ -230,13 +286,23 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .scoring-row:last-child { border-bottom: none; }
-    .scoring-row.header {
-      background: rgba(239,68,68,0.2);
-      font-weight: 700;
-    }
+    .scoring-row.header { background: rgba(239,68,68,0.2); font-weight: 700; }
     .scoring-action { color: var(--text-secondary); }
     .scoring-points { font-weight: 700; color: var(--accent-green); }
     .scoring-points.negative { color: var(--accent-red); }
+    
+    /* Stats */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px 0;
+      background: var(--bg-card);
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 2.5rem; font-weight: 800; color: var(--accent-gold); }
+    .stat-label { color: var(--text-secondary); font-size: 0.9rem; }
     
     /* CTA */
     .cta {
@@ -244,15 +310,8 @@
       text-align: center;
       background: radial-gradient(ellipse at 50% 100%, rgba(139,92,246,0.15) 0%, transparent 50%);
     }
-    .cta h2 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-    }
-    .cta p {
-      color: var(--text-secondary);
-      max-width: 500px;
-      margin: 0 auto 30px;
-    }
+    .cta h2 { font-size: 2.5rem; margin-bottom: 20px; }
+    .cta p { color: var(--text-secondary); max-width: 500px; margin: 0 auto 30px; }
     
     /* Footer */
     .footer {
@@ -261,14 +320,8 @@
       text-align: center;
       border-top: 1px solid rgba(255,255,255,0.05);
     }
-    .footer p {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-    }
-    .footer a {
-      color: var(--accent-red);
-      text-decoration: none;
-    }
+    .footer p { color: var(--text-secondary); font-size: 0.9rem; }
+    .footer a { color: var(--accent-red); text-decoration: none; }
     
     /* Responsive */
     @media (max-width: 768px) {
@@ -276,6 +329,8 @@
       .nav-links { flex-wrap: wrap; justify-content: center; }
       .hero { padding: 60px 0; }
       .hero-cta { flex-direction: column; align-items: center; }
+      .fallacy-grid { grid-template-columns: 1fr; }
+      .ascii-art { font-size: 9px; }
     }
   </style>
 </head>
@@ -287,7 +342,7 @@
       <div class="nav-links">
         <a href="index.html">Home</a>
         <a href="index.html#features">Features</a>
-        <a href="fallacies.html" style="color: var(--accent-gold);">Fallacy Spotter</a>
+        <a href="fallacies.html" style="color: var(--accent-gold);">🎯 Fallacy Spotter</a>
         <a href="index.html#contact" class="btn btn-primary">Join Waitlist</a>
       </div>
     </div>
@@ -295,15 +350,30 @@
 
   <section class="hero">
     <div class="container">
-      <div class="hero-badge">🎮 New Feature Coming Soon</div>
+      <div class="hero-badge">🎮 Critical Thinking Game</div>
       <h1>Spot the Fallacy,<br><span class="gradient-text">Sharpen Your Mind</span></h1>
       <p>Train your critical thinking by identifying logical fallacies in real-time debates. Compete with others, climb leaderboards, and become a master of reason.</p>
       <div class="hero-cta">
-        <a href="#fallacies" class="btn btn-primary">Learn the Fallacies</a>
-        <a href="https://www.youtube.com/playlist?list=PLtKNX4SfKpzX_bhh4LOEWEGy3pkLmFDmk" target="_blank" class="btn btn-secondary">📺 Watch Examples</a>
+        <a href="#categories" class="btn btn-primary">Learn 25+ Fallacies</a>
+        <a href="https://www.youtube.com/playlist?list=PLtKNX4SfKpzX_bhh4LOEWEGy3pkLmFDmk" target="_blank" class="btn btn-secondary">📺 Truthopedia Videos</a>
       </div>
     </div>
   </section>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num">25+</div>
+      <div class="stat-label">Fallacy Types</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Game Modes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Arguments to Analyze</div>
+    </div>
+  </div>
 
   <section class="modes">
     <div class="container">
@@ -341,116 +411,956 @@
     </div>
   </section>
 
-  <section class="categories" id="fallacies">
+  <div id="categories"></div>
+
+  <!-- CATEGORY 1: ATTACK THE PERSON -->
+  <section class="category-section">
     <div class="container">
-      <div class="section-header">
-        <span class="badge">Truthopedia</span>
-        <h2>Know Your Fallacies</h2>
-        <p>Master these logical fallacies to spot weak arguments</p>
+      <div class="category-header">
+        <span class="category-badge attack">👤 Attack the Person</span>
+        <h2>Ad Hominem Family</h2>
+        <p>Fallacies that attack the person instead of their argument</p>
       </div>
       
       <div class="fallacy-grid">
         
         <div class="fallacy-card">
-          <div class="fallacy-icon">🎭</div>
-          <div class="fallacy-name">Straw Man</div>
-          <span class="fallacy-code">STRW</span>
-          <p class="fallacy-desc">Misrepresenting someone's argument to make it easier to attack.</p>
-          <div class="fallacy-example">"So you're saying we should just let criminals run free?"</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🗡️</span>
+            <span class="fallacy-code">CHAR</span>
+          </div>
+          <div class="fallacy-name">Character Assassination</div>
+          <p class="fallacy-desc">Attacking someone's character to discredit their argument, rather than addressing the argument itself.</p>
+          <div class="ascii-art">
+    ARGUMENT           ATTACK
+   ┌─────────┐        ┌─────────┐
+   │ Valid   │   ──X──│ Person  │
+   │ Point   │        │  ↓ ↓ ↓  │
+   └─────────┘        │ "Bad!"  │
+        │             └─────────┘
+        └── IGNORED ──────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "You can't trust his economic policy—he cheated on his wife!"</div>
         </div>
-        
+
         <div class="fallacy-card">
-          <div class="fallacy-icon">🐟</div>
-          <div class="fallacy-name">Red Herring</div>
-          <span class="fallacy-code">RHER</span>
-          <p class="fallacy-desc">Introducing an irrelevant topic to divert attention from the original issue.</p>
-          <div class="fallacy-example">"Why worry about climate when there's poverty?"</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📬</span>
+            <span class="fallacy-code">SHTM</span>
+          </div>
+          <div class="fallacy-name">Shooting the Messenger</div>
+          <p class="fallacy-desc">Dismissing information solely because of who delivers it, regardless of its validity.</p>
+          <div class="ascii-art">
+   📰 NEWS ────────→ 🧑 MESSENGER
+      │                    │
+      │ (valid info)       ↓
+      │              ╔═══════════╗
+      │              ║ "I don't  ║
+      └──── X ───────║ like YOU" ║
+         REJECTED    ╚═══════════╝
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "I don't care if it's true—that reporter is biased!"</div>
         </div>
-        
+
         <div class="fallacy-card">
-          <div class="fallacy-icon">👤</div>
-          <div class="fallacy-name">Ad Hominem</div>
-          <span class="fallacy-code">CHAR</span>
-          <p class="fallacy-desc">Attacking the person making the argument rather than the argument itself.</p>
-          <div class="fallacy-example">"You can't trust him, he's a [insert label]."</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">🎓</div>
-          <div class="fallacy-name">Appeal to Authority</div>
-          <span class="fallacy-code">AUTH</span>
-          <p class="fallacy-desc">Citing an authority who isn't qualified in the relevant field.</p>
-          <div class="fallacy-example">"This celebrity says vaccines are bad."</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">🎪</div>
-          <div class="fallacy-name">Appeal to Popularity</div>
-          <span class="fallacy-code">POPUL</span>
-          <p class="fallacy-desc">Arguing something is true because many people believe it.</p>
-          <div class="fallacy-example">"Millions of people can't be wrong!"</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">⚖️</div>
-          <div class="fallacy-name">False Equivalence</div>
-          <span class="fallacy-code">COMP</span>
-          <p class="fallacy-desc">Treating two things as equal when they're fundamentally different.</p>
-          <div class="fallacy-example">"Both sides are equally bad."</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">🛝</div>
-          <div class="fallacy-name">Slippery Slope</div>
-          <span class="fallacy-code">SLIP</span>
-          <p class="fallacy-desc">Claiming one event will lead to extreme consequences without justification.</p>
-          <div class="fallacy-example">"If we allow X, next thing you know Y and Z!"</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">🚪</div>
-          <div class="fallacy-name">False Dilemma</div>
-          <span class="fallacy-code">FLSD</span>
-          <p class="fallacy-desc">Presenting only two options when more exist.</p>
-          <div class="fallacy-example">"You're either with us or against us."</div>
-        </div>
-        
-        <div class="fallacy-card">
-          <div class="fallacy-icon">💧</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">💧</span>
+            <span class="fallacy-code">WELL</span>
+          </div>
           <div class="fallacy-name">Poisoning the Well</div>
-          <span class="fallacy-code">WELL</span>
-          <p class="fallacy-desc">Preemptively discrediting a source before they speak.</p>
-          <div class="fallacy-example">"Before they respond, remember they once..."</div>
+          <p class="fallacy-desc">Preemptively discrediting a source before they even make their argument.</p>
+          <div class="ascii-art">
+   BEFORE ARGUMENT:
+   ┌──────────────────────────┐
+   │ "Before they speak,      │
+   │  remember they once..." │
+   └───────────┬──────────────┘
+               ↓
+         ☠️ POISONED ☠️
+               ↓
+   ┌──────────────────────────┐
+   │  Anything they say now   │
+   │  is automatically sus    │
+   └──────────────────────────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Before my opponent speaks, remember they were once arrested..."</div>
         </div>
-        
+
         <div class="fallacy-card">
-          <div class="fallacy-icon">🔥</div>
-          <div class="fallacy-name">Gaslighting</div>
-          <span class="fallacy-code">GASL</span>
-          <p class="fallacy-desc">Making someone question their own perception of reality.</p>
-          <div class="fallacy-example">"That never happened. You're imagining things."</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎯</span>
+            <span class="fallacy-code">MOTV</span>
+          </div>
+          <div class="fallacy-name">Appeal to Motive</div>
+          <p class="fallacy-desc">Dismissing an argument by questioning the motives behind it, rather than its merits.</p>
+          <div class="ascii-art">
+   ARGUMENT: "X is true"
+        │
+        ↓
+   ┌─────────────────┐
+   │ "You only say   │
+   │  that because   │──→ 💰 MONEY?
+   │  you want..."   │──→ 🏆 FAME?
+   └─────────────────┘──→ 😈 POWER?
+        │
+        X (argument ignored)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Of course she supports that bill—her company profits from it!"</div>
         </div>
-        
+
         <div class="fallacy-card">
-          <div class="fallacy-icon">😱</div>
-          <div class="fallacy-name">Appeal to Fear</div>
-          <span class="fallacy-code">FEAR</span>
-          <p class="fallacy-desc">Using fear to persuade rather than logical argument.</p>
-          <div class="fallacy-example">"If you don't do X, terrible things will happen!"</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🔗</span>
+            <span class="fallacy-code">ASSOC</span>
+          </div>
+          <div class="fallacy-name">Association Fallacy</div>
+          <p class="fallacy-desc">Guilt or credit by association—judging someone based on who they associate with.</p>
+          <div class="ascii-art">
+      PERSON A ←──knows──→ PERSON B
+         │                    │
+         │                    ↓
+         │               (bad person)
+         │                    │
+         ↓                    │
+   ╔═══════════════╗          │
+   ║ "A must also  ║←─────────┘
+   ║  be bad!"     ║  GUILT BY
+   ╚═══════════════╝  ASSOCIATION
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "He once had dinner with a criminal, so he can't be trusted."</div>
         </div>
-        
+
         <div class="fallacy-card">
-          <div class="fallacy-icon">🍒</div>
-          <div class="fallacy-name">Cherry Picking</div>
-          <span class="fallacy-code">CHRY</span>
-          <p class="fallacy-desc">Selecting only evidence that supports your position.</p>
-          <div class="fallacy-example">"This one study proves my point." (ignores 100 others)</div>
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📉</span>
+            <span class="fallacy-code">CRED</span>
+          </div>
+          <div class="fallacy-name">Credibility Attack</div>
+          <p class="fallacy-desc">Undermining someone's credibility on unrelated matters to dismiss their current argument.</p>
+          <div class="ascii-art">
+   CURRENT TOPIC: Economics
+   ┌─────────────────────────┐
+   │  Valid economic point   │
+   └───────────┬─────────────┘
+               │
+   ╔═══════════╧═══════════╗
+   ║ "But 10 years ago you ║
+   ║  were wrong about     ║
+   ║  SPORTS predictions!" ║
+   ╚═══════════════════════╝
+         (unrelated topic)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Why listen to your health advice? You predicted the wrong Super Bowl winner!"</div>
         </div>
-        
+
       </div>
     </div>
   </section>
 
+  <!-- CATEGORY 2: MISDIRECTION -->
+  <section class="category-section">
+    <div class="container">
+      <div class="category-header">
+        <span class="category-badge misdirect">🐟 Misdirection</span>
+        <h2>Red Herring Family</h2>
+        <p>Fallacies that distract from the actual issue</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🐟</span>
+            <span class="fallacy-code">RHER</span>
+          </div>
+          <div class="fallacy-name">Red Herring</div>
+          <p class="fallacy-desc">Introducing an irrelevant topic to divert attention from the original issue.</p>
+          <div class="ascii-art">
+   TOPIC A ──────────────────→ ANSWER?
+      │
+      │   🐟 "But what about
+      │       Topic B??"
+      │         │
+      └────→────┘
+              ↓
+         TOPIC B (irrelevant)
+              ↓
+         🤷 Original question
+            forgotten
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Why worry about climate change when there's poverty to solve?"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎭</span>
+            <span class="fallacy-code">STRW</span>
+          </div>
+          <div class="fallacy-name">Straw Man</div>
+          <p class="fallacy-desc">Misrepresenting someone's argument to make it easier to attack.</p>
+          <div class="ascii-art">
+   REAL ARGUMENT        STRAW MAN
+   ┌───────────┐       ┌───────────┐
+   │ Nuanced   │  ──→  │ Extreme   │
+   │ Position  │       │ Version   │
+   └───────────┘       └─────┬─────┘
+        │                    │
+        │    "So you're      ↓
+        │     saying..."   💥 ATTACK!
+        │                    │
+        └── (ignored) ───────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "So you're saying we should just let criminals run free?!"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🔄</span>
+            <span class="fallacy-code">WHAT</span>
+          </div>
+          <div class="fallacy-name">Whataboutism</div>
+          <p class="fallacy-desc">Deflecting criticism by pointing to someone else's wrongdoing.</p>
+          <div class="ascii-art">
+   ACCUSATION: "You did X"
+         │
+         ↓
+   ┌─────────────────────┐
+   │  "What about when   │
+   │   YOU did Y??"      │
+   └──────────┬──────────┘
+              │
+              ↓
+      (original accusation
+       never addressed)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "You criticize my lateness? What about the time YOU were late?"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🥅</span>
+            <span class="fallacy-code">GOAL</span>
+          </div>
+          <div class="fallacy-name">Moving the Goalposts</div>
+          <p class="fallacy-desc">Changing the criteria for proof after the original criteria has been met.</p>
+          <div class="ascii-art">
+   ORIGINAL GOAL          NEW GOAL
+   ════════════          ════════════
+        🥅         →→→→→→     🥅
+        │                      │
+   "Prove X" ──→ ✓ Done!   "Now prove
+        │                   X, Y, and Z"
+        │                      │
+        └──── MOVED ──────────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Okay you proved that, but what about THIS other thing?"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎪</span>
+            <span class="fallacy-code">DISC</span>
+          </div>
+          <div class="fallacy-name">Discrediting Tactic</div>
+          <p class="fallacy-desc">Using any means to undermine credibility rather than engage with the argument.</p>
+          <div class="ascii-art">
+        VALID ARGUMENT
+             │
+             ↓
+   ┌─────────────────────┐
+   │   DISCREDIT MENU:   │
+   │  ☐ Mock their voice │
+   │  ☐ Laugh at them    │
+   │  ☐ Call them crazy  │
+   │  ☐ Question sanity  │
+   └─────────────────────┘
+             │
+             ↓
+      ARGUMENT? What argument?
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> *rolls eyes* "Are you seriously saying that? LOL"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">⚖️</span>
+            <span class="fallacy-code">FAIR</span>
+          </div>
+          <div class="fallacy-name">Fair Game Fallacy</div>
+          <p class="fallacy-desc">Claiming any attack is justified because the target is a public figure or "asked for it."</p>
+          <div class="ascii-art">
+   PUBLIC FIGURE
+   ┌───────────────┐
+   │     🎯        │
+   │   TARGET      │
+   └───────────────┘
+          │
+          ↓
+   "They're famous, so
+    ANY attack is fair!"
+          │
+          ↓
+   ╔═════════════════╗
+   ║  (Anything goes) ║
+   ╚═════════════════╝
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "They chose to be a celebrity—they can't complain about rumors!"</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY 3: FALSE AUTHORITY -->
+  <section class="category-section">
+    <div class="container">
+      <div class="category-header">
+        <span class="category-badge authority">🎓 False Authority</span>
+        <h2>Evidence Problems</h2>
+        <p>Fallacies involving misuse of authority or evidence</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎓</span>
+            <span class="fallacy-code">AUTH</span>
+          </div>
+          <div class="fallacy-name">Appeal to Authority</div>
+          <p class="fallacy-desc">Citing an authority who isn't qualified in the relevant field.</p>
+          <div class="ascii-art">
+   TOPIC: Medicine
+   
+   👨‍🔬 Doctor ──→ ✓ VALID
+   
+   🎬 Actor ───→ ✗ INVALID
+      │
+      └─→ "But they're 
+           famous!"
+               │
+               ↓
+          NOT QUALIFIED
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "This celebrity says vaccines are dangerous, so it must be true."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">👥</span>
+            <span class="fallacy-code">POPUL</span>
+          </div>
+          <div class="fallacy-name">Appeal to Popularity</div>
+          <p class="fallacy-desc">Arguing something is true because many people believe it.</p>
+          <div class="ascii-art">
+   👤👤👤👤👤👤👤👤👤👤
+   👤👤👤👤👤👤👤👤👤👤
+   "Millions believe X!"
+            │
+            ↓
+   ╔══════════════════╗
+   ║  "Therefore X    ║
+   ║   must be TRUE!" ║
+   ╚══════════════════╝
+            │
+            ↓
+      WRONG! Popularity
+       ≠ Truth
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Millions of people can't be wrong!"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🍒</span>
+            <span class="fallacy-code">CHRY</span>
+          </div>
+          <div class="fallacy-name">Cherry Picking</div>
+          <p class="fallacy-desc">Selecting only evidence that supports your position while ignoring contradicting evidence.</p>
+          <div class="ascii-art">
+   ALL EVIDENCE:
+   🍒🍎🍎🍎🍎🍎🍎🍎🍒🍎
+   🍎🍎🍒🍎🍎🍎🍎🍎🍎🍎
+   
+   CHERRY PICKED:
+   🍒    🍒    🍒
+   
+   "See? Only cherries!"
+   (ignores all the apples)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "This one study proves my point!" (ignores 50 that don't)</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📖</span>
+            <span class="fallacy-code">ANEC</span>
+          </div>
+          <div class="fallacy-name">Anecdotal Evidence</div>
+          <p class="fallacy-desc">Using personal stories as proof instead of actual data.</p>
+          <div class="ascii-art">
+   SCIENTIFIC DATA     vs.    ANECDOTE
+   ┌─────────────┐          ┌─────────┐
+   │ 📊 Studies  │          │ "My     │
+   │ 📈 Stats    │          │  uncle  │
+   │ 🔬 Research │          │  said..." │
+   └─────────────┘          └─────────┘
+         │                       │
+         │                       ↓
+         │               GIVEN MORE
+         └── IGNORED ──→  WEIGHT!?
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "My grandpa smoked and lived to 95, so smoking isn't that bad."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">👨‍⚖️</span>
+            <span class="fallacy-code">HOST</span>
+          </div>
+          <div class="fallacy-name">Hostile Witness Treatment</div>
+          <p class="fallacy-desc">Treating any opposing viewpoint as automatically suspect or in bad faith.</p>
+          <div class="ascii-art">
+   OPPOSING VIEW
+        │
+        ↓
+   ┌─────────────────┐
+   │ "They MUST have │
+   │  hidden agenda" │
+   │  "Bad faith!"   │
+   │  "Suspicious!"  │
+   └─────────────────┘
+        │
+        ↓
+   No need to engage
+    with their point
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Anyone who disagrees with me is clearly a paid shill."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📜</span>
+            <span class="fallacy-code">TRAD</span>
+          </div>
+          <div class="fallacy-name">Appeal to Tradition</div>
+          <p class="fallacy-desc">Arguing something is right because "it's always been done this way."</p>
+          <div class="ascii-art">
+   PAST ────────────→ PRESENT
+    │                    │
+    │  "We've always     │
+    │   done it this     │
+    │   way!"            │
+    │                    ↓
+    │              ╔═══════════╗
+    └─────────────→║ Must be   ║
+                   ║  correct! ║
+                   ╚═══════════╝
+                   (not necessarily)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Marriage has always been this way, so we shouldn't change it."</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY 4: LOGIC ERRORS -->
+  <section class="category-section">
+    <div class="container">
+      <div class="category-header">
+        <span class="category-badge logic">🧠 Logic Errors</span>
+        <h2>Reasoning Failures</h2>
+        <p>Fallacies with flawed logical structure</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">⚖️</span>
+            <span class="fallacy-code">COMP</span>
+          </div>
+          <div class="fallacy-name">Comparing Inequivalents</div>
+          <p class="fallacy-desc">Treating two fundamentally different things as equivalent (false equivalence).</p>
+          <div class="ascii-art">
+   THING A          THING B
+   ┌──────┐        ┌──────┐
+   │ 🐘   │   =    │ 🐜   │
+   │ BIG  │        │ tiny │
+   └──────┘        └──────┘
+       │               │
+       └───────────────┘
+              │
+              ↓
+     "They're basically
+      the same thing!"
+         (NO THEY'RE NOT)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Both political parties are equally corrupt."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🚪</span>
+            <span class="fallacy-code">FLSD</span>
+          </div>
+          <div class="fallacy-name">False Dilemma</div>
+          <p class="fallacy-desc">Presenting only two options when more actually exist.</p>
+          <div class="ascii-art">
+        ┌──── YOU MUST CHOOSE ────┐
+        │                         │
+        ↓                         ↓
+   ┌─────────┐             ┌─────────┐
+   │ OPTION  │             │ OPTION  │
+   │    A    │     OR      │    B    │
+   └─────────┘             └─────────┘
+   
+   🚫 HIDDEN: Options C, D, E, F...
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "You're either with us or against us."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🛝</span>
+            <span class="fallacy-code">SLIP</span>
+          </div>
+          <div class="fallacy-name">Slippery Slope</div>
+          <p class="fallacy-desc">Claiming one event will inevitably lead to extreme consequences without justification.</p>
+          <div class="ascii-art">
+   SMALL ACTION
+        │
+        ↓
+   ┌─────────┐
+   │ Step 1  │ "If we allow A..."
+   └────┬────┘
+        ↓
+   ┌─────────┐
+   │ Step 2  │ "Then B will happen..."
+   └────┬────┘
+        ↓
+   ┌─────────┐
+   │ Step 3  │ "Then C..."
+   └────┬────┘
+        ↓
+   💥 CATASTROPHE! 💥
+   (with no proof of links)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "If we ban this, next they'll ban everything!"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🔄</span>
+            <span class="fallacy-code">CIRC</span>
+          </div>
+          <div class="fallacy-name">Circular Reasoning</div>
+          <p class="fallacy-desc">The conclusion is used as a premise (begging the question).</p>
+          <div class="ascii-art">
+        ┌──→ PREMISE ──┐
+        │              │
+        │   "X is      ↓
+        │    true      │
+        │   because    │
+        │    X is      │
+        │    true"     │
+        │              │
+        └── CONCLUSION ┘
+           (endless loop)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "The Bible is true because it says so in the Bible."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">❓</span>
+            <span class="fallacy-code">LOAD</span>
+          </div>
+          <div class="fallacy-name">Loaded Question</div>
+          <p class="fallacy-desc">A question that contains a built-in assumption that traps the respondent.</p>
+          <div class="ascii-art">
+   QUESTION:
+   ┌───────────────────────┐
+   │ "Have you stopped     │
+   │  beating your dog?"   │
+   └───────────────────────┘
+            │
+      ┌─────┴─────┐
+      ↓           ↓
+    "YES"       "NO"
+      │           │
+      ↓           ↓
+   Implies     Implies
+   you DID     you STILL
+   beat dog    beat dog
+   
+   🪤 TRAPPED EITHER WAY
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Why do you hate freedom?"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🤷</span>
+            <span class="fallacy-code">IGNR</span>
+          </div>
+          <div class="fallacy-name">Argument from Ignorance</div>
+          <p class="fallacy-desc">Claiming something is true because it hasn't been proven false (or vice versa).</p>
+          <div class="ascii-art">
+   CLAIM: "X exists"
+   
+   PROOF: ❓ (none)
+   
+   DISPROOF: ❓ (none)
+   
+   THEREFORE:
+   ╔═══════════════════╗
+   ║ "X must be true!" ║
+   ║        OR         ║
+   ║ "X must be false!"║
+   ╚═══════════════════╝
+   
+   (Neither is valid logic)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "No one has proven aliens DON'T exist, so they must exist!"</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY 5: MANIPULATION -->
+  <section class="category-section">
+    <div class="container">
+      <div class="category-header">
+        <span class="category-badge manipulate">🎭 Manipulation</span>
+        <h2>Psychological Tactics</h2>
+        <p>Fallacies that exploit emotions and psychology</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🔥</span>
+            <span class="fallacy-code">GASL</span>
+          </div>
+          <div class="fallacy-name">Gaslighting</div>
+          <p class="fallacy-desc">Making someone question their own perception of reality or memory.</p>
+          <div class="ascii-art">
+   REALITY           GASLIGHTER
+   ┌────────┐       ┌────────────┐
+   │ Event  │       │ "That      │
+   │ DID    │  vs.  │  never     │
+   │ happen │       │  happened" │
+   └────────┘       └────────────┘
+       │                  │
+       ↓                  ↓
+   ┌─────────────────────────┐
+   │  VICTIM: "Did I imagine │
+   │   it? Am I crazy?"      │
+   └─────────────────────────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "I never said that. You're imagining things again."</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">😱</span>
+            <span class="fallacy-code">FEAR</span>
+          </div>
+          <div class="fallacy-name">Appeal to Fear</div>
+          <p class="fallacy-desc">Using fear to persuade rather than presenting logical arguments.</p>
+          <div class="ascii-art">
+   LOGICAL ARGUMENT
+        │
+        X (skipped)
+        
+   INSTEAD:
+   ┌─────────────────────┐
+   │  😱 SCARY SCENARIO  │
+   │                     │
+   │  "If you don't do   │
+   │   X, then DOOM!"    │
+   │                     │
+   │  👻💀☠️🔥           │
+   └─────────────────────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "If we don't pass this law, your children will be in danger!"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">💔</span>
+            <span class="fallacy-code">EMOT</span>
+          </div>
+          <div class="fallacy-name">Appeal to Emotion</div>
+          <p class="fallacy-desc">Using emotional manipulation instead of logical reasoning.</p>
+          <div class="ascii-art">
+   LOGIC        EMOTION
+   ┌────┐      ┌─────────┐
+   │📊📈│  <<  │ 😢😭💔  │
+   └────┘      └─────────┘
+     │              │
+     X              ✓
+     │              │
+     └──────────────┘
+            │
+            ↓
+   "Forget facts, feel this!"
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Think of the children!" (without relevant evidence)</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎰</span>
+            <span class="fallacy-code">GAMB</span>
+          </div>
+          <div class="fallacy-name">Gambler's Fallacy</div>
+          <p class="fallacy-desc">Believing past random events affect future random events.</p>
+          <div class="ascii-art">
+   COIN FLIPS:
+   
+   🪙 H H H H H H H H H
+   
+   "It's been heads 9 times!"
+   
+   FALLACY THINKING:
+   ╔═══════════════════════╗
+   ║ "Tails is DUE!        ║
+   ║  Next MUST be tails!" ║
+   ╚═══════════════════════╝
+   
+   REALITY: Still 50/50
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "I've lost 10 times in a row—I'm bound to win next!"</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🪞</span>
+            <span class="fallacy-code">PROJ</span>
+          </div>
+          <div class="fallacy-name">Projection</div>
+          <p class="fallacy-desc">Accusing others of the very behavior you yourself exhibit.</p>
+          <div class="ascii-art">
+   PERSON A          PERSON B
+   ┌────────┐       ┌────────┐
+   │ (does  │──────→│ "YOU   │
+   │   X)   │       │ do X!" │
+   └────────┘       └────────┘
+       │                │
+       │                ↓
+       │         ┌────────────┐
+       │         │ (confused, │
+       │         │  doesn't   │
+       └─────────│   do X)    │
+                 └────────────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> A liar accusing everyone else of lying.</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🐑</span>
+            <span class="fallacy-code">BAND</span>
+          </div>
+          <div class="fallacy-name">Bandwagon Effect</div>
+          <p class="fallacy-desc">Pressuring someone to agree because "everyone else" does.</p>
+          <div class="ascii-art">
+   🚌 THE BANDWAGON
+   ┌─────────────────────┐
+   │ 👤👤👤👤👤👤👤👤   │
+   │  "Everyone's doing  │
+   │   it! Jump on!"     │
+   └─────────────────────┘
+            │
+            ↓
+   YOU: 🧍 "I guess I
+         should too?"
+            │
+            ↓
+   (Pressure, not logic)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "Everyone's buying crypto—you should too!"</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORY 6: POLITICAL/DEBATE -->
+  <section class="category-section">
+    <div class="container">
+      <div class="category-header">
+        <span class="category-badge political">🗳️ Political Tactics</span>
+        <h2>Campaign & Debate Tricks</h2>
+        <p>Fallacies commonly seen in political discourse</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📢</span>
+            <span class="fallacy-code">NEGC</span>
+          </div>
+          <div class="fallacy-name">Negative Campaigning</div>
+          <p class="fallacy-desc">Focusing entirely on attacking opponents rather than presenting your own positions.</p>
+          <div class="ascii-art">
+   MY PLATFORM:          OPPONENT:
+   ┌───────────┐        ┌───────────┐
+   │    ???    │        │ 💥ATTACK! │
+   │  (empty)  │        │ 💥ATTACK! │
+   │           │        │ 💥ATTACK! │
+   └───────────┘        └───────────┘
+        │                     │
+        │    "Vote for me     │
+        │    because THEY     │
+        └────── are BAD!" ────┘
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> An entire campaign ad that only attacks, with no policy positions.</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🃏</span>
+            <span class="fallacy-code">CARD</span>
+          </div>
+          <div class="fallacy-name">Playing a Card</div>
+          <p class="fallacy-desc">Invoking identity categories to deflect criticism or shut down debate.</p>
+          <div class="ascii-art">
+   CRITICISM OF IDEA
+          │
+          ↓
+   ┌─────────────────────┐
+   │ "You only say that  │
+   │  because I'm [X]!"  │
+   └─────────────────────┘
+          │
+          ↓
+   ╔═══════════════════╗
+   ║ DEBATE SHUT DOWN  ║
+   ║ (no engagement    ║
+   ║  with actual idea)║
+   ╚═══════════════════╝
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> "You only disagree because of my [identity]!" (when that's not the reason)</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">📜</span>
+            <span class="fallacy-code">REPU</span>
+          </div>
+          <div class="fallacy-name">Reputation Attack</div>
+          <p class="fallacy-desc">Focusing on damaging someone's reputation rather than addressing their arguments.</p>
+          <div class="ascii-art">
+   TARGET'S ARGUMENT
+        │
+        X (ignored)
+        
+   INSTEAD:
+   ┌─────────────────────┐
+   │  DIG UP DIRT:       │
+   │  • Past mistakes    │
+   │  • Rumors           │
+   │  • Out-of-context   │
+   │    quotes           │
+   └─────────────────────┘
+        │
+        ↓
+   "Reputation destroyed!"
+   (Argument? What argument?)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> Bringing up an opponent's divorce during a policy debate.</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎪</span>
+            <span class="fallacy-code">SPCT</span>
+          </div>
+          <div class="fallacy-name">Appeal to Spectacle</div>
+          <p class="fallacy-desc">Using dramatic presentation to distract from weak arguments.</p>
+          <div class="ascii-art">
+   WEAK ARGUMENT
+        │
+        ↓
+   ┌─────────────────────┐
+   │  ✨ SPECTACLE ✨    │
+   │   🎆 DRAMA 🎆      │
+   │   💥 EMOTION 💥    │
+   │   🔥 OUTRAGE 🔥    │
+   └─────────────────────┘
+        │
+        ↓
+   AUDIENCE: "Wow! So
+    compelling!"
+   
+   (Logic? None needed!)
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> Slamming the table and yelling to make a weak point seem strong.</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🤫</span>
+            <span class="fallacy-code">SILC</span>
+          </div>
+          <div class="fallacy-name">Silencing Tactic</div>
+          <p class="fallacy-desc">Attempting to prevent someone from speaking rather than rebutting their points.</p>
+          <div class="ascii-art">
+   OPPONENT SPEAKING:
+   ┌─────────────────────┐
+   │ "My argument is..." │
+   └─────────────────────┘
+            │
+   ╔════════╧════════╗
+   ║ 🔇 INTERRUPT!   ║
+   ║ 🔇 TALK OVER!   ║
+   ║ 🔇 "YOU CAN'T   ║
+   ║    SAY THAT!"   ║
+   ╚═════════════════╝
+            │
+            ↓
+   Argument never heard
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> Constantly interrupting so the opponent can never complete a thought.</div>
+        </div>
+
+        <div class="fallacy-card">
+          <div class="fallacy-header">
+            <span class="fallacy-icon">🎭</span>
+            <span class="fallacy-code">VIRT</span>
+          </div>
+          <div class="fallacy-name">Virtue Signaling</div>
+          <p class="fallacy-desc">Expressing moral positions primarily for social approval rather than genuine belief.</p>
+          <div class="ascii-art">
+   PUBLIC STATEMENT
+   ┌─────────────────────┐
+   │ "I support [cause]!"│
+   └─────────────────────┘
+            │
+      ┌─────┴─────┐
+      ↓           ↓
+   ACTIONS     ACTIONS
+   MATCH?      DON'T
+    ✓           ✗
+    │           │
+    │           └─→ VIRTUE
+   GENUINE         SIGNALING
+</div>
+          <div class="fallacy-example"><strong>Example:</strong> Publicly supporting causes for likes while privately doing the opposite.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SCORING -->
   <section class="scoring">
     <div class="container">
       <div class="section-header">
@@ -484,6 +1394,10 @@
           <span class="scoring-points">x1.5</span>
         </div>
         <div class="scoring-row">
+          <span class="scoring-action">Submit approved example</span>
+          <span class="scoring-points">+100 pts</span>
+        </div>
+        <div class="scoring-row">
           <span class="scoring-action">Wrong identification</span>
           <span class="scoring-points negative">-5 pts</span>
         </div>
@@ -491,11 +1405,15 @@
     </div>
   </section>
 
+  <!-- CTA -->
   <section class="cta">
     <div class="container">
       <h2>Ready to Think Critically?</h2>
       <p>Join the waitlist to be notified when Fallacy Spotter launches. Train your mind, spot the tricks, seek the truth.</p>
-      <a href="index.html#contact" class="btn btn-primary btn-lg">Join the Waitlist</a>
+      <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <a href="index.html#contact" class="btn btn-primary">Join the Waitlist</a>
+        <a href="https://www.youtube.com/playlist?list=PLtKNX4SfKpzX_bhh4LOEWEGy3pkLmFDmk" target="_blank" class="btn btn-secondary">📺 Watch Truthopedia</a>
+      </div>
     </div>
   </section>
 
