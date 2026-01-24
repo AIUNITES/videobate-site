@@ -5,6 +5,76 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 4: User Login & Admin Panel (January 23, 2026)
+
+### New Files Created
+
+#### login.html - User Authentication
+- Sign In / Create Account tabs
+- Form validation
+- Password toggle visibility
+- Social login buttons (placeholder)
+- "Continue as Guest" option
+- First user automatically becomes admin
+- Demo admin: `admin` / `admin123`
+
+#### profile.html - User Dashboard
+- Profile header with avatar & badges
+- Stats grid: Score, Games, Accuracy, Streak
+- All badges (earned + locked)
+- Leaderboard preview
+- Recent games history
+- Quick actions (Play, Study, Admin)
+
+#### admin.html - Admin Panel
+- Sidebar navigation
+- Dashboard with stats overview
+- User management (CRUD)
+- Question bank management
+- Fallacy database overview
+- Reports & analytics
+- Add User / Add Question modals
+
+#### leaderboard.html - Global Rankings
+- Animated podium for top 3
+- Full ranked list
+- Sort by: Score, Accuracy, Games
+- Current user highlighted
+- Guest-friendly view
+
+### Updated Files
+- **quiz.html** - Integrated with user system
+  - Saves scores to user profile
+  - Tracks game history
+  - Auto-awards badges
+  - Works in guest mode too
+
+### User System Features
+- LocalStorage-based authentication
+- Role-based access (user/admin)
+- Persistent stats tracking
+- Badge earning system
+- Game history
+- Profile customization
+
+### Badge System (12 badges)
+| Badge | Requirement |
+|-------|-------------|
+| 🏆 Perfect Score | 100% on a quiz |
+| 🔥 Hot Streak | 5+ correct in a row |
+| ⚡ On Fire | 10+ correct in a row |
+| 🎮 Regular Player | Play 10 games |
+| 🎯 Dedicated | Play 50 games |
+| 💎 Diamond | Earn 1000 points |
+| 👑 Champion | Earn 5000 points |
+| 🎯 Sharp Eye | 80%+ accuracy |
+| 🧠 Quiz Master | Master all categories |
+| ⏱️ Speedster | Win 5 timed games |
+| 💀 Survivor | 100+ in survival |
+| 👨‍🏫 Teacher | Share score 5 times |
+
+---
+
 ## Session 3: Interactive Quiz + More Fallacies (January 23, 2026)
 
 ### New Files Created

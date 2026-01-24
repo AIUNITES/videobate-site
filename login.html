@@ -18,6 +18,7 @@
       --accent-cyan: #00d4ff;
       --accent-green: #22c55e;
       --accent-purple: #8b5cf6;
+      --accent-orange: #f97316;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,6 +53,8 @@
       align-items: center;
       justify-content: center;
       padding: 40px 20px;
+      gap: 40px;
+      flex-wrap: wrap;
     }
     
     .auth-container {
@@ -280,6 +283,65 @@
     }
     .message.show { display: block; }
     
+    /* Demo Credentials Box */
+    .demo-box {
+      background: rgba(255,215,0,0.1);
+      border: 1px solid rgba(255,215,0,0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+    .demo-box h3 {
+      color: var(--accent-gold);
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .demo-creds {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .demo-cred {
+      background: var(--bg-dark);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+    .demo-cred .label {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .demo-cred .value {
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+    .demo-box .note {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    .demo-fill-btn {
+      margin-top: 12px;
+      width: 100%;
+      padding: 10px;
+      background: var(--accent-gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .demo-fill-btn:hover {
+      background: #ffed4a;
+    }
+    
     /* Footer Links */
     .auth-footer {
       text-align: center;
@@ -310,10 +372,104 @@
       color: var(--accent-gold);
     }
     
+    /* Info Panel (Changelog) */
+    .info-panel {
+      width: 100%;
+      max-width: 380px;
+    }
+    .info-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid rgba(255,255,255,0.05);
+      margin-bottom: 20px;
+    }
+    .info-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .info-card ul {
+      list-style: none;
+    }
+    .info-card li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .info-card li:last-child {
+      border-bottom: none;
+    }
+    .info-card li .version {
+      color: var(--accent-cyan);
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .info-card li .date {
+      color: #666;
+      font-size: 0.8rem;
+      float: right;
+    }
+    
+    /* Storage Info */
+    .storage-info {
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      font-size: 0.85rem;
+    }
+    .storage-info h4 {
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+    .storage-info p {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .storage-info code {
+      background: var(--bg-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    
+    /* Features List */
+    .features-list {
+      display: grid;
+      gap: 10px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: var(--bg-dark);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .feature-item .icon {
+      font-size: 1.2rem;
+    }
+    
     /* Responsive */
+    @media (max-width: 900px) {
+      .main {
+        flex-direction: column;
+      }
+      .info-panel {
+        max-width: 420px;
+        order: 2;
+      }
+    }
     @media (max-width: 480px) {
       .auth-card { padding: 30px 20px; }
       .form-row { flex-direction: column; gap: 0; }
+      .demo-creds { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -324,12 +480,101 @@
   </header>
 
   <main class="main">
+    
+    <!-- Left: Info Panel -->
+    <div class="info-panel">
+      
+      <!-- Changelog -->
+      <div class="info-card">
+        <h3>📝 Changelog</h3>
+        <ul>
+          <li>
+            <span class="version">v1.3</span> User profiles & leaderboard
+            <span class="date">Jan 23</span>
+          </li>
+          <li>
+            <span class="version">v1.2</span> Interactive quiz with 3 modes
+            <span class="date">Jan 23</span>
+          </li>
+          <li>
+            <span class="version">v1.1</span> 48 fallacies with ASCII art
+            <span class="date">Jan 23</span>
+          </li>
+          <li>
+            <span class="version">v1.0</span> Initial fallacy library
+            <span class="date">Jan 23</span>
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Storage Info -->
+      <div class="info-card">
+        <div class="storage-info">
+          <h4>💾 Browser Storage</h4>
+          <p>Your data is saved locally in your browser using <code>localStorage</code>.</p>
+          <p>This means:</p>
+          <ul style="margin-left: 20px; margin-top: 8px;">
+            <li>✅ No server required</li>
+            <li>✅ Data persists between sessions</li>
+            <li>✅ Private to your device</li>
+            <li>⚠️ Clearing browser data = reset</li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- Features -->
+      <div class="info-card">
+        <h3>✨ Features</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <span class="icon">🏆</span>
+            <span>Track your scores & stats</span>
+          </div>
+          <div class="feature-item">
+            <span class="icon">🏅</span>
+            <span>Earn 12 achievement badges</span>
+          </div>
+          <div class="feature-item">
+            <span class="icon">📊</span>
+            <span>Compete on leaderboards</span>
+          </div>
+          <div class="feature-item">
+            <span class="icon">📝</span>
+            <span>Game history tracking</span>
+          </div>
+          <div class="feature-item">
+            <span class="icon">⚙️</span>
+            <span>Admin panel (for admins)</span>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Right: Auth Form -->
     <div class="auth-container">
       <div class="auth-card">
         <div class="auth-header">
           <div class="icon">🎯</div>
           <h1>Fallacy Spotter</h1>
           <p>Track your progress & compete on leaderboards</p>
+        </div>
+        
+        <!-- Demo Credentials -->
+        <div class="demo-box">
+          <h3>🔑 Demo Account</h3>
+          <div class="demo-creds">
+            <div class="demo-cred">
+              <span class="label">Username</span>
+              <span class="value">admin</span>
+            </div>
+            <div class="demo-cred">
+              <span class="label">Password</span>
+              <span class="value">admin123</span>
+            </div>
+          </div>
+          <button type="button" class="demo-fill-btn" onclick="fillDemoCredentials()">⚡ Fill & Login as Demo Admin</button>
+          <p class="note">💡 First registered user automatically becomes admin</p>
         </div>
         
         <div class="auth-tabs">
@@ -357,19 +602,11 @@
           <a href="#" class="forgot-link">Forgot password?</a>
           
           <div class="form-checkbox">
-            <input type="checkbox" id="rememberMe">
-            <label for="rememberMe">Remember me for 30 days</label>
+            <input type="checkbox" id="rememberMe" checked>
+            <label for="rememberMe">Remember me (save to browser)</label>
           </div>
           
           <button type="submit" class="btn btn-primary">Sign In</button>
-          
-          <div class="divider"><span>or continue with</span></div>
-          
-          <div class="social-login">
-            <button type="button" class="social-btn" title="Google">🔵</button>
-            <button type="button" class="social-btn" title="GitHub">⚫</button>
-            <button type="button" class="social-btn" title="Discord">🟣</button>
-          </div>
         </form>
         
         <!-- REGISTER FORM -->
@@ -417,18 +654,10 @@
           </div>
           
           <button type="submit" class="btn btn-primary">Create Account</button>
-          
-          <div class="divider"><span>or sign up with</span></div>
-          
-          <div class="social-login">
-            <button type="button" class="social-btn" title="Google">🔵</button>
-            <button type="button" class="social-btn" title="GitHub">⚫</button>
-            <button type="button" class="social-btn" title="Discord">🟣</button>
-          </div>
         </form>
         
         <div class="guest-mode">
-          <a href="quiz.html">Continue as Guest →</a>
+          <a href="quiz.html">👤 Continue as Guest (no saving) →</a>
         </div>
         
         <div class="auth-footer">
@@ -438,6 +667,7 @@
         </div>
       </div>
     </div>
+    
   </main>
 
 <script>
@@ -503,6 +733,17 @@ function logout() {
   window.location.reload();
 }
 
+// ========== DEMO CREDENTIALS ==========
+function fillDemoCredentials() {
+  document.getElementById('loginEmail').value = 'admin';
+  document.getElementById('loginPassword').value = 'admin123';
+  
+  // Auto submit
+  setTimeout(() => {
+    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+  }, 300);
+}
+
 // ========== LOGIN ==========
 document.getElementById('loginForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -518,12 +759,12 @@ document.getElementById('loginForm').addEventListener('submit', (e) => {
   
   if (user) {
     setCurrentUser(user);
-    showMessage('Login successful! Redirecting...', 'success');
+    showMessage('✅ Login successful! Redirecting...', 'success');
     setTimeout(() => {
       window.location.href = 'profile.html';
     }, 1000);
   } else {
-    showMessage('Invalid email/username or password', 'error');
+    showMessage('❌ Invalid email/username or password', 'error');
   }
 });
 
@@ -540,12 +781,12 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
   
   // Validation
   if (password !== confirmPassword) {
-    showMessage('Passwords do not match', 'error');
+    showMessage('❌ Passwords do not match', 'error');
     return;
   }
   
   if (password.length < 8) {
-    showMessage('Password must be at least 8 characters', 'error');
+    showMessage('❌ Password must be at least 8 characters', 'error');
     return;
   }
   
@@ -553,12 +794,12 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
   
   // Check if username or email exists
   if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-    showMessage('Username already taken', 'error');
+    showMessage('❌ Username already taken', 'error');
     return;
   }
   
   if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    showMessage('Email already registered', 'error');
+    showMessage('❌ Email already registered', 'error');
     return;
   }
   
@@ -586,10 +827,11 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
   saveUsers(users);
   setCurrentUser(newUser);
   
-  showMessage('Account created! Redirecting...', 'success');
+  const roleMsg = newUser.role === 'admin' ? ' You are the first user, so you\'re now Admin!' : '';
+  showMessage('✅ Account created!' + roleMsg + ' Redirecting...', 'success');
   setTimeout(() => {
     window.location.href = 'profile.html';
-  }, 1000);
+  }, 1500);
 });
 
 // ========== CHECK IF ALREADY LOGGED IN ==========
@@ -598,14 +840,14 @@ if (currentUser) {
   window.location.href = 'profile.html';
 }
 
-// ========== DEMO: Create admin user if none exists ==========
+// ========== ENSURE DEMO ADMIN EXISTS ==========
 const users = getUsers();
 if (users.length === 0) {
   // Create default admin
   const adminUser = {
     id: 1,
-    firstName: 'Admin',
-    lastName: 'User',
+    firstName: 'Demo',
+    lastName: 'Admin',
     username: 'admin',
     email: 'admin@videobate.com',
     password: 'admin123', // Demo only!
@@ -617,11 +859,62 @@ if (users.length === 0) {
       correctAnswers: 400,
       wrongAnswers: 50,
       bestStreak: 15,
-      badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👨‍🏫 Quiz Master']
+      badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👑 Champion']
     }
   };
-  saveUsers([adminUser]);
-  console.log('Demo admin created: admin / admin123');
+  
+  // Create some demo users for leaderboard
+  const demoUsers = [
+    adminUser,
+    {
+      id: 2,
+      firstName: 'Sarah',
+      lastName: 'Logic',
+      username: 'sarahlogic',
+      email: 'sarah@example.com',
+      password: 'password123',
+      createdAt: new Date(Date.now() - 86400000).toISOString(),
+      role: 'user',
+      stats: { totalScore: 3200, gamesPlayed: 35, correctAnswers: 280, wrongAnswers: 70, bestStreak: 12, badges: ['🔥 Hot Streak', '🎮 Regular Player'] }
+    },
+    {
+      id: 3,
+      firstName: 'Mike',
+      lastName: 'Reason',
+      username: 'mikereason',
+      email: 'mike@example.com',
+      password: 'password123',
+      createdAt: new Date(Date.now() - 172800000).toISOString(),
+      role: 'user',
+      stats: { totalScore: 2100, gamesPlayed: 25, correctAnswers: 180, wrongAnswers: 70, bestStreak: 8, badges: ['🎮 Regular Player'] }
+    },
+    {
+      id: 4,
+      firstName: 'Emma',
+      lastName: 'Truth',
+      username: 'emmatruth',
+      email: 'emma@example.com',
+      password: 'password123',
+      createdAt: new Date(Date.now() - 259200000).toISOString(),
+      role: 'user',
+      stats: { totalScore: 1500, gamesPlayed: 18, correctAnswers: 140, wrongAnswers: 40, bestStreak: 10, badges: ['🎯 Sharp Eye'] }
+    },
+    {
+      id: 5,
+      firstName: 'Alex',
+      lastName: 'Skeptic',
+      username: 'alexskeptic',
+      email: 'alex@example.com',
+      password: 'password123',
+      createdAt: new Date(Date.now() - 345600000).toISOString(),
+      role: 'user',
+      stats: { totalScore: 800, gamesPlayed: 10, correctAnswers: 75, wrongAnswers: 25, bestStreak: 6, badges: [] }
+    }
+  ];
+  
+  saveUsers(demoUsers);
+  console.log('✅ Demo users created!');
+  console.log('🔑 Admin login: admin / admin123');
 }
 </script>
 

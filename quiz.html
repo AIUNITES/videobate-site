@@ -532,6 +532,74 @@
   <div class="timer" id="timer" style="display:none">⏱️ <span id="timerValue">30</span>s</div>
 
 <script>
+// ========== USER SYSTEM INTEGRATION ==========
+function getUsers() {
+  return JSON.parse(localStorage.getItem('fallacySpotter_users') || '[]');
+}
+
+function saveUsers(users) {
+  localStorage.setItem('fallacySpotter_users', JSON.stringify(users));
+}
+
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('fallacySpotter_currentUser') || 'null');
+}
+
+function setCurrentUser(user) {
+  localStorage.setItem('fallacySpotter_currentUser', JSON.stringify(user));
+}
+
+function saveGameResults() {
+  const user = getCurrentUser();
+  if (!user) return; // Guest mode - don't save
+  
+  // Update user stats
+  user.stats.totalScore += state.score;
+  user.stats.gamesPlayed += 1;
+  user.stats.correctAnswers += state.correct;
+  user.stats.wrongAnswers += state.wrong;
+  if (state.maxStreak > user.stats.bestStreak) {
+    user.stats.bestStreak = state.maxStreak;
+  }
+  
+  // Check for badges
+  const percent = state.correct / state.questions.length;
+  if (percent === 1 && !user.stats.badges.includes('🏆 Perfect Score')) {
+    user.stats.badges.push('🏆 Perfect Score');
+  }
+  if (state.maxStreak >= 5 && !user.stats.badges.includes('🔥 Hot Streak')) {
+    user.stats.badges.push('🔥 Hot Streak');
+  }
+  if (user.stats.gamesPlayed >= 10 && !user.stats.badges.includes('🎮 Regular Player')) {
+    user.stats.badges.push('🎮 Regular Player');
+  }
+  if (user.stats.totalScore >= 1000 && !user.stats.badges.includes('💎 Diamond')) {
+    user.stats.badges.push('💎 Diamond');
+  }
+  
+  // Save to users array
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.id === user.id);
+  if (userIndex >= 0) {
+    users[userIndex] = user;
+    saveUsers(users);
+  }
+  
+  // Update current user
+  setCurrentUser(user);
+  
+  // Save game history
+  const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + user.id) || '[]');
+  games.unshift({
+    date: new Date().toISOString(),
+    mode: state.mode,
+    score: state.score,
+    correct: state.correct,
+    total: state.questions.length
+  });
+  localStorage.setItem('fallacySpotter_games_' + user.id, JSON.stringify(games.slice(0, 20)));
+}
+
 // ========== QUESTION DATABASE ==========
 const questions = [
   // EASY QUESTIONS
@@ -1148,6 +1216,9 @@ function showResults() {
   document.getElementById('badges').innerHTML = badges.map(b => 
     `<span class="badge-item">${b}</span>`
   ).join('');
+  
+  // Save game results if logged in
+  saveGameResults();
 }
 
 // Timer functions
