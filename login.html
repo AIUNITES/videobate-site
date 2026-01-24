@@ -34,8 +34,10 @@
     
     /* Header */
     .header {
-      padding: 20px;
-      text-align: center;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .logo {
@@ -45,62 +47,86 @@
       text-decoration: none;
     }
     .logo span { color: var(--text-primary); }
+    .header-links {
+      display: flex;
+      gap: 20px;
+    }
+    .header-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .header-links a:hover { color: var(--accent-cyan); }
     
-    /* Main Container */
+    /* Demo Banner */
+    .demo-banner {
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .demo-banner a {
+      color: white;
+      text-decoration: underline;
+    }
+    
+    /* Main Layout */
     .main {
       flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      gap: 40px;
-      flex-wrap: wrap;
+      padding: 30px 20px;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
     
-    .auth-container {
-      width: 100%;
+    /* Left Column - Auth */
+    .auth-column {
+      flex: 1;
       max-width: 420px;
     }
     
     .auth-card {
       background: var(--bg-card);
       border-radius: 20px;
-      padding: 40px;
+      padding: 35px;
       border: 1px solid rgba(255,255,255,0.05);
     }
     
     .auth-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
     .auth-header .icon {
-      font-size: 3rem;
-      margin-bottom: 15px;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
     }
     .auth-header h1 {
-      font-size: 1.8rem;
-      margin-bottom: 8px;
+      font-size: 1.6rem;
+      margin-bottom: 5px;
     }
     .auth-header p {
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
     
     /* Tabs */
     .auth-tabs {
       display: flex;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       background: var(--bg-dark);
       border-radius: 10px;
       padding: 4px;
     }
     .auth-tab {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       border: none;
       background: transparent;
       color: var(--text-secondary);
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       border-radius: 8px;
@@ -110,35 +136,26 @@
       background: var(--accent-purple);
       color: white;
     }
-    .auth-tab:hover:not(.active) {
-      color: var(--text-primary);
-    }
     
     /* Forms */
-    .auth-form {
-      display: none;
-    }
-    .auth-form.active {
-      display: block;
-    }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
     
-    .form-group {
-      margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 18px; }
     .form-label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
       color: var(--text-secondary);
     }
     .form-input {
       width: 100%;
-      padding: 14px 16px;
+      padding: 12px 14px;
       background: var(--bg-input);
       border: 2px solid transparent;
-      border-radius: 10px;
+      border-radius: 8px;
       color: var(--text-primary);
-      font-size: 1rem;
+      font-size: 0.95rem;
       transition: all 0.3s;
     }
     .form-input:focus {
@@ -146,46 +163,36 @@
       border-color: var(--accent-purple);
       background: var(--bg-dark);
     }
-    .form-input::placeholder {
-      color: #666;
-    }
     
-    .form-row {
-      display: flex;
-      gap: 15px;
-    }
-    .form-row .form-group {
-      flex: 1;
-    }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
     
-    .password-toggle {
-      position: relative;
-    }
+    .password-toggle { position: relative; }
     .password-toggle .toggle-btn {
       position: absolute;
-      right: 14px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
       border: none;
       color: var(--text-secondary);
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
     
     .form-checkbox {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 18px;
     }
     .form-checkbox input {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       accent-color: var(--accent-purple);
     }
     .form-checkbox label {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--text-secondary);
     }
     .form-checkbox a {
@@ -195,10 +202,10 @@
     
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
-      border-radius: 10px;
-      font-size: 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s;
@@ -209,66 +216,39 @@
     }
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(139,92,246,0.3);
+      box-shadow: 0 8px 25px rgba(139,92,246,0.3);
     }
     
     .divider {
       display: flex;
       align-items: center;
-      margin: 25px 0;
+      margin: 20px 0;
       color: var(--text-secondary);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
-    .divider::before,
-    .divider::after {
+    .divider::before, .divider::after {
       content: '';
       flex: 1;
       height: 1px;
       background: rgba(255,255,255,0.1);
     }
-    .divider span {
-      padding: 0 15px;
-    }
-    
-    .social-login {
-      display: flex;
-      gap: 12px;
-    }
-    .social-btn {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: var(--bg-dark);
-      border-radius: 10px;
-      color: var(--text-primary);
-      font-size: 1.3rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .social-btn:hover {
-      border-color: var(--accent-purple);
-      background: var(--bg-input);
-    }
+    .divider span { padding: 0 12px; }
     
     .forgot-link {
       display: block;
       text-align: right;
       margin-top: -10px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       color: var(--accent-cyan);
       text-decoration: none;
-      font-size: 0.9rem;
-    }
-    .forgot-link:hover {
-      text-decoration: underline;
+      font-size: 0.85rem;
     }
     
-    /* Error/Success Messages */
     .message {
-      padding: 12px 16px;
+      padding: 10px 14px;
       border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
+      margin-bottom: 18px;
+      font-size: 0.85rem;
       display: none;
     }
     .message.error {
@@ -283,106 +263,19 @@
     }
     .message.show { display: block; }
     
-    /* Demo Credentials Box */
-    .demo-box {
-      background: rgba(255,215,0,0.1);
-      border: 1px solid rgba(255,215,0,0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-    .demo-box h3 {
-      color: var(--accent-gold);
-      font-size: 0.95rem;
-      margin-bottom: 12px;
+    /* Right Column - Demo & Info */
+    .info-column {
+      flex: 1;
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .demo-creds {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .demo-cred {
-      background: var(--bg-dark);
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 0.9rem;
-    }
-    .demo-cred .label {
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      display: block;
-      margin-bottom: 4px;
-    }
-    .demo-cred .value {
-      color: var(--accent-cyan);
-      font-weight: 700;
-    }
-    .demo-box .note {
-      margin-top: 12px;
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-    .demo-fill-btn {
-      margin-top: 12px;
-      width: 100%;
-      padding: 10px;
-      background: var(--accent-gold);
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .demo-fill-btn:hover {
-      background: #ffed4a;
+      flex-direction: column;
+      gap: 20px;
     }
     
-    /* Footer Links */
-    .auth-footer {
-      text-align: center;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-    .auth-footer a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.9rem;
-      margin: 0 10px;
-    }
-    .auth-footer a:hover {
-      color: var(--accent-cyan);
-    }
-    
-    /* Guest Mode */
-    .guest-mode {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .guest-mode a {
-      color: var(--text-secondary);
-      text-decoration: none;
-    }
-    .guest-mode a:hover {
-      color: var(--accent-gold);
-    }
-    
-    /* Info Panel (Changelog) */
-    .info-panel {
-      width: 100%;
-      max-width: 380px;
-    }
     .info-card {
       background: var(--bg-card);
       border-radius: 16px;
       padding: 25px;
       border: 1px solid rgba(255,255,255,0.05);
-      margin-bottom: 20px;
     }
     .info-card h3 {
       font-size: 1.1rem;
@@ -391,190 +284,181 @@
       align-items: center;
       gap: 8px;
     }
-    .info-card ul {
-      list-style: none;
+    
+    /* Demo Login */
+    .demo-card {
+      border: 1px solid var(--accent-gold);
+      background: rgba(255,215,0,0.05);
     }
-    .info-card li {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 0.9rem;
+    .demo-card h3 { color: var(--accent-gold); }
+    
+    .demo-accounts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .demo-account {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      background: var(--bg-dark);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .demo-account-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .demo-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .demo-avatar.admin { background: var(--accent-red); }
+    .demo-avatar.user { background: var(--accent-purple); }
+    .demo-name { font-weight: 600; font-size: 0.9rem; }
+    .demo-role {
+      font-size: 0.75rem;
       color: var(--text-secondary);
     }
-    .info-card li:last-child {
-      border-bottom: none;
-    }
-    .info-card li .version {
-      color: var(--accent-cyan);
+    .demo-btn {
+      padding: 8px 16px;
+      background: var(--accent-gold);
+      color: #000;
+      border: none;
+      border-radius: 6px;
       font-weight: 600;
-      margin-right: 8px;
-    }
-    .info-card li .date {
-      color: #666;
       font-size: 0.8rem;
-      float: right;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .demo-btn:hover {
+      background: #ffed4a;
+      transform: translateY(-1px);
     }
     
     /* Storage Info */
     .storage-info {
-      background: rgba(0,212,255,0.1);
-      border: 1px solid rgba(0,212,255,0.3);
-      border-radius: 12px;
-      padding: 15px;
       font-size: 0.85rem;
-    }
-    .storage-info h4 {
-      color: var(--accent-cyan);
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-    }
-    .storage-info p {
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      line-height: 1.6;
     }
     .storage-info code {
       background: var(--bg-dark);
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 0.8rem;
+      color: var(--accent-cyan);
     }
+    .storage-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .storage-item:last-child { border-bottom: none; }
+    .storage-key { color: var(--accent-cyan); }
+    .storage-desc { color: var(--text-secondary); }
     
-    /* Features List */
-    .features-list {
-      display: grid;
-      gap: 10px;
+    /* Changelog */
+    .changelog-list {
+      max-height: 200px;
+      overflow-y: auto;
     }
-    .feature-item {
+    .changelog-item {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .changelog-item:last-child { border-bottom: none; }
+    .changelog-version {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px;
-      background: var(--bg-dark);
-      border-radius: 8px;
-      font-size: 0.9rem;
+      margin-bottom: 6px;
     }
-    .feature-item .icon {
-      font-size: 1.2rem;
+    .version-tag {
+      background: var(--accent-purple);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .version-date {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+    }
+    .changelog-text {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .changelog-text ul {
+      margin-left: 20px;
+      margin-top: 5px;
+    }
+    
+    /* Clear Data */
+    .clear-data-btn {
+      background: rgba(239,68,68,0.2);
+      color: var(--accent-red);
+      border: 1px solid var(--accent-red);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s;
+      width: 100%;
+    }
+    .clear-data-btn:hover {
+      background: var(--accent-red);
+      color: white;
     }
     
     /* Responsive */
     @media (max-width: 900px) {
-      .main {
-        flex-direction: column;
-      }
-      .info-panel {
-        max-width: 420px;
-        order: 2;
-      }
+      .main { flex-direction: column; }
+      .auth-column { max-width: 100%; }
     }
     @media (max-width: 480px) {
-      .auth-card { padding: 30px 20px; }
+      .auth-card { padding: 25px 20px; }
       .form-row { flex-direction: column; gap: 0; }
-      .demo-creds { grid-template-columns: 1fr; }
+      .header-links { display: none; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Demo Banner -->
+  <div class="demo-banner">
+    🎮 <strong>Demo Mode</strong> — All data saved to browser localStorage. <a href="#storage">Learn more</a>
+  </div>
+
   <header class="header">
     <a href="index.html" class="logo">🎬 Video<span>Bate</span></a>
+    <div class="header-links">
+      <a href="fallacies.html">📚 Learn Fallacies</a>
+      <a href="quiz.html">🎮 Play Quiz</a>
+      <a href="leaderboard.html">🏆 Leaderboard</a>
+    </div>
   </header>
 
   <main class="main">
     
-    <!-- Left: Info Panel -->
-    <div class="info-panel">
-      
-      <!-- Changelog -->
-      <div class="info-card">
-        <h3>📝 Changelog</h3>
-        <ul>
-          <li>
-            <span class="version">v1.3</span> User profiles & leaderboard
-            <span class="date">Jan 23</span>
-          </li>
-          <li>
-            <span class="version">v1.2</span> Interactive quiz with 3 modes
-            <span class="date">Jan 23</span>
-          </li>
-          <li>
-            <span class="version">v1.1</span> 48 fallacies with ASCII art
-            <span class="date">Jan 23</span>
-          </li>
-          <li>
-            <span class="version">v1.0</span> Initial fallacy library
-            <span class="date">Jan 23</span>
-          </li>
-        </ul>
-      </div>
-      
-      <!-- Storage Info -->
-      <div class="info-card">
-        <div class="storage-info">
-          <h4>💾 Browser Storage</h4>
-          <p>Your data is saved locally in your browser using <code>localStorage</code>.</p>
-          <p>This means:</p>
-          <ul style="margin-left: 20px; margin-top: 8px;">
-            <li>✅ No server required</li>
-            <li>✅ Data persists between sessions</li>
-            <li>✅ Private to your device</li>
-            <li>⚠️ Clearing browser data = reset</li>
-          </ul>
-        </div>
-      </div>
-      
-      <!-- Features -->
-      <div class="info-card">
-        <h3>✨ Features</h3>
-        <div class="features-list">
-          <div class="feature-item">
-            <span class="icon">🏆</span>
-            <span>Track your scores & stats</span>
-          </div>
-          <div class="feature-item">
-            <span class="icon">🏅</span>
-            <span>Earn 12 achievement badges</span>
-          </div>
-          <div class="feature-item">
-            <span class="icon">📊</span>
-            <span>Compete on leaderboards</span>
-          </div>
-          <div class="feature-item">
-            <span class="icon">📝</span>
-            <span>Game history tracking</span>
-          </div>
-          <div class="feature-item">
-            <span class="icon">⚙️</span>
-            <span>Admin panel (for admins)</span>
-          </div>
-        </div>
-      </div>
-      
-    </div>
-    
-    <!-- Right: Auth Form -->
-    <div class="auth-container">
+    <!-- Left: Auth Forms -->
+    <div class="auth-column">
       <div class="auth-card">
         <div class="auth-header">
           <div class="icon">🎯</div>
           <h1>Fallacy Spotter</h1>
-          <p>Track your progress & compete on leaderboards</p>
-        </div>
-        
-        <!-- Demo Credentials -->
-        <div class="demo-box">
-          <h3>🔑 Demo Account</h3>
-          <div class="demo-creds">
-            <div class="demo-cred">
-              <span class="label">Username</span>
-              <span class="value">admin</span>
-            </div>
-            <div class="demo-cred">
-              <span class="label">Password</span>
-              <span class="value">admin123</span>
-            </div>
-          </div>
-          <button type="button" class="demo-fill-btn" onclick="fillDemoCredentials()">⚡ Fill & Login as Demo Admin</button>
-          <p class="note">💡 First registered user automatically becomes admin</p>
+          <p>Track progress & compete on leaderboards</p>
         </div>
         
         <div class="auth-tabs">
@@ -588,25 +472,31 @@
         <form class="auth-form active" id="loginForm">
           <div class="form-group">
             <label class="form-label">Email or Username</label>
-            <input type="text" class="form-input" id="loginEmail" placeholder="Enter your email or username" required>
+            <input type="text" class="form-input" id="loginEmail" placeholder="Enter email or username" required>
           </div>
           
           <div class="form-group">
             <label class="form-label">Password</label>
             <div class="password-toggle">
-              <input type="password" class="form-input" id="loginPassword" placeholder="Enter your password" required>
+              <input type="password" class="form-input" id="loginPassword" placeholder="Enter password" required>
               <button type="button" class="toggle-btn" onclick="togglePassword('loginPassword', this)">👁️</button>
             </div>
           </div>
           
-          <a href="#" class="forgot-link">Forgot password?</a>
+          <a href="reset-password.html" class="forgot-link">Forgot password?</a>
           
           <div class="form-checkbox">
             <input type="checkbox" id="rememberMe" checked>
-            <label for="rememberMe">Remember me (save to browser)</label>
+            <label for="rememberMe">Remember me for 30 days</label>
           </div>
           
           <button type="submit" class="btn btn-primary">Sign In</button>
+          
+          <div class="divider"><span>or</span></div>
+          
+          <a href="quiz.html" style="display: block; text-align: center; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">
+            Continue as Guest →
+          </a>
         </form>
         
         <!-- REGISTER FORM -->
@@ -624,7 +514,7 @@
           
           <div class="form-group">
             <label class="form-label">Username</label>
-            <input type="text" class="form-input" id="username" placeholder="Choose a username" required>
+            <input type="text" class="form-input" id="username" placeholder="Choose username" required>
           </div>
           
           <div class="form-group">
@@ -640,50 +530,166 @@
             </div>
           </div>
           
-          <div class="form-group">
-            <label class="form-label">Confirm Password</label>
-            <div class="password-toggle">
-              <input type="password" class="form-input" id="confirmPassword" placeholder="Confirm your password" required>
-              <button type="button" class="toggle-btn" onclick="togglePassword('confirmPassword', this)">👁️</button>
-            </div>
-          </div>
-          
           <div class="form-checkbox">
             <input type="checkbox" id="agreeTerms" required>
-            <label for="agreeTerms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+            <label for="agreeTerms">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></label>
           </div>
           
           <button type="submit" class="btn btn-primary">Create Account</button>
         </form>
-        
-        <div class="guest-mode">
-          <a href="quiz.html">👤 Continue as Guest (no saving) →</a>
-        </div>
-        
-        <div class="auth-footer">
-          <a href="fallacies.html">Learn Fallacies</a>
-          <a href="quiz.html">Take Quiz</a>
-          <a href="index.html">Home</a>
-        </div>
       </div>
     </div>
     
+    <!-- Right: Demo & Info -->
+    <div class="info-column">
+      
+      <!-- Demo Quick Login -->
+      <div class="info-card demo-card">
+        <h3>⚡ Quick Demo Login</h3>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
+          Try the app instantly with pre-made accounts:
+        </p>
+        <div class="demo-accounts">
+          <div class="demo-account">
+            <div class="demo-account-info">
+              <div class="demo-avatar admin">👑</div>
+              <div>
+                <div class="demo-name">Admin User</div>
+                <div class="demo-role">admin / admin123</div>
+              </div>
+            </div>
+            <button class="demo-btn" onclick="demoLogin('admin', 'admin123')">Login</button>
+          </div>
+          <div class="demo-account">
+            <div class="demo-account-info">
+              <div class="demo-avatar user">SL</div>
+              <div>
+                <div class="demo-name">Sarah Logic</div>
+                <div class="demo-role">sarahlogic / password123</div>
+              </div>
+            </div>
+            <button class="demo-btn" onclick="demoLogin('sarahlogic', 'password123')">Login</button>
+          </div>
+          <div class="demo-account">
+            <div class="demo-account-info">
+              <div class="demo-avatar user">MR</div>
+              <div>
+                <div class="demo-name">Mike Reason</div>
+                <div class="demo-role">mikereason / password123</div>
+              </div>
+            </div>
+            <button class="demo-btn" onclick="demoLogin('mikereason', 'password123')">Login</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Storage Info -->
+      <div class="info-card" id="storage">
+        <h3>💾 Browser Storage</h3>
+        <p class="storage-info" style="margin-bottom: 15px;">
+          All data is saved to your browser's <code>localStorage</code>. Nothing is sent to a server.
+        </p>
+        <div class="storage-item">
+          <span class="storage-key">fallacySpotter_users</span>
+          <span class="storage-desc">All user accounts</span>
+        </div>
+        <div class="storage-item">
+          <span class="storage-key">fallacySpotter_currentUser</span>
+          <span class="storage-desc">Logged in user</span>
+        </div>
+        <div class="storage-item">
+          <span class="storage-key">fallacySpotter_games_[id]</span>
+          <span class="storage-desc">Game history per user</span>
+        </div>
+        <button class="clear-data-btn" onclick="clearAllData()">🗑️ Clear All Data & Reset</button>
+      </div>
+      
+      <!-- Changelog -->
+      <div class="info-card">
+        <h3>📋 Changelog</h3>
+        <div class="changelog-list">
+          <div class="changelog-item">
+            <div class="changelog-version">
+              <span class="version-tag">v1.5.0</span>
+              <span class="version-date">Jan 23, 2026</span>
+            </div>
+            <div class="changelog-text">
+              <ul>
+                <li>Password reset flow (4-step wizard)</li>
+                <li>User settings page with 5 tabs</li>
+                <li>Data export (JSON download)</li>
+                <li>Account deletion option</li>
+              </ul>
+            </div>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-version">
+              <span class="version-tag">v1.4.0</span>
+              <span class="version-date">Jan 23, 2026</span>
+            </div>
+            <div class="changelog-text">
+              <ul>
+                <li>Added user login & registration</li>
+                <li>Admin panel with user management</li>
+                <li>Leaderboard with rankings</li>
+                <li>Profile page with stats & badges</li>
+                <li>Game history tracking</li>
+              </ul>
+            </div>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-version">
+              <span class="version-tag">v1.3.0</span>
+              <span class="version-date">Jan 23, 2026</span>
+            </div>
+            <div class="changelog-text">
+              <ul>
+                <li>Interactive quiz with 20+ questions</li>
+                <li>3 game modes: Practice, Timed, Survival</li>
+                <li>12 new fallacy types added</li>
+              </ul>
+            </div>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-version">
+              <span class="version-tag">v1.2.0</span>
+              <span class="version-date">Jan 23, 2026</span>
+            </div>
+            <div class="changelog-text">
+              <ul>
+                <li>Expanded to 48 fallacy types</li>
+                <li>ASCII art illustrations</li>
+                <li>8 categories with color coding</li>
+              </ul>
+            </div>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-version">
+              <span class="version-tag">v1.0.0</span>
+              <span class="version-date">Jan 22, 2026</span>
+            </div>
+            <div class="changelog-text">
+              <ul>
+                <li>Initial Fallacy Spotter release</li>
+                <li>12 core fallacy types</li>
+                <li>Truthopedia integration</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
   </main>
 
 <script>
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.auth-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    // Update tabs
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    
-    // Update forms
-    const tabName = tab.dataset.tab;
     document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-    document.getElementById(tabName + 'Form').classList.add('active');
-    
-    // Clear message
+    document.getElementById(tab.dataset.tab + 'Form').classList.add('active');
     hideMessage();
   });
 });
@@ -728,20 +734,25 @@ function setCurrentUser(user) {
   localStorage.setItem('fallacySpotter_currentUser', JSON.stringify(user));
 }
 
-function logout() {
-  localStorage.removeItem('fallacySpotter_currentUser');
-  window.location.reload();
+// ========== DEMO LOGIN ==========
+function demoLogin(username, password) {
+  document.getElementById('loginEmail').value = username;
+  document.getElementById('loginPassword').value = password;
+  document.getElementById('loginForm').dispatchEvent(new Event('submit'));
 }
 
-// ========== DEMO CREDENTIALS ==========
-function fillDemoCredentials() {
-  document.getElementById('loginEmail').value = 'admin';
-  document.getElementById('loginPassword').value = 'admin123';
-  
-  // Auto submit
-  setTimeout(() => {
-    document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-  }, 300);
+// ========== CLEAR ALL DATA ==========
+function clearAllData() {
+  if (confirm('⚠️ This will delete ALL users, scores, and game history. Are you sure?')) {
+    // Clear all fallacySpotter keys
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('fallacySpotter_')) {
+        localStorage.removeItem(key);
+      }
+    });
+    showMessage('All data cleared! Reloading...', 'success');
+    setTimeout(() => location.reload(), 1000);
+  }
 }
 
 // ========== LOGIN ==========
@@ -761,8 +772,8 @@ document.getElementById('loginForm').addEventListener('submit', (e) => {
     setCurrentUser(user);
     showMessage('✅ Login successful! Redirecting...', 'success');
     setTimeout(() => {
-      window.location.href = 'profile.html';
-    }, 1000);
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
+    }, 800);
   } else {
     showMessage('❌ Invalid email/username or password', 'error');
   }
@@ -777,42 +788,33 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
   const username = document.getElementById('username').value.trim();
   const email = document.getElementById('registerEmail').value.trim();
   const password = document.getElementById('registerPassword').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
-  
-  // Validation
-  if (password !== confirmPassword) {
-    showMessage('❌ Passwords do not match', 'error');
-    return;
-  }
   
   if (password.length < 8) {
-    showMessage('❌ Password must be at least 8 characters', 'error');
+    showMessage('Password must be at least 8 characters', 'error');
     return;
   }
   
   const users = getUsers();
   
-  // Check if username or email exists
   if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-    showMessage('❌ Username already taken', 'error');
+    showMessage('Username already taken', 'error');
     return;
   }
   
   if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    showMessage('❌ Email already registered', 'error');
+    showMessage('Email already registered', 'error');
     return;
   }
   
-  // Create new user
   const newUser = {
     id: Date.now(),
     firstName,
     lastName,
     username,
     email,
-    password, // Note: In production, this should be hashed!
+    password,
     createdAt: new Date().toISOString(),
-    role: users.length === 0 ? 'admin' : 'user', // First user is admin
+    role: users.length === 0 ? 'admin' : 'user',
     stats: {
       totalScore: 0,
       gamesPlayed: 0,
@@ -827,45 +829,32 @@ document.getElementById('registerForm').addEventListener('submit', (e) => {
   saveUsers(users);
   setCurrentUser(newUser);
   
-  const roleMsg = newUser.role === 'admin' ? ' You are the first user, so you\'re now Admin!' : '';
-  showMessage('✅ Account created!' + roleMsg + ' Redirecting...', 'success');
+  showMessage('✅ Account created! Redirecting...', 'success');
   setTimeout(() => {
     window.location.href = 'profile.html';
-  }, 1500);
+  }, 800);
 });
 
 // ========== CHECK IF ALREADY LOGGED IN ==========
 const currentUser = getCurrentUser();
 if (currentUser) {
-  window.location.href = 'profile.html';
+  window.location.href = currentUser.role === 'admin' ? 'admin.html' : 'profile.html';
 }
 
-// ========== ENSURE DEMO ADMIN EXISTS ==========
-const users = getUsers();
-if (users.length === 0) {
-  // Create default admin
-  const adminUser = {
-    id: 1,
-    firstName: 'Demo',
-    lastName: 'Admin',
-    username: 'admin',
-    email: 'admin@videobate.com',
-    password: 'admin123', // Demo only!
-    createdAt: new Date().toISOString(),
-    role: 'admin',
-    stats: {
-      totalScore: 5000,
-      gamesPlayed: 50,
-      correctAnswers: 400,
-      wrongAnswers: 50,
-      bestStreak: 15,
-      badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👑 Champion']
-    }
-  };
-  
-  // Create some demo users for leaderboard
+// ========== CREATE DEMO USERS IF NONE EXIST ==========
+if (getUsers().length === 0) {
   const demoUsers = [
-    adminUser,
+    {
+      id: 1,
+      firstName: 'Admin',
+      lastName: 'User',
+      username: 'admin',
+      email: 'admin@videobate.com',
+      password: 'admin123',
+      createdAt: new Date().toISOString(),
+      role: 'admin',
+      stats: { totalScore: 5000, gamesPlayed: 50, correctAnswers: 400, wrongAnswers: 50, bestStreak: 15, badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👨‍🏫 Quiz Master'] }
+    },
     {
       id: 2,
       firstName: 'Sarah',
@@ -914,7 +903,8 @@ if (users.length === 0) {
   
   saveUsers(demoUsers);
   console.log('✅ Demo users created!');
-  console.log('🔑 Admin login: admin / admin123');
+  console.log('🔑 Admin: admin / admin123');
+  console.log('👤 Users: sarahlogic, mikereason, emmatruth, alexskeptic / password123');
 }
 </script>
 

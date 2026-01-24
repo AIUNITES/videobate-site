@@ -5,18 +5,86 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 5: Password Reset & User Settings (January 23, 2026)
+
+### New Files Created
+
+#### reset-password.html - Password Recovery Flow
+- **4-Step Wizard:**
+  1. Enter email/username to find account
+  2. Enter verification code (demo: `123456`)
+  3. Set new password
+  4. Success confirmation
+- User avatar preview when account found
+- Demo mode note explaining localStorage simulation
+- Password saved to localStorage on reset
+
+#### settings.html - User Settings Dashboard
+- **5 Settings Tabs:**
+  - 👤 Profile - Edit name, username, email
+  - 🔒 Security - Change password, view sessions
+  - 🎨 Preferences - Game settings, display options
+  - 💾 Data - Export data, reset stats
+  - ⚠️ Danger Zone - Delete account
+
+- **Profile Section:**
+  - Avatar preview (auto-generated from initials)
+  - Edit first/last name, username, email
+  - View account type and member since date
+
+- **Security Section:**
+  - Change password form with validation
+  - Active sessions view
+
+- **Preferences Section:**
+  - Sound effects toggle
+  - Animations toggle
+  - Show explanations toggle
+  - Auto-advance questions toggle
+  - Default game mode selector
+
+- **Data Section:**
+  - Stats summary (score, games, correct, wrong, streak)
+  - Export data as JSON file
+  - Copy data to clipboard
+  - Reset all stats button
+
+- **Danger Zone:**
+  - Delete account (with triple confirmation)
+  - Log out everywhere
+
+### Updated Files
+- **login.html** - "Forgot password?" now links to reset-password.html
+- **profile.html** - Added "⚙️ Settings" button to quick actions
+
+### localStorage Keys Used
+| Key | Purpose |
+|-----|--------|
+| `fallacySpotter_users` | All user accounts |
+| `fallacySpotter_currentUser` | Logged in user |
+| `fallacySpotter_games_[id]` | Game history per user |
+| `fallacySpotter_prefs_[id]` | User preferences |
+
+---
+
 ## Session 4: User Login & Admin Panel (January 23, 2026)
 
 ### New Files Created
 
 #### login.html - User Authentication
 - Sign In / Create Account tabs
-- Form validation
-- Password toggle visibility
-- Social login buttons (placeholder)
+- **Demo Mode Banner** at top of page
+- **Quick Demo Login** buttons for instant access:
+  - Admin: `admin` / `admin123`
+  - Sarah Logic: `sarahlogic` / `password123`
+  - Mike Reason: `mikereason` / `password123`
+- **Browser Storage Info** section showing what's saved
+- **Clear All Data** button to reset everything
+- **Changelog** with version history
+- Form validation & password toggle
 - "Continue as Guest" option
 - First user automatically becomes admin
-- Demo admin: `admin` / `admin123`
+- Auto-creates 5 demo users on first load
 
 #### profile.html - User Dashboard
 - Profile header with avatar & badges
