@@ -1749,6 +1749,61 @@ function renderCloudUsersTable(users) {
   }).join('');
 }
 
+// Load Cloud Scores
+async function loadCloudScores() {
+  const url = localStorage.getItem('fallacySpotter_usersApiUrl');
+  
+  if (!url) {
+    document.getElementById('cloudScoresTable').innerHTML = 
+      '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above first</td></tr>';
+    return;
+  }
+  
+  document.getElementById('cloudScoresTable').innerHTML = 
+    '<tr><td colspan="6" style="text-align: center; color: var(--accent-cyan); padding: 40px;">🔄 Loading...</td></tr>';
+  
+  try {
+    const response = await fetch(url + '?type=scores');
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      renderCloudScoresTable(data);
+    } else {
+      document.getElementById('cloudScoresTable').innerHTML = 
+        '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">No scores found in database</td></tr>';
+    }
+  } catch (err) {
+    document.getElementById('cloudScoresTable').innerHTML = 
+      `<tr><td colspan="6" style="text-align: center; color: var(--accent-red); padding: 40px;">❌ Error: ${err.message}</td></tr>`;
+  }
+}
+
+// Render Cloud Scores Table
+function renderCloudScoresTable(scores) {
+  if (scores.length === 0) {
+    document.getElementById('cloudScoresTable').innerHTML = 
+      '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">No scores in database</td></tr>';
+    return;
+  }
+  
+  // Sort by score descending
+  scores.sort((a, b) => b.score - a.score);
+  
+  document.getElementById('cloudScoresTable').innerHTML = scores.slice(0, 50).map(s => {
+    const timestamp = s.timestamp ? new Date(s.timestamp).toLocaleString() : 'N/A';
+    return `
+      <tr>
+        <td><strong>@${s.username || 'unknown'}</strong></td>
+        <td>${s.displayName || 'N/A'}</td>
+        <td style="color: var(--accent-gold); font-weight: 600;">${s.score}</td>
+        <td>${s.correct}/${s.correct + (s.wrong || 0)}</td>
+        <td><span style="background: var(--bg-dark); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${s.mode || 'practice'}</span></td>
+        <td style="font-size: 0.85rem; color: var(--text-secondary);">${timestamp}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
 // ========== LIVE DATA URL ==========
 
 function saveLiveDataUrl() {
@@ -2118,7 +2173,6 @@ loadGoogleFormConfig();
 loadLiveDataUrl();
 loadGlobalLeaderboard();
 loadUsersApiUrl();
-loadUsersFormConfig();
 </script>
 
 </body>

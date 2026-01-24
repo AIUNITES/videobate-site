@@ -467,11 +467,11 @@ function loadLocalLeaderboard() {
 }
 
 function loadGlobalLeaderboard() {
-  const liveUrl = localStorage.getItem('fallacySpotter_liveDataUrl');
+  const apiUrl = localStorage.getItem('fallacySpotter_usersApiUrl');
   
-  if (liveUrl) {
-    // Fetch live data from Apps Script
-    fetchLiveLeaderboard(liveUrl);
+  if (apiUrl) {
+    // Fetch live data from Apps Script with ?type=scores
+    fetchLiveLeaderboard(apiUrl + '?type=scores');
   } else {
     // Fall back to locally stored CSV data
     loadStoredGlobalLeaderboard();

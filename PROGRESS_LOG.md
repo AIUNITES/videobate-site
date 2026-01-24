@@ -5,114 +5,117 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
-## Session 7: Cloud User Database via Google Forms (January 24, 2026)
+## Session 7: Unified Cloud Database via Single Google Form (January 24, 2026)
 
-### Architecture: Google Forms/Sheets as User Database
+### Key Innovation: Packed Data Format
+
+Instead of creating separate forms for users and scores, we pack all data into the **existing Help/Feedback form's message field** using a delimiter format:
 
 ```
-┌──────────────┐     ┌───────────────┐     ┌─────────────────┐
-│  REGISTRATION  │ ───▶ │  GOOGLE FORM  │ ───▶ │   USERS SHEET   │
-│   (new user)   │     │  (collects)   │     │   (stores all)  │
-└──────────────┘     └───────────────┘     └────────┬────────┘
-                                                   │
-                                                   ▼
-                                            ┌─────────────────┐
-                                            │  APPS SCRIPT    │
-                                            │  (returns JSON) │
-                                            └────────┬────────┘
-                                                   │
-                      ┌────────────────────────────┘
-                      │
-┌──────────────┐◀───┘
-│     LOGIN      │
-│  (fetch users, │
-│   validate)    │
-└──────────────┘
+TYPE|field1|field2|field3|...
 ```
 
-### Dual Mode System
+**User Registration:**
+```
+USER|username|email|password|firstName|lastName|role|createdAt
+```
 
-| Mode | How It Works | When Used |
-|------|-------------|----------|
-| 🟢 **Online** | Users stored in Google Sheets, login fetches from API | When API URL is configured |
-| 🟠 **Offline** | Users stored in browser localStorage | Default / fallback |
+**Quiz Score:**
+```
+SCORE|username|displayName|score|correct|wrong|streak|mode|timestamp
+```
 
-### Files Modified
+### Form Configuration (Hardcoded)
 
-#### login.html - Complete Rewrite
-- **Connection status banner** shows Online/Offline mode
-- **Status card** with live connection indicator
-- **Dual-mode authentication**:
-  - Online: Fetches users from Apps Script API
-  - Offline: Uses localStorage (demo users)
-- **Registration submits to Google Form** when online
-- **Also saves locally** for immediate login
-- Demo card only shown when offline
+| Entry ID | Field | Usage |
+|----------|-------|-------|
+| `entry.904300305` | Email | User's email |
+| `entry.2053726945` | Source | Identifies origin (e.g., "FallacySpotter-Registration") |
+| `entry.1759393763` | Message | **Packed data goes here** |
 
-#### admin.html - New "User Database" Tab
-- **Connection Status card** with test button
-- **API URL config** for reading users
-- **Form URL config** for registration
-- **Entry IDs** for all user fields
-- **Cloud Users table** showing live data
-- **Complete setup guide** with Apps Script code
+**Form URL:** `https://docs.google.com/forms/d/e/1FAIpQLSeQUi49AdTBRjetz5MDFQgMIkm9-vOMb_ARKwYEz41j_Nfiwg/formResponse`
 
-### localStorage Keys Added
-
-| Key | Purpose |
-|-----|--------|
-| `fallacySpotter_usersApiUrl` | Apps Script URL for fetching users |
-| `fallacySpotter_usersFormUrl` | Google Form URL for registration |
-| `fallacySpotter_usersFormEntryIds` | Entry IDs for form fields |
-
-### Google Form Fields for Users
-
-1. Username (Short answer)
-2. Email (Short answer)
-3. Password (Short answer)
-4. First Name (Short answer)
-5. Last Name (Short answer)
-6. Role (Short answer) - defaults to "user"
-7. Created At (Short answer) - ISO timestamp
-
-### Apps Script Code for Users
+### Apps Script (Parses Packed Data)
 
 ```javascript
-function doGet() {
+function doGet(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
   
-  const users = data.slice(1).map(row => {
-    const user = {};
-    headers.forEach((h, i) => {
-      if (h.includes('user') && h.includes('name')) user.username = row[i];
-      else if (h === 'username') user.username = row[i];
-      else if (h === 'email') user.email = row[i];
-      else if (h === 'password') user.password = row[i];
-      else if (h.includes('first')) user.firstName = row[i];
-      else if (h.includes('last')) user.lastName = row[i];
-      else if (h === 'role') user.role = row[i];
-      else if (h.includes('created')) user.createdAt = row[i];
-    });
-    return user;
-  }).filter(u => u.username);
+  // Find the message column (contains packed data)
+  const msgIdx = headers.findIndex(h => h.includes('message') || h.includes('feedback'));
+  
+  const users = [];
+  const scores = [];
+  
+  data.slice(1).forEach(row => {
+    const message = msgIdx >= 0 ? row[msgIdx] : '';
+    if (!message || typeof message !== 'string') return;
+    
+    const parts = message.split('|');
+    const type = parts[0];
+    
+    if (type === 'USER' && parts.length >= 8) {
+      users.push({
+        username: parts[1],
+        email: parts[2],
+        password: parts[3],
+        firstName: parts[4],
+        lastName: parts[5],
+        role: parts[6] || 'user',
+        createdAt: parts[7]
+      });
+    } else if (type === 'SCORE' && parts.length >= 9) {
+      scores.push({
+        username: parts[1],
+        displayName: parts[2],
+        score: parseInt(parts[3]) || 0,
+        correct: parseInt(parts[4]) || 0,
+        wrong: parseInt(parts[5]) || 0,
+        streak: parseInt(parts[6]) || 0,
+        mode: parts[7],
+        timestamp: parts[8]
+      });
+    }
+  });
+  
+  // Return based on ?type= parameter
+  const requestType = e?.parameter?.type || 'users';
+  const result = requestType === 'scores' ? scores : users;
   
   return ContentService
-    .createTextOutput(JSON.stringify(users))
+    .createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
-### Setup Steps
+**API Endpoints:**
+- `?type=users` → Returns user accounts
+- `?type=scores` → Returns quiz scores
 
-1. **Create Google Form** with user fields (Username, Email, Password, etc.)
-2. **Link to Sheet**: Form → Responses → Create spreadsheet
-3. **Add Apps Script**: Extensions → Apps Script → paste code
-4. **Deploy**: Deploy → Web app → Anyone can access
-5. **Get Entry IDs**: Form → Pre-filled link → find entry.XXX values
-6. **Configure in Admin**: User Database tab → paste URLs and IDs
-7. **Test**: Click "Test Connection"
+### Files Modified
+
+| File | Changes |
+|------|--------|
+| **login.html** | Hardcoded form constants, submits USER data to message field |
+| **quiz.html** | Hardcoded form constants, submits SCORE data to message field |
+| **admin.html** | Simplified User Database tab, added Cloud Scores table, new Apps Script code |
+| **leaderboard.html** | Updated to use `?type=scores` endpoint |
+
+### Setup (Just 3 Steps!)
+
+1. **Open your Google Sheet** (linked to Help/Feedback form)
+2. **Add Apps Script**: Extensions → Apps Script → paste code → Deploy as Web App
+3. **Paste URL in Admin Panel** → User Database tab → Save
+
+### Benefits
+
+✅ **Single form** for everything (users, scores, feedback)  
+✅ **No new forms** to create  
+✅ **One API** serves both users and scores  
+✅ **Backwards compatible** with existing Help/Feedback submissions  
+✅ **3-step setup** instead of complex multi-form configuration
 
 ---
 
