@@ -5,6 +5,81 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 8: Reusable Cloud Database Module (January 24, 2026)
+
+### Created: `js/cloud-database.js`
+
+A reusable module that can be added to ANY AIUNITES site to enable cloud sync.
+
+**Features:**
+- Toggle between Online/Offline mode
+- Submit data to shared Google Form
+- Fetch data from Apps Script API
+- Auto-render admin settings panel
+- Support for multiple data types (USER, SCORE, WAITLIST, CONTACT, FEEDBACK)
+
+**Usage in any site:**
+```html
+<script src="js/cloud-database.js"></script>
+<script>
+  CloudDB.init({ siteName: 'MySiteName' });
+  
+  // Submit data
+  CloudDB.submit('WAITLIST', { email: 'user@example.com', name: 'John' });
+  
+  // Fetch data
+  const result = await CloudDB.fetch('users');
+  
+  // Render admin panel
+  CloudDB.renderAdminPanel('containerId');
+</script>
+```
+
+### Admin Panel Updates
+
+- Added **⚙️ Settings** tab to sidebar
+- Settings tab includes:
+  - Cloud Database toggle (Online/Offline)
+  - Apps Script API URL configuration  
+  - Site name configuration
+  - Data export (JSON backup)
+  - Clear all local data
+
+### Users Tab Improvements
+
+- Now shows **merged view** of Local + Cloud users
+- Visual indicators:
+  - 💾 Local (purple badge)
+  - ☁️ Cloud (cyan badge, cyan/green avatar)
+- 🔄 Sync Cloud button to refresh
+- Cloud users shown as read-only (no edit/delete)
+
+### Files Created/Modified
+
+| File | Changes |
+|------|---------|
+| `js/cloud-database.js` | **NEW** - Reusable cloud DB module |
+| `js/apps-script-code.js` | **NEW** - Enhanced Apps Script with all data types |
+| `admin.html` | Added Settings tab, merged Users view, CloudDB integration |
+| `index.html` | Added Login link to navigation |
+
+### How to Add Cloud DB to Other Sites
+
+1. **Copy `js/cloud-database.js`** to the site's js folder
+2. **Add script tag** in HTML: `<script src="js/cloud-database.js"></script>`
+3. **Initialize in your code:**
+   ```javascript
+   CloudDB.init({ siteName: 'YourSiteName' });
+   ```
+4. **For admin pages**, add a container and render the panel:
+   ```html
+   <div id="cloudSettings"></div>
+   <script>CloudDB.renderAdminPanel('cloudSettings');</script>
+   ```
+5. **Users configure** the API URL in their browser (stored in localStorage)
+
+---
+
 ## Session 7: Unified Cloud Database via Single Google Form (January 24, 2026)
 
 ### Key Innovation: Packed Data Format

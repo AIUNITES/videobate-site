@@ -6,6 +6,7 @@
   <title>Admin Panel | Fallacy Spotter - VideoBate</title>
   <meta name="description" content="Admin dashboard for managing users, questions, and content.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <script src="js/cloud-database.js"></script>
   <style>
     :root {
       --bg-dark: #0f0f14;
@@ -539,6 +540,7 @@
           <li><a href="#" data-tab="reports"><span class="icon">📈</span> Reports</a></li>
           <li><a href="#" data-tab="userdb"><span class="icon">☁️</span> User Database</a></li>
           <li><a href="#" data-tab="global"><span class="icon">🌐</span> Global Leaderboard</a></li>
+          <li><a href="#" data-tab="settings"><span class="icon">⚙️</span> Settings</a></li>
         </ul>
         
         <div class="sidebar-section">Quick Links</div>
@@ -649,8 +651,15 @@
         <div class="top-bar">
           <h1 class="page-title">👥 User Management</h1>
           <div class="top-actions">
+            <button class="btn btn-secondary" onclick="loadUsersTable()" id="syncUsersBtn">🔄 Sync Cloud</button>
             <button class="btn btn-primary" onclick="openModal('addUserModal')">+ Add User</button>
           </div>
+        </div>
+        <div id="usersSourceInfo" style="margin-bottom: 20px; padding: 12px 16px; background: var(--bg-card); border-radius: 8px; display: flex; align-items: center; gap: 15px;">
+          <span style="color: var(--text-secondary);">Showing:</span>
+          <span style="background: rgba(139,92,246,0.2); color: var(--accent-purple); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">💾 Local Users</span>
+          <span style="color: var(--text-secondary);">+</span>
+          <span style="background: rgba(0,212,255,0.2); color: var(--accent-cyan); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">☁️ Cloud Users</span>
         </div>
         
         <div class="card">
@@ -1221,6 +1230,38 @@
         </div>
       </div>
       
+      <!-- SETTINGS TAB -->
+      <div class="tab-content" id="settingsTab">
+        <div class="top-bar">
+          <h1 class="page-title">⚙️ Settings</h1>
+        </div>
+        
+        <!-- Cloud Database Settings (uses CloudDB module) -->
+        <div class="card">
+          <div id="cloudDbSettings"></div>
+        </div>
+        
+        <!-- Site Configuration -->
+        <div class="card">
+          <h3 class="card-title" style="margin-bottom: 20px;">🌐 Site Configuration</h3>
+          <div class="form-group">
+            <label class="form-label">Site Name</label>
+            <input type="text" class="form-input" id="siteName" value="VideoBate" placeholder="Your site name">
+          </div>
+          <button class="btn btn-primary" onclick="saveSiteConfig()">💾 Save Site Config</button>
+        </div>
+        
+        <!-- Data Management -->
+        <div class="card" style="border: 1px solid var(--accent-red);">
+          <h3 class="card-title" style="color: var(--accent-red); margin-bottom: 20px;">⚠️ Data Management</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">These actions cannot be undone. Use with caution.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="exportAllData()">📤 Export All Data</button>
+            <button class="btn btn-danger" onclick="clearAllLocalData()">🗑️ Clear Local Data</button>
+          </div>
+        </div>
+      </div>
+      
     </main>
   </div>
   
@@ -1419,49 +1460,109 @@ function loadDashboard() {
 }
 
 // ========== USERS TABLE ==========
-function loadUsersTable() {
-  const users = getUsers();
-  renderUsersTable(users);
+async function loadUsersTable() {
+  const localUsers = getUsers();
+  const apiUrl = localStorage.getItem('fallacySpotter_usersApiUrl');
+  
+  // Start with local users
+  let allUsers = localUsers.map(u => ({ ...u, source: 'local' }));
+  
+  // Try to fetch cloud users
+  if (apiUrl) {
+    try {
+      const response = await fetch(apiUrl);
+      const cloudUsers = await response.json();
+      
+      if (Array.isArray(cloudUsers)) {
+        // Add cloud users that aren't already in local
+        cloudUsers.forEach(cu => {
+          const exists = allUsers.some(u => 
+            u.username?.toLowerCase() === cu.username?.toLowerCase() ||
+            u.email?.toLowerCase() === cu.email?.toLowerCase()
+          );
+          if (!exists) {
+            allUsers.push({
+              id: 'cloud_' + cu.username,
+              firstName: cu.firstName || '',
+              lastName: cu.lastName || '',
+              username: cu.username,
+              email: cu.email,
+              role: cu.role || 'user',
+              createdAt: cu.createdAt,
+              source: 'cloud',
+              stats: { totalScore: 0, gamesPlayed: 0, correctAnswers: 0, wrongAnswers: 0, bestStreak: 0 }
+            });
+          }
+        });
+      }
+    } catch (err) {
+      console.log('Could not fetch cloud users:', err.message);
+    }
+  }
+  
+  // Cache for filtering
+  allUsersCache = allUsers;
+  
+  renderUsersTable(allUsers);
 }
 
 function renderUsersTable(users) {
-  document.getElementById('usersTable').innerHTML = users.map(u => `
+  document.getElementById('usersTable').innerHTML = users.map(u => {
+    const initials = ((u.firstName?.[0] || '') + (u.lastName?.[0] || '')).toUpperCase() || '?';
+    const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || 'Unknown';
+    const isCloud = u.source === 'cloud';
+    const sourceBadge = isCloud 
+      ? '<span style="background: rgba(0,212,255,0.2); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 8px;">☁️ Cloud</span>'
+      : '<span style="background: rgba(139,92,246,0.2); color: var(--accent-purple); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 8px;">💾 Local</span>';
+    
+    return `
     <tr>
       <td>
         <div class="user-cell">
-          <div class="user-avatar-sm">${(u.firstName[0] + u.lastName[0]).toUpperCase()}</div>
-          ${u.firstName} ${u.lastName}
+          <div class="user-avatar-sm" style="${isCloud ? 'background: linear-gradient(135deg, #00d4ff, #22c55e);' : ''}">${initials}</div>
+          ${name} ${sourceBadge}
         </div>
       </td>
-      <td>${u.email}</td>
-      <td>@${u.username}</td>
+      <td>${u.email || 'N/A'}</td>
+      <td>@${u.username || 'unknown'}</td>
       <td><span class="role-badge ${u.role}">${u.role}</span></td>
-      <td>${u.stats.totalScore.toLocaleString()}</td>
-      <td>${u.stats.gamesPlayed}</td>
-      <td>${new Date(u.createdAt).toLocaleDateString()}</td>
+      <td>${(u.stats?.totalScore || 0).toLocaleString()}</td>
+      <td>${u.stats?.gamesPlayed || 0}</td>
+      <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
       <td>
-                <div class="action-btns">
-          <button class="action-btn edit" onclick="resetPassword(${u.id})" title="Reset Password">🔑</button>
-          <button class="action-btn edit" onclick="editUser(${u.id})" title="Edit">✏️</button>
-          <button class="action-btn delete" onclick="deleteUser(${u.id})" title="Delete">🗑️</button>
+        <div class="action-btns">
+          ${!isCloud ? `<button class="action-btn edit" onclick="resetPassword(${u.id})" title="Reset Password">🔑</button>` : ''}
+          ${!isCloud ? `<button class="action-btn edit" onclick="editUser(${u.id})" title="Edit">✏️</button>` : ''}
+          ${!isCloud ? `<button class="action-btn delete" onclick="deleteUser(${u.id})" title="Delete">🗑️</button>` : ''}
+          ${isCloud ? '<span style="color: var(--text-secondary); font-size: 0.8rem;">Cloud user</span>' : ''}
         </div>
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 }
 
-function filterUsers() {
+// Store all users for filtering
+let allUsersCache = [];
+
+async function filterUsers() {
   const search = document.getElementById('userSearch').value.toLowerCase();
   const role = document.getElementById('roleFilter').value;
   
-  let users = getUsers();
+  // If cache is empty, reload
+  if (allUsersCache.length === 0) {
+    await loadUsersTable();
+    return;
+  }
+  
+  let users = [...allUsersCache];
   
   if (search) {
     users = users.filter(u => 
-      u.firstName.toLowerCase().includes(search) ||
-      u.lastName.toLowerCase().includes(search) ||
-      u.email.toLowerCase().includes(search) ||
-      u.username.toLowerCase().includes(search)
+      (u.firstName || '').toLowerCase().includes(search) ||
+      (u.lastName || '').toLowerCase().includes(search) ||
+      (u.email || '').toLowerCase().includes(search) ||
+      (u.username || '').toLowerCase().includes(search)
     );
   }
   
@@ -2173,6 +2274,62 @@ loadGoogleFormConfig();
 loadLiveDataUrl();
 loadGlobalLeaderboard();
 loadUsersApiUrl();
+
+// Initialize CloudDB and render settings panel
+if (typeof CloudDB !== 'undefined') {
+  CloudDB.init({ siteName: 'VideoBate' });
+  CloudDB.renderAdminPanel('cloudDbSettings');
+}
+
+// ========== SETTINGS TAB ==========
+function saveSiteConfig() {
+  const siteName = document.getElementById('siteName').value.trim();
+  localStorage.setItem('aiunites_siteName', siteName);
+  if (typeof CloudDB !== 'undefined') {
+    CloudDB.config.siteName = siteName;
+  }
+  alert('✅ Site configuration saved!');
+}
+
+function exportAllData() {
+  const data = {
+    users: getUsers(),
+    globalLeaderboard: JSON.parse(localStorage.getItem('fallacySpotter_globalLeaderboard') || '{}'),
+    settings: {
+      googleFormUrl: localStorage.getItem('fallacySpotter_googleFormUrl'),
+      usersApiUrl: localStorage.getItem('fallacySpotter_usersApiUrl'),
+      liveDataUrl: localStorage.getItem('fallacySpotter_liveDataUrl'),
+      cloudEnabled: localStorage.getItem('aiunites_clouddb_enabled'),
+      cloudApiUrl: localStorage.getItem('aiunites_clouddb_apiUrl')
+    },
+    exportedAt: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `videobate-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearAllLocalData() {
+  if (!confirm('⚠️ Are you sure you want to clear ALL local data?\n\nThis includes:\n- All users\n- Leaderboard data\n- Settings\n\nThis cannot be undone!')) return;
+  if (!confirm('🚨 FINAL WARNING: This will delete everything. Continue?')) return;
+  
+  const keysToRemove = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('fallacySpotter_') || key.startsWith('aiunites_')) {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+  
+  alert('✅ All local data cleared. Reloading page...');
+  location.reload();
+}
 </script>
 
 </body>
