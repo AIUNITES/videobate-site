@@ -5,6 +5,48 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 3: Interactive Quiz + More Fallacies (January 23, 2026)
+
+### New Files Created
+- **quiz.html** - Interactive fallacy quiz game with:
+  - 3 game modes: Practice, Timed (30s), Survival
+  - 20+ scenario-based questions across Easy/Medium/Hard
+  - Real-time scoring with streak bonuses
+  - ASCII art explanations after each answer
+  - Badges and achievements
+  - Progress tracking
+
+### New Fallacy Categories Added
+
+#### ⚔️ Advanced Debate Tactics (6 new)
+| Code | Name | Description |
+|------|------|-------------|
+| GISH | Gish Gallop | Overwhelming with too many claims |
+| SEAL | Sea Lioning | "Just asking questions" harassment |
+| DARV | DARVO | Deny, Attack, Reverse Victim/Offender |
+| TONE | Tone Policing | Dismissing based on delivery |
+| NIRV | Nirvana Fallacy | Rejecting imperfect solutions |
+| CLIC | Thought-Terminating Cliché | Phrases that end discussion |
+
+#### ⚡ Causation Errors (6 new)
+| Code | Name | Description |
+|------|------|-------------|
+| POST | Post Hoc | "After = because of" error |
+| TEXA | Texas Sharpshooter | Drawing target after shooting |
+| SING | Single Cause Fallacy | Ignoring multiple factors |
+| NATU | Appeal to Nature | Natural = good fallacy |
+| NOVL | Appeal to Novelty | New = better fallacy |
+| SUNK | Sunk Cost Fallacy | Continuing due to past investment |
+
+### Total Fallacy Count: 48 types
+
+### UI Updates
+- Added "🧠 Take the Quiz" button to hero section
+- Updated stats bar to show "48 Fallacy Types"
+- Added quiz link to CTA section
+
+---
+
 ## Session 2: Expanded Fallacy Library with ASCII Art (January 23, 2026)
 
 ### Changes Made
