@@ -5,6 +5,88 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 6: Global Leaderboard via Google Forms (January 23, 2026)
+
+### Architecture: Fully Automatic with Live Data
+
+```
+┌─────────────┐     ┌───────────────┐     ┌─────────────────┐
+│   PLAYER    │ ───▶ │  GOOGLE FORM  │ ───▶ │  GOOGLE SHEET   │
+│  Completes  │     │  (collects    │     │  (stores data)  │
+│    Quiz     │     │   responses)  │     │                 │
+└─────────────┘     └───────────────┘     └────────┬────────┘
+                                                   │
+                                                   ▼
+                                            ┌─────────────────┐
+                                            │  APPS SCRIPT    │
+                                            │  (Web App API)  │
+                                            └────────┬────────┘
+                                                   │
+                                                   ▼
+┌───────────────────────────────────────────────────┐
+│              LEADERBOARD PAGE                     │
+│  🟢 LIVE - Fetches data automatically on load    │
+└───────────────────────────────────────────────────┘
+```
+
+**No manual admin work needed!** Data flows automatically.
+
+### New Features
+
+#### admin.html - Live Data URL Configuration
+- **New green-highlighted card** for Apps Script Web App URL
+- Save URL button
+- Test Connection button (verifies API works)
+- Full setup instructions with copyable Apps Script code
+
+#### leaderboard.html - Live Fetching
+- Automatically fetches from Apps Script URL if configured
+- Shows "🟢 LIVE" indicator with game/player count
+- Loading state while fetching
+- Error handling with fallback to cached data
+- Falls back to CSV-uploaded data if no live URL
+
+### Apps Script Code (included in admin panel)
+
+```javascript
+function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  
+  const results = data.slice(1).map(row => {
+    return {
+      timestamp: row[headers.indexOf('timestamp')] || new Date().toISOString(),
+      username: row[headers.indexOf('username')] || 'unknown',
+      displayName: row[headers.indexOf('display name')] || 'Unknown',
+      score: parseInt(row[headers.indexOf('score')]) || 0,
+      correct: parseInt(row[headers.indexOf('correct')]) || 0,
+      wrong: parseInt(row[headers.indexOf('wrong')]) || 0,
+      streak: parseInt(row[headers.indexOf('streak')]) || 0,
+      mode: row[headers.indexOf('mode')] || 'practice'
+    };
+  }).filter(r => r.username !== 'unknown');
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(results))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+### Data Flow Options
+
+| Method | Manual Work | Realtime |
+|--------|------------|----------|
+| ✅ Live URL (Apps Script) | None! | Yes |
+| CSV Upload | Download CSV, upload | No |
+
+### localStorage Keys Added
+| Key | Purpose |
+|-----|--------|
+| `fallacySpotter_liveDataUrl` | Apps Script Web App URL |
+
+---
+
 ## Session 5: Password Reset & User Settings (January 23, 2026)
 
 ### New Files Created

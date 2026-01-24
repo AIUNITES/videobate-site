@@ -467,6 +467,106 @@ function loadLocalLeaderboard() {
 }
 
 function loadGlobalLeaderboard() {
+  const liveUrl = localStorage.getItem('fallacySpotter_liveDataUrl');
+  
+  if (liveUrl) {
+    // Fetch live data from Apps Script
+    fetchLiveLeaderboard(liveUrl);
+  } else {
+    // Fall back to locally stored CSV data
+    loadStoredGlobalLeaderboard();
+  }
+}
+
+async function fetchLiveLeaderboard(url) {
+  // Show loading state
+  document.getElementById('leaderboardList').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">🔄</div>
+      <h3>Loading Live Data...</h3>
+      <p>Fetching latest scores from the server</p>
+    </div>
+  `;
+  document.getElementById('podium').innerHTML = '';
+  
+  try {
+    const response = await fetch(url);
+    const games = await response.json();
+    
+    if (!Array.isArray(games) || games.length === 0) {
+      document.getElementById('leaderboardList').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🌐</div>
+          <h3>No Global Data Yet</h3>
+          <p>Play quizzes to submit your scores!</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Aggregate by username
+    const playerStats = {};
+    games.forEach(game => {
+      const key = (game.username || 'unknown').toLowerCase();
+      if (key === 'unknown') return;
+      
+      if (!playerStats[key]) {
+        playerStats[key] = {
+          username: game.username,
+          displayName: game.displayName || game.username,
+          totalScore: 0,
+          totalGames: 0,
+          bestScore: 0,
+          bestStreak: 0,
+          lastPlayed: game.timestamp
+        };
+      }
+      
+      const score = parseInt(game.score) || 0;
+      const streak = parseInt(game.streak) || 0;
+      
+      playerStats[key].totalScore += score;
+      playerStats[key].totalGames++;
+      if (score > playerStats[key].bestScore) playerStats[key].bestScore = score;
+      if (streak > playerStats[key].bestStreak) playerStats[key].bestStreak = streak;
+      if (new Date(game.timestamp) > new Date(playerStats[key].lastPlayed)) {
+        playerStats[key].lastPlayed = game.timestamp;
+      }
+    });
+    
+    const players = Object.values(playerStats);
+    
+    // Sort
+    if (currentSort === 'score') {
+      players.sort((a, b) => b.bestScore - a.bestScore);
+    } else if (currentSort === 'games') {
+      players.sort((a, b) => b.totalGames - a.totalGames);
+    } else {
+      players.sort((a, b) => b.bestScore - a.bestScore);
+    }
+    
+    // Render
+    renderGlobalPodium(players.slice(0, 3));
+    renderGlobalLeaderboard(players);
+    
+    // Update description with live indicator
+    document.getElementById('scopeDesc').innerHTML = '🟢 <span style="color: var(--accent-green);">LIVE</span> - Fetched ' + games.length + ' games from ' + players.length + ' players';
+    
+  } catch (err) {
+    console.error('Failed to fetch live leaderboard:', err);
+    document.getElementById('leaderboardList').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⚠️</div>
+        <h3>Failed to Load Live Data</h3>
+        <p>Error: ${err.message}<br>Showing cached data instead...</p>
+      </div>
+    `;
+    // Fall back to stored data
+    setTimeout(() => loadStoredGlobalLeaderboard(), 2000);
+  }
+}
+
+function loadStoredGlobalLeaderboard() {
   const data = JSON.parse(localStorage.getItem('fallacySpotter_globalLeaderboard') || '{}');
   const players = Object.values(data);
   
