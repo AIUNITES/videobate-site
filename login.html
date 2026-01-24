@@ -682,16 +682,13 @@ function setCurrentUser(user) {
 }
 
 // ========== GOOGLE SHEETS CONFIG ==========
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeQUi49AdTBRjetz5MDFQgMIkm9-vOMb_ARKwYEz41j_Nfiwg/formResponse';
+const ENTRY_EMAIL = 'entry.904300305';
+const ENTRY_SOURCE = 'entry.2053726945';
+const ENTRY_MESSAGE = 'entry.1759393763';
+
 function getUsersApiUrl() {
   return localStorage.getItem('fallacySpotter_usersApiUrl') || '';
-}
-
-function getUsersFormUrl() {
-  return localStorage.getItem('fallacySpotter_usersFormUrl') || '';
-}
-
-function getUsersFormEntryIds() {
-  return JSON.parse(localStorage.getItem('fallacySpotter_usersFormEntryIds') || '{}');
 }
 
 // ========== CHECK CONNECTION ==========
@@ -916,32 +913,23 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
       }
     };
     
-    // Submit to Google Form if online
-    if (isOnlineMode) {
-      const formUrl = getUsersFormUrl();
-      const entryIds = getUsersFormEntryIds();
-      
-      if (formUrl && entryIds.username) {
-        const formData = new FormData();
-        if (entryIds.username) formData.append(entryIds.username, username);
-        if (entryIds.email) formData.append(entryIds.email, email);
-        if (entryIds.password) formData.append(entryIds.password, password);
-        if (entryIds.firstName) formData.append(entryIds.firstName, firstName);
-        if (entryIds.lastName) formData.append(entryIds.lastName, lastName);
-        if (entryIds.role) formData.append(entryIds.role, 'user');
-        if (entryIds.createdAt) formData.append(entryIds.createdAt, new Date().toISOString());
-        
-        try {
-          await fetch(formUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: formData
-          });
-          console.log('✅ User submitted to Google Form');
-        } catch (err) {
-          console.warn('Failed to submit to Google Form:', err);
-        }
-      }
+    // Submit to Google Form (packed data in message field)
+    const packedData = `USER|${username}|${email}|${password}|${firstName}|${lastName}|user|${new Date().toISOString()}`;
+    
+    const formData = new FormData();
+    formData.append(ENTRY_EMAIL, email);
+    formData.append(ENTRY_SOURCE, 'FallacySpotter-Registration');
+    formData.append(ENTRY_MESSAGE, packedData);
+    
+    try {
+      await fetch(GOOGLE_FORM_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      });
+      console.log('✅ User submitted to Google Form');
+    } catch (err) {
+      console.warn('Failed to submit to Google Form:', err);
     }
     
     // Also save locally for immediate use

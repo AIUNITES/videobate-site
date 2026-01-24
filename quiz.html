@@ -1241,46 +1241,26 @@ function showResults() {
 }
 
 // ========== GOOGLE FORM SUBMISSION ==========
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeQUi49AdTBRjetz5MDFQgMIkm9-vOMb_ARKwYEz41j_Nfiwg/formResponse';
+const ENTRY_EMAIL = 'entry.904300305';
+const ENTRY_SOURCE = 'entry.2053726945';
+const ENTRY_MESSAGE = 'entry.1759393763';
+
 function submitToGoogleForm() {
   // Get user info
   const user = getCurrentUser();
   const username = user ? user.username : 'Guest_' + Math.random().toString(36).substring(7);
   const displayName = user ? (user.firstName + ' ' + user.lastName) : 'Guest Player';
+  const email = user ? user.email : '';
   
-  // Google Form configuration
-  // SETUP: Create a Google Form with these fields:
-  // 1. Username (Short answer)
-  // 2. Display Name (Short answer)  
-  // 3. Score (Short answer - number)
-  // 4. Correct Answers (Short answer - number)
-  // 5. Wrong Answers (Short answer - number)
-  // 6. Best Streak (Short answer - number)
-  // 7. Game Mode (Short answer)
-  // 8. Timestamp (Short answer)
-  //
-  // After creating the form, get the form ID and entry IDs from the pre-filled link
-  // Replace FORM_ID and entry.XXXXX values below
-  
-  const GOOGLE_FORM_URL = localStorage.getItem('fallacySpotter_googleFormUrl') || '';
-  
-  if (!GOOGLE_FORM_URL) {
-    console.log('Google Form not configured. Results saved locally only.');
-    return;
-  }
-  
-  // Get entry IDs from localStorage (set by admin)
-  const entryIds = JSON.parse(localStorage.getItem('fallacySpotter_formEntryIds') || '{}');
+  // Pack score data: SCORE|username|displayName|score|correct|wrong|streak|mode|timestamp
+  const packedData = `SCORE|${username}|${displayName}|${state.score}|${state.correct}|${state.wrong}|${state.maxStreak}|${state.mode}|${new Date().toISOString()}`;
   
   // Build form data
   const formData = new FormData();
-  if (entryIds.username) formData.append(entryIds.username, username);
-  if (entryIds.displayName) formData.append(entryIds.displayName, displayName);
-  if (entryIds.score) formData.append(entryIds.score, state.score);
-  if (entryIds.correct) formData.append(entryIds.correct, state.correct);
-  if (entryIds.wrong) formData.append(entryIds.wrong, state.wrong);
-  if (entryIds.streak) formData.append(entryIds.streak, state.maxStreak);
-  if (entryIds.mode) formData.append(entryIds.mode, state.mode);
-  if (entryIds.timestamp) formData.append(entryIds.timestamp, new Date().toISOString());
+  formData.append(ENTRY_EMAIL, email);
+  formData.append(ENTRY_SOURCE, 'FallacySpotter-Score');
+  formData.append(ENTRY_MESSAGE, packedData);
   
   // Submit via fetch (no-cors mode for Google Forms)
   fetch(GOOGLE_FORM_URL, {

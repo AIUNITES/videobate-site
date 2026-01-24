@@ -855,112 +855,111 @@
           </div>
         </div>
         
-        <!-- Apps Script URL for Reading Users -->
+        <!-- Hardcoded Form Info -->
+        <div class="card" style="border: 1px solid var(--accent-gold); background: rgba(255,215,0,0.05);">
+          <div class="card-header">
+            <h3 class="card-title">📝 Google Form (Hardcoded)</h3>
+            <span style="background: var(--accent-green); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">✅ CONFIGURED</span>
+          </div>
+          <p style="color: var(--text-secondary); margin-bottom: 15px;">
+            The app is configured to use your existing Help/Feedback form with packed data format.
+          </p>
+          <div style="background: var(--bg-dark); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.8rem;">
+            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Form URL:</span> <span style="color: var(--text-secondary);">...1FAIpQLSeQUi49AdTBRjetz5MDFQgMIkm9-vOMb_ARKwYEz41j_Nfiwg...</span></div>
+            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Email:</span> entry.904300305</div>
+            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Source:</span> entry.2053726945</div>
+            <div><span style="color: var(--accent-cyan);">Message:</span> entry.1759393763 <span style="color: var(--accent-gold);">← Packed data goes here</span></div>
+          </div>
+          <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.85rem;">
+            <strong>Data Format:</strong><br>
+            <code style="background: #000; padding: 2px 6px; border-radius: 4px; color: var(--accent-green);">USER|username|email|password|firstName|lastName|role|createdAt</code><br>
+            <code style="background: #000; padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan);">SCORE|username|displayName|score|correct|wrong|streak|mode|timestamp</code>
+          </p>
+        </div>
+        
+        <!-- Apps Script URL for Reading Data -->
         <div class="card" style="border: 2px solid var(--accent-green); background: rgba(34,197,94,0.05);">
           <div class="card-header">
-            <h3 class="card-title">📚 Read Users (Apps Script API)</h3>
+            <h3 class="card-title">📚 Apps Script API URL</h3>
             <span style="background: var(--accent-green); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">REQUIRED</span>
           </div>
           <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            This URL allows the login page to fetch and verify users from your Google Sheet.
+            This URL allows the app to fetch and parse users/scores from your Google Sheet.
           </p>
           
           <div class="form-group">
-            <label class="form-label">Apps Script Web App URL (for reading users)</label>
+            <label class="form-label">Apps Script Web App URL</label>
             <input type="text" class="form-input" id="usersApiUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
           </div>
           
           <button class="btn btn-primary" onclick="saveUsersApiUrl()">💾 Save API URL</button>
           <span id="usersApiStatus" style="margin-left: 15px;"></span>
           
-          <details style="margin-top: 20px;">
-            <summary style="cursor: pointer; color: var(--accent-cyan);">📖 Apps Script Code for Users</summary>
+          <details style="margin-top: 20px;" open>
+            <summary style="cursor: pointer; color: var(--accent-cyan); font-weight: 600;">📖 Apps Script Code (COPY THIS)</summary>
             <div style="background: var(--bg-dark); padding: 20px; border-radius: 8px; margin-top: 15px;">
-              <p style="margin-bottom: 15px; font-size: 0.9rem;">In your Google Sheet, go to <strong>Extensions → Apps Script</strong> and paste:</p>
-              <pre style="background: #000; padding: 15px; border-radius: 8px; font-size: 0.75rem; overflow-x: auto; color: var(--accent-cyan); white-space: pre-wrap;">function doGet() {
+              <p style="margin-bottom: 15px; font-size: 0.9rem;">In your Google Sheet (linked to the form), go to <strong>Extensions → Apps Script</strong> and paste:</p>
+              <pre style="background: #000; padding: 15px; border-radius: 8px; font-size: 0.7rem; overflow-x: auto; color: var(--accent-cyan); white-space: pre-wrap;">function doGet(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   const data = sheet.getDataRange().getValues();
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
   
-  const users = data.slice(1).map(row => {
-    const user = {};
-    headers.forEach((h, i) => {
-      // Map common header variations
-      if (h.includes('user') && h.includes('name')) user.username = row[i];
-      else if (h === 'username') user.username = row[i];
-      else if (h === 'email') user.email = row[i];
-      else if (h === 'password') user.password = row[i];
-      else if (h.includes('first')) user.firstName = row[i];
-      else if (h.includes('last')) user.lastName = row[i];
-      else if (h === 'role') user.role = row[i];
-      else if (h.includes('created')) user.createdAt = row[i];
-    });
-    return user;
-  }).filter(u => u.username); // Filter empty rows
+  // Find the message column (contains packed data)
+  const msgIdx = headers.findIndex(h => h.includes('message') || h.includes('feedback'));
+  
+  const users = [];
+  const scores = [];
+  
+  data.slice(1).forEach(row => {
+    const message = msgIdx >= 0 ? row[msgIdx] : '';
+    if (!message || typeof message !== 'string') return;
+    
+    const parts = message.split('|');
+    const type = parts[0];
+    
+    if (type === 'USER' && parts.length >= 8) {
+      users.push({
+        username: parts[1],
+        email: parts[2],
+        password: parts[3],
+        firstName: parts[4],
+        lastName: parts[5],
+        role: parts[6] || 'user',
+        createdAt: parts[7]
+      });
+    } else if (type === 'SCORE' && parts.length >= 9) {
+      scores.push({
+        username: parts[1],
+        displayName: parts[2],
+        score: parseInt(parts[3]) || 0,
+        correct: parseInt(parts[4]) || 0,
+        wrong: parseInt(parts[5]) || 0,
+        streak: parseInt(parts[6]) || 0,
+        mode: parts[7],
+        timestamp: parts[8]
+      });
+    }
+  });
+  
+  // Return based on ?type= parameter
+  const requestType = e?.parameter?.type || 'users';
+  const result = requestType === 'scores' ? scores : users;
   
   return ContentService
-    .createTextOutput(JSON.stringify(users))
+    .createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
 }</pre>
-              <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">Deploy as Web App with "Anyone" access, then paste the URL above.</p>
+              <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">
+                <strong>Deploy:</strong> Click Deploy → New deployment → Web app → "Anyone" can access → Deploy<br>
+                <strong>Copy the URL</strong> and paste it above!
+              </p>
+              <p style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-gold);">
+                <strong>Usage:</strong><br>
+                • <code>?type=users</code> → Returns user accounts<br>
+                • <code>?type=scores</code> → Returns quiz scores
+              </p>
             </div>
           </details>
-        </div>
-        
-        <!-- Google Form for Registration -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">📝 Registration Form (Google Form)</h3>
-          </div>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            New user registrations will be submitted to this Google Form, which saves to your Sheet.
-          </p>
-          
-          <div class="form-group">
-            <label class="form-label">Google Form Response URL</label>
-            <input type="text" class="form-input" id="usersFormUrl" placeholder="https://docs.google.com/forms/d/e/FORM_ID/formResponse">
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Get this from: Form → Send → Link (change /viewform to /formResponse)</p>
-          </div>
-          
-          <details style="margin-bottom: 20px;">
-            <summary style="cursor: pointer; color: var(--accent-cyan);">Entry IDs for Form Fields</summary>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 15px 0;">
-              Create a Google Form with these fields (all Short answer), then find each entry ID from the pre-filled link.
-            </p>
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Username Entry ID</label>
-                <input type="text" class="form-input" id="userEntryUsername" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Email Entry ID</label>
-                <input type="text" class="form-input" id="userEntryEmail" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password Entry ID</label>
-                <input type="text" class="form-input" id="userEntryPassword" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">First Name Entry ID</label>
-                <input type="text" class="form-input" id="userEntryFirstName" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Last Name Entry ID</label>
-                <input type="text" class="form-input" id="userEntryLastName" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Role Entry ID</label>
-                <input type="text" class="form-input" id="userEntryRole" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Created At Entry ID</label>
-                <input type="text" class="form-input" id="userEntryCreatedAt" placeholder="entry.123456789">
-              </div>
-            </div>
-          </details>
-          
-          <button class="btn btn-primary" onclick="saveUsersFormConfig()">💾 Save Form Configuration</button>
-          <span id="usersFormStatus" style="margin-left: 15px;"></span>
         </div>
         
         <!-- Users from Cloud -->
@@ -987,18 +986,42 @@
           </div>
         </div>
         
+        <!-- Cloud Scores -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">🏆 Cloud Scores</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadCloudScores()">🔄 Refresh</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Display Name</th>
+                  <th>Score</th>
+                  <th>Correct</th>
+                  <th>Mode</th>
+                  <th>Timestamp</th>
+                </tr>
+              </thead>
+              <tbody id="cloudScoresTable">
+                <tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above, then click Refresh</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
         <!-- Setup Guide -->
         <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0,212,255,0.05);">
-          <h3 class="card-title" style="color: var(--accent-cyan); margin-bottom: 15px;">📖 Complete Setup Guide</h3>
+          <h3 class="card-title" style="color: var(--accent-cyan); margin-bottom: 15px;">📖 Quick Setup (3 Steps)</h3>
           <ol style="color: var(--text-secondary); line-height: 2.2; margin-left: 20px;">
-            <li><strong>Create Google Form</strong> with fields: Username, Email, Password, First Name, Last Name, Role, Created At</li>
-            <li><strong>Link Form to Sheet</strong>: Form → Responses → Create spreadsheet</li>
-            <li><strong>Create Apps Script</strong>: In Sheet, Extensions → Apps Script → paste code above</li>
-            <li><strong>Deploy Script</strong>: Deploy → New deployment → Web app → Anyone can access</li>
-            <li><strong>Get Form Entry IDs</strong>: Form → 3 dots → Get pre-filled link → find entry.XXX values</li>
-            <li><strong>Configure above</strong>: Paste API URL and Form URL + Entry IDs</li>
-            <li><strong>Test</strong>: Click "Test Connection" to verify everything works!</li>
+            <li><strong>Open your Google Sheet</strong> (linked to your Help/Feedback form)</li>
+            <li><strong>Add Apps Script</strong>: Extensions → Apps Script → paste code above → Deploy as Web App</li>
+            <li><strong>Paste URL above</strong> and click "Test Connection"</li>
           </ol>
+          <p style="margin-top: 15px; padding: 15px; background: rgba(34,197,94,0.1); border-radius: 8px; font-size: 0.9rem;">
+            ✅ <strong>That's it!</strong> Registration and quiz scores will automatically submit to your form, and the API will parse them.
+          </p>
         </div>
       </div>
       
@@ -1633,43 +1656,6 @@ function saveUsersApiUrl() {
 function loadUsersApiUrl() {
   const url = localStorage.getItem('fallacySpotter_usersApiUrl') || '';
   document.getElementById('usersApiUrl').value = url;
-}
-
-// Save Users Form Config
-function saveUsersFormConfig() {
-  const url = document.getElementById('usersFormUrl').value.trim();
-  const entryIds = {
-    username: document.getElementById('userEntryUsername').value.trim(),
-    email: document.getElementById('userEntryEmail').value.trim(),
-    password: document.getElementById('userEntryPassword').value.trim(),
-    firstName: document.getElementById('userEntryFirstName').value.trim(),
-    lastName: document.getElementById('userEntryLastName').value.trim(),
-    role: document.getElementById('userEntryRole').value.trim(),
-    createdAt: document.getElementById('userEntryCreatedAt').value.trim()
-  };
-  
-  localStorage.setItem('fallacySpotter_usersFormUrl', url);
-  localStorage.setItem('fallacySpotter_usersFormEntryIds', JSON.stringify(entryIds));
-  
-  const status = document.getElementById('usersFormStatus');
-  status.textContent = '✅ Saved!';
-  status.style.color = 'var(--accent-green)';
-  setTimeout(() => status.textContent = '', 3000);
-}
-
-// Load Users Form Config
-function loadUsersFormConfig() {
-  const url = localStorage.getItem('fallacySpotter_usersFormUrl') || '';
-  const entryIds = JSON.parse(localStorage.getItem('fallacySpotter_usersFormEntryIds') || '{}');
-  
-  document.getElementById('usersFormUrl').value = url;
-  document.getElementById('userEntryUsername').value = entryIds.username || '';
-  document.getElementById('userEntryEmail').value = entryIds.email || '';
-  document.getElementById('userEntryPassword').value = entryIds.password || '';
-  document.getElementById('userEntryFirstName').value = entryIds.firstName || '';
-  document.getElementById('userEntryLastName').value = entryIds.lastName || '';
-  document.getElementById('userEntryRole').value = entryIds.role || '';
-  document.getElementById('userEntryCreatedAt').value = entryIds.createdAt || '';
 }
 
 // Test User DB Connection
