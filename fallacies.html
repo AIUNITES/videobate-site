@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fallacy Spotter - Critical Thinking Game | VideoBate</title>
+  <meta name="description" content="Spot logical fallacies in real-time debates. Train your critical thinking skills with our gamified fallacy detection system.">
+  <meta name="keywords" content="logical fallacies, critical thinking, debate, straw man, red herring, ad hominem, argument analysis">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+  <style>
+    :root {
+      --bg-dark: #0f0f14;
+      --bg-card: #1a1a24;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --accent-red: #ef4444;
+      --accent-gold: #ffd700;
+      --accent-cyan: #00d4ff;
+      --accent-green: #22c55e;
+      --accent-purple: #8b5cf6;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    /* Nav */
+    .nav {
+      background: rgba(15, 15, 20, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent-red); text-decoration: none; }
+    .logo span { color: var(--text-primary); }
+    .nav-links { display: flex; gap: 25px; align-items: center; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+    .nav-links a:hover { color: var(--text-primary); }
+    .btn { padding: 10px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; transition: all 0.3s; display: inline-block; }
+    .btn-primary { background: var(--accent-red); color: white; }
+    .btn-primary:hover { background: #dc2626; transform: translateY(-2px); }
+    .btn-secondary { border: 1px solid rgba(255,255,255,0.2); color: var(--text-primary); }
+    .btn-secondary:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(239,68,68,0.15) 0%, transparent 50%);
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,215,0,0.15);
+      color: var(--accent-gold);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255,215,0,0.3);
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+    .hero-cta { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    
+    /* Fallacy Categories */
+    .categories {
+      padding: 80px 0;
+    }
+    .section-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .section-header .badge {
+      display: inline-block;
+      background: rgba(139,92,246,0.15);
+      color: var(--accent-purple);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+    }
+    .section-header h2 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    .section-header p {
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .fallacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .fallacy-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: all 0.3s;
+    }
+    .fallacy-card:hover {
+      border-color: var(--accent-red);
+      transform: translateY(-5px);
+    }
+    .fallacy-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    .fallacy-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent-gold);
+    }
+    .fallacy-code {
+      display: inline-block;
+      background: rgba(239,68,68,0.2);
+      color: var(--accent-red);
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .fallacy-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .fallacy-example {
+      margin-top: 15px;
+      padding: 12px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-left: 3px solid var(--accent-purple);
+    }
+    
+    /* Game Modes */
+    .modes {
+      padding: 80px 0;
+      background: var(--bg-card);
+    }
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+    }
+    .mode-card {
+      background: var(--bg-dark);
+      border-radius: 16px;
+      padding: 30px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .mode-icon {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+    .mode-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .mode-desc {
+      color: var(--text-secondary);
+    }
+    .mode-badge {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .mode-badge.live { background: rgba(34,197,94,0.2); color: var(--accent-green); }
+    .mode-badge.solo { background: rgba(0,212,255,0.2); color: var(--accent-cyan); }
+    .mode-badge.pvp { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+    
+    /* Scoring */
+    .scoring {
+      padding: 80px 0;
+    }
+    .scoring-table {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .scoring-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 25px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .scoring-row:last-child { border-bottom: none; }
+    .scoring-row.header {
+      background: rgba(239,68,68,0.2);
+      font-weight: 700;
+    }
+    .scoring-action { color: var(--text-secondary); }
+    .scoring-points { font-weight: 700; color: var(--accent-green); }
+    .scoring-points.negative { color: var(--accent-red); }
+    
+    /* CTA */
+    .cta {
+      padding: 100px 0;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 100%, rgba(139,92,246,0.15) 0%, transparent 50%);
+    }
+    .cta h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .cta p {
+      color: var(--text-secondary);
+      max-width: 500px;
+      margin: 0 auto 30px;
+    }
+    
+    /* Footer */
+    .footer {
+      background: var(--bg-card);
+      padding: 40px 0;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .footer p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .footer a {
+      color: var(--accent-red);
+      text-decoration: none;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-container { flex-direction: column; gap: 15px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; }
+      .hero { padding: 60px 0; }
+      .hero-cta { flex-direction: column; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="nav">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">🎬 Video<span>Bate</span></a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="fallacies.html" style="color: var(--accent-gold);">Fallacy Spotter</a>
+        <a href="index.html#contact" class="btn btn-primary">Join Waitlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">🎮 New Feature Coming Soon</div>
+      <h1>Spot the Fallacy,<br><span class="gradient-text">Sharpen Your Mind</span></h1>
+      <p>Train your critical thinking by identifying logical fallacies in real-time debates. Compete with others, climb leaderboards, and become a master of reason.</p>
+      <div class="hero-cta">
+        <a href="#fallacies" class="btn btn-primary">Learn the Fallacies</a>
+        <a href="https://www.youtube.com/playlist?list=PLtKNX4SfKpzX_bhh4LOEWEGy3pkLmFDmk" target="_blank" class="btn btn-secondary">📺 Watch Examples</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="modes">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Game Modes</span>
+        <h2>How to Play</h2>
+        <p>Multiple ways to train and compete</p>
+      </div>
+      <div class="modes-grid">
+        <div class="mode-card">
+          <div class="mode-icon">📺</div>
+          <h3 class="mode-name">Training Mode</h3>
+          <p class="mode-desc">Watch curated clips and identify fallacies at your own pace. Perfect for learning.</p>
+          <span class="mode-badge solo">Solo</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-icon">🔴</div>
+          <h3 class="mode-name">Live Tagging</h3>
+          <p class="mode-desc">Tag fallacies in real-time during live debates. First to spot wins bonus points!</p>
+          <span class="mode-badge live">Live</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-icon">⚔️</div>
+          <h3 class="mode-name">Challenge Mode</h3>
+          <p class="mode-desc">Go head-to-head with other players. Same clip, fastest correct answer wins.</p>
+          <span class="mode-badge pvp">PvP</span>
+        </div>
+        <div class="mode-card">
+          <div class="mode-icon">🏆</div>
+          <h3 class="mode-name">Tournaments</h3>
+          <p class="mode-desc">Weekly competitions with brackets. Climb the leaderboard and win prizes.</p>
+          <span class="mode-badge pvp">Competitive</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="categories" id="fallacies">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Truthopedia</span>
+        <h2>Know Your Fallacies</h2>
+        <p>Master these logical fallacies to spot weak arguments</p>
+      </div>
+      
+      <div class="fallacy-grid">
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🎭</div>
+          <div class="fallacy-name">Straw Man</div>
+          <span class="fallacy-code">STRW</span>
+          <p class="fallacy-desc">Misrepresenting someone's argument to make it easier to attack.</p>
+          <div class="fallacy-example">"So you're saying we should just let criminals run free?"</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🐟</div>
+          <div class="fallacy-name">Red Herring</div>
+          <span class="fallacy-code">RHER</span>
+          <p class="fallacy-desc">Introducing an irrelevant topic to divert attention from the original issue.</p>
+          <div class="fallacy-example">"Why worry about climate when there's poverty?"</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">👤</div>
+          <div class="fallacy-name">Ad Hominem</div>
+          <span class="fallacy-code">CHAR</span>
+          <p class="fallacy-desc">Attacking the person making the argument rather than the argument itself.</p>
+          <div class="fallacy-example">"You can't trust him, he's a [insert label]."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🎓</div>
+          <div class="fallacy-name">Appeal to Authority</div>
+          <span class="fallacy-code">AUTH</span>
+          <p class="fallacy-desc">Citing an authority who isn't qualified in the relevant field.</p>
+          <div class="fallacy-example">"This celebrity says vaccines are bad."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🎪</div>
+          <div class="fallacy-name">Appeal to Popularity</div>
+          <span class="fallacy-code">POPUL</span>
+          <p class="fallacy-desc">Arguing something is true because many people believe it.</p>
+          <div class="fallacy-example">"Millions of people can't be wrong!"</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">⚖️</div>
+          <div class="fallacy-name">False Equivalence</div>
+          <span class="fallacy-code">COMP</span>
+          <p class="fallacy-desc">Treating two things as equal when they're fundamentally different.</p>
+          <div class="fallacy-example">"Both sides are equally bad."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🛝</div>
+          <div class="fallacy-name">Slippery Slope</div>
+          <span class="fallacy-code">SLIP</span>
+          <p class="fallacy-desc">Claiming one event will lead to extreme consequences without justification.</p>
+          <div class="fallacy-example">"If we allow X, next thing you know Y and Z!"</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🚪</div>
+          <div class="fallacy-name">False Dilemma</div>
+          <span class="fallacy-code">FLSD</span>
+          <p class="fallacy-desc">Presenting only two options when more exist.</p>
+          <div class="fallacy-example">"You're either with us or against us."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">💧</div>
+          <div class="fallacy-name">Poisoning the Well</div>
+          <span class="fallacy-code">WELL</span>
+          <p class="fallacy-desc">Preemptively discrediting a source before they speak.</p>
+          <div class="fallacy-example">"Before they respond, remember they once..."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🔥</div>
+          <div class="fallacy-name">Gaslighting</div>
+          <span class="fallacy-code">GASL</span>
+          <p class="fallacy-desc">Making someone question their own perception of reality.</p>
+          <div class="fallacy-example">"That never happened. You're imagining things."</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">😱</div>
+          <div class="fallacy-name">Appeal to Fear</div>
+          <span class="fallacy-code">FEAR</span>
+          <p class="fallacy-desc">Using fear to persuade rather than logical argument.</p>
+          <div class="fallacy-example">"If you don't do X, terrible things will happen!"</div>
+        </div>
+        
+        <div class="fallacy-card">
+          <div class="fallacy-icon">🍒</div>
+          <div class="fallacy-name">Cherry Picking</div>
+          <span class="fallacy-code">CHRY</span>
+          <p class="fallacy-desc">Selecting only evidence that supports your position.</p>
+          <div class="fallacy-example">"This one study proves my point." (ignores 100 others)</div>
+        </div>
+        
+      </div>
+    </div>
+  </section>
+
+  <section class="scoring">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Points</span>
+        <h2>Scoring System</h2>
+        <p>Earn points for correct identifications</p>
+      </div>
+      <div class="scoring-table">
+        <div class="scoring-row header">
+          <span>Action</span>
+          <span>Points</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">Correct identification (Easy)</span>
+          <span class="scoring-points">+10 pts</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">Correct identification (Medium)</span>
+          <span class="scoring-points">+25 pts</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">Correct identification (Hard)</span>
+          <span class="scoring-points">+50 pts</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">First to spot (Live mode)</span>
+          <span class="scoring-points">+10 bonus</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">3+ streak multiplier</span>
+          <span class="scoring-points">x1.5</span>
+        </div>
+        <div class="scoring-row">
+          <span class="scoring-action">Wrong identification</span>
+          <span class="scoring-points negative">-5 pts</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="container">
+      <h2>Ready to Think Critically?</h2>
+      <p>Join the waitlist to be notified when Fallacy Spotter launches. Train your mind, spot the tricks, seek the truth.</p>
+      <a href="index.html#contact" class="btn btn-primary btn-lg">Join the Waitlist</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>
+        © 2026 VideoBate by <a href="https://aiunites.github.io/aiunites-site/">AIUNITES</a>. All Rights Reserved.<br>
+        <a href="index.html">Home</a> · <a href="fallacies.html">Fallacy Spotter</a> · #Truthopedia #CriticalThinking
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
