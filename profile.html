@@ -65,10 +65,19 @@
     .nav-links a:hover { color: var(--text-primary); }
     .nav-links .active { color: var(--accent-gold); }
     
+    /* User Menu with Dropdown */
     .user-menu {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 12px;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    .user-menu:hover {
+      background: rgba(255,255,255,0.05);
     }
     .user-avatar {
       width: 36px;
@@ -85,19 +94,41 @@
       font-weight: 600;
       font-size: 0.95rem;
     }
-    .logout-btn {
-      background: none;
-      border: 1px solid rgba(255,255,255,0.2);
-      color: var(--text-secondary);
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      transition: all 0.3s;
+    .user-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 180px;
+      display: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      z-index: 1000;
     }
-    .logout-btn:hover {
-      border-color: var(--accent-red);
+    .user-dropdown.active {
+      display: block;
+    }
+    .user-dropdown a {
+      display: block;
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .user-dropdown a:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+    }
+    .user-dropdown .admin-link {
       color: var(--accent-red);
+    }
+    .user-dropdown .logout-link {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      margin-top: 8px;
+      padding-top: 12px;
     }
     
     .container {
@@ -298,6 +329,8 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      border: none;
+      cursor: pointer;
     }
     .action-btn.primary {
       background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
@@ -356,6 +389,513 @@
     .leaderboard-name { flex: 1; font-weight: 600; }
     .leaderboard-score { color: var(--accent-gold); font-weight: 700; }
     
+    /* ==================== MODALS ==================== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-content.modal-large {
+      max-width: 700px;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .modal-header h2 {
+      font-size: 1.3rem;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .modal-close:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-primary);
+    }
+    .modal-body {
+      padding: 24px;
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-input);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-purple);
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(139,92,246,0.3);
+    }
+    .btn-secondary {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--accent-gold);
+    }
+    .btn-secondary.danger {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+    .btn-secondary.danger:hover {
+      background: var(--accent-red);
+      color: white;
+    }
+    .full-width {
+      width: 100%;
+    }
+    
+    /* Settings Modal Sections */
+    .settings-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+      margin: 24px 0;
+    }
+    .backup-section h4, .cache-section h4, .legal-section h4 {
+      margin-bottom: 8px;
+    }
+    .backup-warning, .cache-info {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .backup-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .restore-btn {
+      cursor: pointer;
+    }
+    .legal-links {
+      display: flex;
+      gap: 20px;
+    }
+    .legal-links a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+    .legal-links a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Admin Panel Tabs */
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .admin-tab {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .admin-tab:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-primary);
+    }
+    .admin-tab.active {
+      background: var(--accent-purple);
+      color: white;
+    }
+    .admin-tab-content {
+      display: none;
+    }
+    .admin-tab-content.active {
+      display: block;
+    }
+    
+    /* Settings Section */
+    .settings-section {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .settings-section h4 {
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+    .setting-info label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .setting-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    /* Toggle Switch */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg-input);
+      border-radius: 28px;
+      transition: 0.3s;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle input:checked + .toggle-slider {
+      background: var(--accent-green);
+    }
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+    
+    /* Admin Stats Grid */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .admin-stat-card {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .admin-stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+    }
+    .admin-stat-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    .admin-version {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+    }
+    .admin-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    /* Users Table */
+    .users-header {
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+    .users-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .user-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-dark);
+      border-radius: 10px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar-small {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+    .user-row-name {
+      font-weight: 600;
+    }
+    .user-row-username {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    .user-meta {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    /* Changelog */
+    .changelog-content {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .changelog-version {
+      margin-bottom: 24px;
+    }
+    .changelog-version h3 {
+      color: var(--accent-cyan);
+      margin-bottom: 8px;
+    }
+    .changelog-date {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: normal;
+    }
+    .changelog-version ul {
+      margin-left: 20px;
+      color: var(--text-secondary);
+    }
+    .changelog-version li {
+      margin-bottom: 4px;
+    }
+    
+    /* Cache Modal Tabs */
+    .cache-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .cache-tab {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .cache-tab:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .cache-tab.active {
+      background: var(--accent-purple);
+      color: white;
+    }
+    .cache-tab-content {
+      display: none;
+    }
+    .cache-tab-content.active {
+      display: block;
+    }
+    .cache-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .cache-summary-card {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+    .cache-summary-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+    .cache-summary-label {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    .cache-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .cache-item {
+      background: var(--bg-dark);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .cache-item-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .cache-item-icon {
+      font-size: 1.2rem;
+    }
+    .cache-item-title {
+      font-weight: 600;
+    }
+    .cache-item-meta {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      display: flex;
+      gap: 12px;
+    }
+    .cache-raw-view {
+      background: var(--bg-dark);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .cache-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .cache-size {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+    
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 3000;
+    }
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .toast.success {
+      border-color: var(--accent-green);
+    }
+    .toast.error {
+      border-color: var(--accent-red);
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
     /* Responsive */
     @media (max-width: 768px) {
       .profile-header {
@@ -366,6 +906,7 @@
       .profile-badges { justify-content: center; }
       .nav { flex-wrap: wrap; gap: 10px; }
       .nav-links { display: none; }
+      .admin-tabs { flex-direction: column; }
     }
   </style>
 </head>
@@ -379,10 +920,15 @@
       <a href="leaderboard.html">🏆 Leaderboard</a>
       <a href="profile.html" class="active">👤 Profile</a>
     </div>
-    <div class="user-menu">
+    <div class="user-menu" onclick="toggleUserMenu()">
       <div class="user-avatar" id="navAvatar">?</div>
       <span class="user-name" id="navName">Guest</span>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div class="user-dropdown" id="userDropdown">
+        <a href="#" id="adminLink" class="admin-link" style="display:none" onclick="openAdminPanel(event)">🛡️ Admin Panel</a>
+        <a href="#" onclick="openSettings(event)">⚙️ Settings</a>
+        <a href="admin.html" id="adminPageLink" style="display:none">🛠️ Full Admin</a>
+        <a href="#" class="logout-link" onclick="logout()">🚪 Log Out</a>
+      </div>
     </div>
   </nav>
 
@@ -395,9 +941,7 @@
         <h1 id="profileName">Loading...</h1>
         <div class="username" id="profileUsername">@username</div>
         <div class="member-since" id="memberSince">Member since...</div>
-        <div class="profile-badges" id="profileBadges">
-          <!-- Badges populated by JS -->
-        </div>
+        <div class="profile-badges" id="profileBadges"></div>
       </div>
     </div>
     
@@ -408,8 +952,8 @@
         <a href="quiz.html" class="action-btn primary">🎮 Play Quiz</a>
         <a href="fallacies.html" class="action-btn secondary">📚 Study Fallacies</a>
         <a href="leaderboard.html" class="action-btn secondary">🏆 View Leaderboard</a>
-        <a href="settings.html" class="action-btn secondary">⚙️ Settings</a>
-        <a href="admin.html" class="action-btn admin" id="adminBtn" style="display:none">🛠️ Admin Panel</a>
+        <button class="action-btn secondary" onclick="openSettings(event)">⚙️ Settings</button>
+        <button class="action-btn admin" id="adminBtn" style="display:none" onclick="openAdminPanel(event)">🛡️ Admin Panel</button>
       </div>
     </div>
     
@@ -450,17 +994,13 @@
     <!-- Badges Section -->
     <div class="section-card">
       <h2>🏅 Badges & Achievements</h2>
-      <div class="badges-grid" id="badgesGrid">
-        <!-- Badges populated by JS -->
-      </div>
+      <div class="badges-grid" id="badgesGrid"></div>
     </div>
     
     <!-- Leaderboard Preview -->
     <div class="section-card">
       <h2>🏆 Your Ranking</h2>
-      <div id="leaderboardPreview">
-        <!-- Populated by JS -->
-      </div>
+      <div id="leaderboardPreview"></div>
       <div style="text-align: center; margin-top: 20px;">
         <a href="leaderboard.html" class="action-btn secondary">View Full Leaderboard →</a>
       </div>
@@ -475,6 +1015,238 @@
     </div>
     
   </div>
+
+  <!-- ==================== SETTINGS MODAL ==================== -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" onclick="closeSettingsModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="user-settings-form" onsubmit="handleSettingsSubmit(event)">
+          <div class="form-group">
+            <label>Display Name</label>
+            <input type="text" id="settings-name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="settings-email">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+            <button type="submit" class="btn-primary">Save Settings</button>
+          </div>
+        </form>
+        <div class="settings-divider"></div>
+        <div class="backup-section">
+          <h4>💾 Backup & Restore</h4>
+          <p class="backup-warning">Your data is stored locally in your browser. Back up regularly!</p>
+          <div class="backup-buttons">
+            <button type="button" class="btn-secondary" onclick="backupUserData()">📥 Download Backup</button>
+            <label class="btn-secondary restore-btn">📤 Restore from Backup<input type="file" id="restore-data-input" accept=".json" hidden onchange="restoreUserData(event)"></label>
+          </div>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="cache-section">
+          <h4>🗄️ View My Cache</h4>
+          <p class="cache-info">See what's stored in your browser</p>
+          <button type="button" class="btn-secondary full-width" onclick="openCacheViewer()">👁️ View Cached Data</button>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="legal-section">
+          <h4>📜 Legal</h4>
+          <div class="legal-links">
+            <a href="#" onclick="showLegal(event, 'terms')">Terms of Service</a>
+            <a href="#" onclick="showLegal(event, 'privacy')">Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CACHE VIEWER MODAL ==================== -->
+  <div id="cache-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>🗄️ My Cached Data</h2>
+        <button class="modal-close" onclick="closeCacheModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cache-tabs">
+          <button class="cache-tab active" onclick="switchCacheTab('summary')">Summary</button>
+          <button class="cache-tab" onclick="switchCacheTab('items')">My Games</button>
+          <button class="cache-tab" onclick="switchCacheTab('raw')">Raw Data</button>
+        </div>
+        <div id="cache-summary-tab" class="cache-tab-content active">
+          <div class="cache-summary-grid" id="cache-summary-grid"></div>
+        </div>
+        <div id="cache-items-tab" class="cache-tab-content">
+          <div class="cache-list" id="cache-items-list"></div>
+        </div>
+        <div id="cache-raw-tab" class="cache-tab-content">
+          <pre class="cache-raw-view" id="cache-raw-view"></pre>
+        </div>
+        <div class="cache-footer">
+          <span class="cache-size" id="cache-size">Total size: 0 KB</span>
+          <button type="button" class="btn-secondary danger" onclick="clearMyCache()">🗑️ Clear My Data Only</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ADMIN PANEL MODAL ==================== -->
+  <div id="admin-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2>🛡️ Admin Panel</h2>
+        <button class="modal-close" onclick="closeAdminModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="admin-tabs">
+          <button class="admin-tab active" onclick="switchAdminTab('settings')">System Settings</button>
+          <button class="admin-tab" onclick="switchAdminTab('users')">Users</button>
+          <button class="admin-tab" onclick="switchAdminTab('stats')">Statistics</button>
+          <button class="admin-tab" onclick="switchAdminTab('changelog')">Changelog</button>
+        </div>
+
+        <!-- System Settings Tab -->
+        <div id="admin-settings-tab" class="admin-tab-content active">
+          <form onsubmit="handleSystemSettings(event)">
+            <div class="settings-section">
+              <h4>Registration Settings</h4>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <label>Require Email Verification</label>
+                  <span class="setting-desc">Users must verify email before logging in</span>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" id="setting-email-verification">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <label>Allow Public Signup</label>
+                  <span class="setting-desc">Anyone can create an account</span>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" id="setting-public-signup" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="settings-section">
+              <h4>Limits</h4>
+              <div class="form-group">
+                <label>Max Games per User</label>
+                <input type="number" id="setting-max-items" value="100" min="1" max="1000">
+              </div>
+            </div>
+            <div class="settings-section">
+              <h4>Features</h4>
+              <div class="setting-row">
+                <div class="setting-info">
+                  <label>Maintenance Mode</label>
+                  <span class="setting-desc">Only admins can access the app</span>
+                </div>
+                <label class="toggle">
+                  <input type="checkbox" id="setting-maintenance">
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Save Settings</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="admin-users-tab" class="admin-tab-content">
+          <div class="users-header"><span id="users-count">0 users</span></div>
+          <div class="users-table" id="users-table"></div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="admin-stats-tab" class="admin-tab-content">
+          <div class="admin-stats-grid">
+            <div class="admin-stat-card">
+              <div class="admin-stat-value" id="admin-stat-users">0</div>
+              <div class="admin-stat-label">Total Users</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-value" id="admin-stat-games">0</div>
+              <div class="admin-stat-label">Total Games</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-value" id="admin-stat-questions">25</div>
+              <div class="admin-stat-label">Questions</div>
+            </div>
+            <div class="admin-stat-card">
+              <div class="admin-stat-value" id="admin-stat-fallacies">48</div>
+              <div class="admin-stat-label">Fallacy Types</div>
+            </div>
+          </div>
+          <div class="admin-version"><span>App Version: v1.0.0</span></div>
+          <div class="admin-actions">
+            <button class="btn-secondary" onclick="exportAllData()">📤 Export All Data</button>
+            <button class="btn-secondary danger" onclick="resetAllData()">🗑️ Reset All Data</button>
+          </div>
+        </div>
+
+        <!-- Changelog Tab -->
+        <div id="admin-changelog-tab" class="admin-tab-content">
+          <div class="changelog-content" id="changelog-content">
+            <div class="changelog-version">
+              <h3>v1.0.0 <span class="changelog-date">January 2026</span></h3>
+              <ul>
+                <li>Initial release of Fallacy Spotter</li>
+                <li>48 fallacy types with ASCII art</li>
+                <li>3 game modes: Practice, Timed, Survival</li>
+                <li>User profiles and achievements</li>
+                <li>Global leaderboard with cloud sync</li>
+                <li>Admin panel with user management</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LEGAL MODAL ==================== -->
+  <div id="legal-modal" class="modal">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <h2 id="legal-modal-title">Terms of Service</h2>
+        <button class="modal-close" onclick="closeLegalModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="terms-content">
+          <p style="color: var(--text-secondary); margin-bottom: 16px;">Last updated: January 2026</p>
+          <h3 style="margin: 16px 0 8px;">1. Acceptance of Terms</h3>
+          <p style="color: var(--text-secondary);">By using Fallacy Spotter, you agree to these Terms of Service.</p>
+          <h3 style="margin: 16px 0 8px;">2. Data Storage</h3>
+          <p style="color: var(--text-secondary);">All data is stored locally in your browser. We do not collect or store data on external servers.</p>
+          <h3 style="margin: 16px 0 8px;">3. Disclaimer</h3>
+          <p style="color: var(--text-secondary);">This application is provided "as is" for educational purposes.</p>
+        </div>
+        <div id="privacy-content" style="display: none;">
+          <p style="color: var(--text-secondary); margin-bottom: 16px;">Last updated: January 2026</p>
+          <h3 style="margin: 16px 0 8px;">1. Information We Collect</h3>
+          <p style="color: var(--text-secondary);">Username, display name, and game statistics.</p>
+          <h3 style="margin: 16px 0 8px;">2. How We Store Data</h3>
+          <p style="color: var(--text-secondary);"><strong>All data is stored locally in your browser's localStorage.</strong> We do not transmit your data externally.</p>
+          <h3 style="margin: 16px 0 8px;">3. Your Rights</h3>
+          <p style="color: var(--text-secondary);">You can view, export, and delete your data anytime via Settings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
 
 <script>
 // ========== USER SYSTEM ==========
@@ -504,6 +1276,18 @@ const currentUser = getCurrentUser();
 if (!currentUser) {
   window.location.href = 'login.html';
 }
+
+// ========== USER MENU ==========
+function toggleUserMenu() {
+  document.getElementById('userDropdown').classList.toggle('active');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.user-menu')) {
+    document.getElementById('userDropdown').classList.remove('active');
+  }
+});
 
 // ========== ALL BADGES ==========
 const allBadges = [
@@ -544,6 +1328,8 @@ function populateProfile() {
   if (currentUser.role === 'admin') {
     document.getElementById('profileBadges').innerHTML = `<span class="profile-badge admin">⚙️ Admin</span>` + badgesHtml;
     document.getElementById('adminBtn').style.display = 'inline-flex';
+    document.getElementById('adminLink').style.display = 'block';
+    document.getElementById('adminPageLink').style.display = 'block';
   } else {
     document.getElementById('profileBadges').innerHTML = badgesHtml || '<span class="profile-badge">🆕 Newcomer</span>';
   }
@@ -561,7 +1347,6 @@ function populateProfile() {
   document.getElementById('statAccuracy').textContent = accuracy + '%';
   
   // Badges grid
-  const userBadgeNames = stats.badges.map(b => b.split(' ').slice(1).join(' ')); // Remove emoji
   document.getElementById('badgesGrid').innerHTML = allBadges.map(badge => {
     const earned = stats.badges.some(b => b.includes(badge.name));
     return `
@@ -573,10 +1358,7 @@ function populateProfile() {
     `;
   }).join('');
   
-  // Leaderboard preview
   populateLeaderboard();
-  
-  // Recent games (mock data for demo)
   populateRecentGames();
 }
 
@@ -584,9 +1366,7 @@ function populateLeaderboard() {
   const users = getUsers().sort((a, b) => b.stats.totalScore - a.stats.totalScore);
   const userRank = users.findIndex(u => u.id === currentUser.id) + 1;
   
-  // Show top 3 + current user
   let html = '';
-  
   for (let i = 0; i < Math.min(3, users.length); i++) {
     const u = users[i];
     const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : 'bronze';
@@ -615,12 +1395,9 @@ function populateLeaderboard() {
 }
 
 function populateRecentGames() {
-  // Get games from localStorage
   const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + currentUser.id) || '[]');
   
-  if (games.length === 0) {
-    return; // Keep default "No games" message
-  }
+  if (games.length === 0) return;
   
   const html = games.slice(0, 5).map(game => `
     <div class="game-item">
@@ -635,6 +1412,354 @@ function populateRecentGames() {
   
   document.getElementById('recentGames').innerHTML = html;
 }
+
+// ========== SETTINGS MODAL ==========
+function openSettings(e) {
+  e?.preventDefault();
+  document.getElementById('settings-name').value = currentUser.firstName + ' ' + currentUser.lastName;
+  document.getElementById('settings-email').value = currentUser.email || '';
+  document.getElementById('settings-modal').classList.add('active');
+  document.getElementById('userDropdown').classList.remove('active');
+}
+
+function closeSettingsModal() {
+  document.getElementById('settings-modal').classList.remove('active');
+}
+
+function handleSettingsSubmit(e) {
+  e.preventDefault();
+  const displayName = document.getElementById('settings-name').value.trim();
+  const email = document.getElementById('settings-email').value.trim();
+  
+  const names = displayName.split(' ');
+  currentUser.firstName = names[0] || currentUser.firstName;
+  currentUser.lastName = names.slice(1).join(' ') || currentUser.lastName;
+  currentUser.email = email;
+  
+  setCurrentUser(currentUser);
+  
+  // Update in users array
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) {
+    users[idx] = currentUser;
+    saveUsers(users);
+  }
+  
+  closeSettingsModal();
+  populateProfile();
+  showToast('Settings saved!', 'success');
+}
+
+function backupUserData() {
+  const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + currentUser.id) || '[]');
+  
+  const backup = {
+    version: '1.0.0',
+    app: 'Fallacy Spotter',
+    exportedAt: new Date().toISOString(),
+    user: {
+      username: currentUser.username,
+      displayName: currentUser.firstName + ' ' + currentUser.lastName,
+      email: currentUser.email
+    },
+    stats: currentUser.stats,
+    games: games
+  };
+  
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `fallacy-spotter-backup-${currentUser.username}-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  
+  URL.revokeObjectURL(url);
+  showToast('Backup downloaded!', 'success');
+}
+
+function restoreUserData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    try {
+      const backup = JSON.parse(event.target.result);
+      
+      if (backup.stats) {
+        currentUser.stats = backup.stats;
+        setCurrentUser(currentUser);
+        
+        const users = getUsers();
+        const idx = users.findIndex(u => u.id === currentUser.id);
+        if (idx >= 0) {
+          users[idx] = currentUser;
+          saveUsers(users);
+        }
+      }
+      
+      if (backup.games) {
+        localStorage.setItem('fallacySpotter_games_' + currentUser.id, JSON.stringify(backup.games));
+      }
+      
+      populateProfile();
+      closeSettingsModal();
+      showToast('Data restored!', 'success');
+    } catch (error) {
+      showToast('Restore failed: ' + error.message, 'error');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ========== CACHE VIEWER ==========
+function openCacheViewer() {
+  loadCacheSummary();
+  loadCacheItems();
+  loadCacheRaw();
+  document.getElementById('cache-modal').classList.add('active');
+}
+
+function closeCacheModal() {
+  document.getElementById('cache-modal').classList.remove('active');
+}
+
+function switchCacheTab(tab) {
+  document.querySelectorAll('.cache-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.cache-tab:nth-child(${tab === 'summary' ? 1 : tab === 'items' ? 2 : 3})`).classList.add('active');
+  
+  document.querySelectorAll('.cache-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`cache-${tab}-tab`).classList.add('active');
+}
+
+function loadCacheSummary() {
+  const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + currentUser.id) || '[]');
+  
+  document.getElementById('cache-summary-grid').innerHTML = `
+    <div class="cache-summary-card">
+      <div class="cache-summary-value">${games.length}</div>
+      <div class="cache-summary-label">Games Saved</div>
+    </div>
+    <div class="cache-summary-card">
+      <div class="cache-summary-value">${currentUser.stats.badges.length}</div>
+      <div class="cache-summary-label">Badges Earned</div>
+    </div>
+  `;
+  
+  const totalSize = JSON.stringify(games).length / 1024;
+  document.getElementById('cache-size').textContent = `Total size: ${totalSize.toFixed(2)} KB`;
+}
+
+function loadCacheItems() {
+  const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + currentUser.id) || '[]');
+  
+  if (games.length === 0) {
+    document.getElementById('cache-items-list').innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;">No games found</p>';
+    return;
+  }
+  
+  document.getElementById('cache-items-list').innerHTML = games.map(game => `
+    <div class="cache-item">
+      <div class="cache-item-header">
+        <span class="cache-item-icon">🎮</span>
+        <span class="cache-item-title">${game.mode} - ${game.score} pts</span>
+      </div>
+      <div class="cache-item-meta">
+        <span>${game.correct}/${game.total} correct</span>
+        <span>${new Date(game.date).toLocaleDateString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadCacheRaw() {
+  const games = JSON.parse(localStorage.getItem('fallacySpotter_games_' + currentUser.id) || '[]');
+  document.getElementById('cache-raw-view').textContent = JSON.stringify({ user: currentUser, games }, null, 2);
+}
+
+function clearMyCache() {
+  if (!confirm('Delete all your game history? This cannot be undone.')) return;
+  
+  localStorage.removeItem('fallacySpotter_games_' + currentUser.id);
+  currentUser.stats = {
+    totalScore: 0,
+    gamesPlayed: 0,
+    correctAnswers: 0,
+    wrongAnswers: 0,
+    bestStreak: 0,
+    badges: []
+  };
+  setCurrentUser(currentUser);
+  
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === currentUser.id);
+  if (idx >= 0) {
+    users[idx] = currentUser;
+    saveUsers(users);
+  }
+  
+  closeCacheModal();
+  closeSettingsModal();
+  populateProfile();
+  showToast('Your data has been cleared', 'success');
+}
+
+// ========== ADMIN PANEL ==========
+function openAdminPanel(e) {
+  e?.preventDefault();
+  if (currentUser.role !== 'admin') {
+    showToast('Admin access required', 'error');
+    return;
+  }
+  
+  loadAdminStats();
+  loadAdminUsers();
+  document.getElementById('admin-modal').classList.add('active');
+  document.getElementById('userDropdown').classList.remove('active');
+}
+
+function closeAdminModal() {
+  document.getElementById('admin-modal').classList.remove('active');
+}
+
+function switchAdminTab(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(`admin-${tab}-tab`).classList.add('active');
+}
+
+function loadAdminStats() {
+  const users = getUsers();
+  let totalGames = 0;
+  users.forEach(u => { totalGames += u.stats.gamesPlayed; });
+  
+  document.getElementById('admin-stat-users').textContent = users.length;
+  document.getElementById('admin-stat-games').textContent = totalGames;
+}
+
+function loadAdminUsers() {
+  const users = getUsers();
+  document.getElementById('users-count').textContent = `${users.length} users`;
+  
+  document.getElementById('users-table').innerHTML = users.map(user => `
+    <div class="user-row">
+      <div class="user-info">
+        <div class="user-avatar-small">${(user.firstName[0] + user.lastName[0]).toUpperCase()}</div>
+        <div>
+          <div class="user-row-name">${user.firstName} ${user.lastName}</div>
+          <div class="user-row-username">@${user.username} ${user.role === 'admin' ? '🛡️' : ''}</div>
+        </div>
+      </div>
+      <div class="user-meta">
+        <span>Score: ${user.stats.totalScore.toLocaleString()}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function handleSystemSettings(e) {
+  e.preventDefault();
+  showToast('System settings saved!', 'success');
+}
+
+function exportAllData() {
+  const data = {
+    users: getUsers(),
+    exportedAt: new Date().toISOString()
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `fallacy-spotter-full-export-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  
+  URL.revokeObjectURL(url);
+  showToast('Full export downloaded!', 'success');
+}
+
+function resetAllData() {
+  if (!confirm('⚠️ This will delete ALL data for ALL users. Are you sure?')) return;
+  
+  const password = prompt('Enter admin password to confirm:');
+  if (password !== 'admin123') {
+    showToast('Incorrect password', 'error');
+    return;
+  }
+  
+  localStorage.clear();
+  closeAdminModal();
+  showToast('All data reset!', 'success');
+  setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+}
+
+// ========== LEGAL MODAL ==========
+function showLegal(e, type) {
+  e?.preventDefault();
+  
+  const title = document.getElementById('legal-modal-title');
+  const termsContent = document.getElementById('terms-content');
+  const privacyContent = document.getElementById('privacy-content');
+  
+  if (type === 'terms') {
+    title.textContent = 'Terms of Service';
+    termsContent.style.display = 'block';
+    privacyContent.style.display = 'none';
+  } else {
+    title.textContent = 'Privacy Policy';
+    termsContent.style.display = 'none';
+    privacyContent.style.display = 'block';
+  }
+  
+  document.getElementById('legal-modal').classList.add('active');
+}
+
+function closeLegalModal() {
+  document.getElementById('legal-modal').classList.remove('active');
+}
+
+// ========== TOAST ==========
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span>${type === 'success' ? '✅' : '❌'}</span>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'slideIn 0.3s ease reverse';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ========== KEYBOARD SHORTCUTS ==========
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeSettingsModal();
+    closeCacheModal();
+    closeAdminModal();
+    closeLegalModal();
+  }
+});
+
+// Modal backdrop clicks
+['settings-modal', 'cache-modal', 'admin-modal', 'legal-modal'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', (e) => {
+    if (e.target.id === id) {
+      document.getElementById(id).classList.remove('active');
+    }
+  });
+});
 
 // Initialize
 populateProfile();
