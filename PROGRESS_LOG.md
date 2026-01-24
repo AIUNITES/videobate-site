@@ -5,6 +5,117 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 7: Cloud User Database via Google Forms (January 24, 2026)
+
+### Architecture: Google Forms/Sheets as User Database
+
+```
+┌──────────────┐     ┌───────────────┐     ┌─────────────────┐
+│  REGISTRATION  │ ───▶ │  GOOGLE FORM  │ ───▶ │   USERS SHEET   │
+│   (new user)   │     │  (collects)   │     │   (stores all)  │
+└──────────────┘     └───────────────┘     └────────┬────────┘
+                                                   │
+                                                   ▼
+                                            ┌─────────────────┐
+                                            │  APPS SCRIPT    │
+                                            │  (returns JSON) │
+                                            └────────┬────────┘
+                                                   │
+                      ┌────────────────────────────┘
+                      │
+┌──────────────┐◀───┘
+│     LOGIN      │
+│  (fetch users, │
+│   validate)    │
+└──────────────┘
+```
+
+### Dual Mode System
+
+| Mode | How It Works | When Used |
+|------|-------------|----------|
+| 🟢 **Online** | Users stored in Google Sheets, login fetches from API | When API URL is configured |
+| 🟠 **Offline** | Users stored in browser localStorage | Default / fallback |
+
+### Files Modified
+
+#### login.html - Complete Rewrite
+- **Connection status banner** shows Online/Offline mode
+- **Status card** with live connection indicator
+- **Dual-mode authentication**:
+  - Online: Fetches users from Apps Script API
+  - Offline: Uses localStorage (demo users)
+- **Registration submits to Google Form** when online
+- **Also saves locally** for immediate login
+- Demo card only shown when offline
+
+#### admin.html - New "User Database" Tab
+- **Connection Status card** with test button
+- **API URL config** for reading users
+- **Form URL config** for registration
+- **Entry IDs** for all user fields
+- **Cloud Users table** showing live data
+- **Complete setup guide** with Apps Script code
+
+### localStorage Keys Added
+
+| Key | Purpose |
+|-----|--------|
+| `fallacySpotter_usersApiUrl` | Apps Script URL for fetching users |
+| `fallacySpotter_usersFormUrl` | Google Form URL for registration |
+| `fallacySpotter_usersFormEntryIds` | Entry IDs for form fields |
+
+### Google Form Fields for Users
+
+1. Username (Short answer)
+2. Email (Short answer)
+3. Password (Short answer)
+4. First Name (Short answer)
+5. Last Name (Short answer)
+6. Role (Short answer) - defaults to "user"
+7. Created At (Short answer) - ISO timestamp
+
+### Apps Script Code for Users
+
+```javascript
+function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  
+  const users = data.slice(1).map(row => {
+    const user = {};
+    headers.forEach((h, i) => {
+      if (h.includes('user') && h.includes('name')) user.username = row[i];
+      else if (h === 'username') user.username = row[i];
+      else if (h === 'email') user.email = row[i];
+      else if (h === 'password') user.password = row[i];
+      else if (h.includes('first')) user.firstName = row[i];
+      else if (h.includes('last')) user.lastName = row[i];
+      else if (h === 'role') user.role = row[i];
+      else if (h.includes('created')) user.createdAt = row[i];
+    });
+    return user;
+  }).filter(u => u.username);
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(users))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+### Setup Steps
+
+1. **Create Google Form** with user fields (Username, Email, Password, etc.)
+2. **Link to Sheet**: Form → Responses → Create spreadsheet
+3. **Add Apps Script**: Extensions → Apps Script → paste code
+4. **Deploy**: Deploy → Web app → Anyone can access
+5. **Get Entry IDs**: Form → Pre-filled link → find entry.XXX values
+6. **Configure in Admin**: User Database tab → paste URLs and IDs
+7. **Test**: Click "Test Connection"
+
+---
+
 ## Session 6: Global Leaderboard via Google Forms (January 23, 2026)
 
 ### Architecture: Fully Automatic with Live Data

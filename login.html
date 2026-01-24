@@ -58,17 +58,18 @@
     }
     .header-links a:hover { color: var(--accent-cyan); }
     
-    /* Demo Banner */
-    .demo-banner {
-      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+    /* Status Banner */
+    .status-banner {
       padding: 10px 20px;
       text-align: center;
       font-size: 0.9rem;
       font-weight: 600;
     }
-    .demo-banner a {
-      color: white;
-      text-decoration: underline;
+    .status-banner.online {
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+    }
+    .status-banner.offline {
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
     }
     
     /* Main Layout */
@@ -218,6 +219,11 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(139,92,246,0.3);
     }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
     
     .divider {
       display: flex;
@@ -261,6 +267,11 @@
       border: 1px solid var(--accent-green);
       color: var(--accent-green);
     }
+    .message.info {
+      background: rgba(0,212,255,0.15);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
     .message.show { display: block; }
     
     /* Right Column - Demo & Info */
@@ -283,6 +294,42 @@
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+    
+    /* Connection Status Card */
+    .status-card {
+      border: 1px solid var(--accent-cyan);
+      background: rgba(0,212,255,0.05);
+    }
+    .status-card.connected {
+      border-color: var(--accent-green);
+      background: rgba(34,197,94,0.05);
+    }
+    .status-card h3 { color: var(--accent-cyan); }
+    .status-card.connected h3 { color: var(--accent-green); }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      background: var(--bg-dark);
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent-orange);
+      animation: pulse 2s infinite;
+    }
+    .status-dot.connected {
+      background: var(--accent-green);
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
     /* Demo Login */
@@ -350,13 +397,6 @@
       color: var(--text-secondary);
       line-height: 1.6;
     }
-    .storage-info code {
-      background: var(--bg-dark);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      color: var(--accent-cyan);
-    }
     .storage-item {
       display: flex;
       justify-content: space-between;
@@ -364,45 +404,8 @@
       border-bottom: 1px solid rgba(255,255,255,0.05);
     }
     .storage-item:last-child { border-bottom: none; }
-    .storage-key { color: var(--accent-cyan); }
-    .storage-desc { color: var(--text-secondary); }
-    
-    /* Changelog */
-    .changelog-list {
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    .changelog-item {
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    .changelog-item:last-child { border-bottom: none; }
-    .changelog-version {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .version-tag {
-      background: var(--accent-purple);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .version-date {
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-    }
-    .changelog-text {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-    .changelog-text ul {
-      margin-left: 20px;
-      margin-top: 5px;
-    }
+    .storage-key { color: var(--accent-cyan); font-size: 0.8rem; }
+    .storage-desc { color: var(--text-secondary); font-size: 0.8rem; }
     
     /* Clear Data */
     .clear-data-btn {
@@ -436,9 +439,9 @@
 </head>
 <body>
 
-  <!-- Demo Banner -->
-  <div class="demo-banner">
-    🎮 <strong>Demo Mode</strong> — All data saved to browser localStorage. <a href="#storage">Learn more</a>
+  <!-- Status Banner -->
+  <div class="status-banner offline" id="statusBanner">
+    🔌 <strong>Offline Mode</strong> — Using local browser storage. Configure Google Sheets in Admin Panel for cloud sync.
   </div>
 
   <header class="header">
@@ -483,14 +486,14 @@
             </div>
           </div>
           
-          <a href="#" class="forgot-link" onclick="alert('Demo Mode: Ask an admin to reset your password, or use the Clear All Data button on the right.'); return false;">Forgot password?</a>
+          <a href="#" class="forgot-link" onclick="alert('Contact an admin to reset your password.'); return false;">Forgot password?</a>
           
           <div class="form-checkbox">
             <input type="checkbox" id="rememberMe" checked>
             <label for="rememberMe">Remember me for 30 days</label>
           </div>
           
-          <button type="submit" class="btn btn-primary">Sign In</button>
+          <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
           
           <div class="divider"><span>or</span></div>
           
@@ -514,7 +517,7 @@
           
           <div class="form-group">
             <label class="form-label">Username</label>
-            <input type="text" class="form-input" id="username" placeholder="Choose username" required>
+            <input type="text" class="form-input" id="username" placeholder="Choose username" required pattern="[a-zA-Z0-9_]+" title="Letters, numbers, and underscores only">
           </div>
           
           <div class="form-group">
@@ -535,16 +538,31 @@
             <label for="agreeTerms">I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></label>
           </div>
           
-          <button type="submit" class="btn btn-primary">Create Account</button>
+          <button type="submit" class="btn btn-primary" id="registerBtn">Create Account</button>
         </form>
       </div>
     </div>
     
-    <!-- Right: Demo & Info -->
+    <!-- Right: Info -->
     <div class="info-column">
       
-      <!-- Demo Quick Login -->
-      <div class="info-card demo-card">
+      <!-- Connection Status -->
+      <div class="info-card status-card" id="statusCard">
+        <h3>🔌 Connection Status</h3>
+        <div class="status-indicator">
+          <div class="status-dot" id="statusDot"></div>
+          <div>
+            <div style="font-weight: 600;" id="statusText">Checking...</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);" id="statusDetail">Connecting to user database</div>
+          </div>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary);" id="statusMessage">
+          Checking connection to Google Sheets...
+        </p>
+      </div>
+      
+      <!-- Demo Quick Login (only shown when offline) -->
+      <div class="info-card demo-card" id="demoCard">
         <h3>⚡ Quick Demo Login</h3>
         <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
           Try the app instantly with pre-made accounts:
@@ -570,119 +588,48 @@
             </div>
             <button class="demo-btn" onclick="demoLogin('sarahlogic', 'password123')">Login</button>
           </div>
-          <div class="demo-account">
-            <div class="demo-account-info">
-              <div class="demo-avatar user">MR</div>
-              <div>
-                <div class="demo-name">Mike Reason</div>
-                <div class="demo-role">mikereason / password123</div>
-              </div>
-            </div>
-            <button class="demo-btn" onclick="demoLogin('mikereason', 'password123')">Login</button>
-          </div>
+        </div>
+      </div>
+      
+      <!-- How It Works -->
+      <div class="info-card">
+        <h3>🔧 How It Works</h3>
+        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8;">
+          <p><strong style="color: var(--accent-green);">🟢 Online Mode:</strong><br>
+          Users stored in Google Sheets. Register/login syncs with cloud.</p>
+          <p style="margin-top: 12px;"><strong style="color: var(--accent-orange);">🟠 Offline Mode:</strong><br>
+          Users stored in browser localStorage. Data is device-specific.</p>
+          <p style="margin-top: 12px;"><strong style="color: var(--accent-cyan);">💡 Tip:</strong><br>
+          Admin can configure Google Sheets in the Admin Panel → User Database tab.</p>
         </div>
       </div>
       
       <!-- Storage Info -->
       <div class="info-card" id="storage">
-        <h3>💾 Browser Storage</h3>
-        <p class="storage-info" style="margin-bottom: 15px;">
-          All data is saved to your browser's <code>localStorage</code>. Nothing is sent to a server.
-        </p>
+        <h3>💾 Local Storage Keys</h3>
         <div class="storage-item">
           <span class="storage-key">fallacySpotter_users</span>
-          <span class="storage-desc">All user accounts</span>
+          <span class="storage-desc">User accounts (offline)</span>
         </div>
         <div class="storage-item">
           <span class="storage-key">fallacySpotter_currentUser</span>
-          <span class="storage-desc">Logged in user</span>
+          <span class="storage-desc">Current session</span>
         </div>
         <div class="storage-item">
-          <span class="storage-key">fallacySpotter_games_[id]</span>
-          <span class="storage-desc">Game history per user</span>
+          <span class="storage-key">fallacySpotter_usersApiUrl</span>
+          <span class="storage-desc">Google Sheets API URL</span>
         </div>
-        <button class="clear-data-btn" onclick="clearAllData()">🗑️ Clear All Data & Reset</button>
-      </div>
-      
-      <!-- Changelog -->
-      <div class="info-card">
-        <h3>📋 Changelog</h3>
-        <div class="changelog-list">
-          <div class="changelog-item">
-            <div class="changelog-version">
-              <span class="version-tag">v1.5.0</span>
-              <span class="version-date">Jan 23, 2026</span>
-            </div>
-            <div class="changelog-text">
-              <ul>
-                <li>Password reset flow (4-step wizard)</li>
-                <li>User settings page with 5 tabs</li>
-                <li>Data export (JSON download)</li>
-                <li>Account deletion option</li>
-              </ul>
-            </div>
-          </div>
-          <div class="changelog-item">
-            <div class="changelog-version">
-              <span class="version-tag">v1.4.0</span>
-              <span class="version-date">Jan 23, 2026</span>
-            </div>
-            <div class="changelog-text">
-              <ul>
-                <li>Added user login & registration</li>
-                <li>Admin panel with user management</li>
-                <li>Leaderboard with rankings</li>
-                <li>Profile page with stats & badges</li>
-                <li>Game history tracking</li>
-              </ul>
-            </div>
-          </div>
-          <div class="changelog-item">
-            <div class="changelog-version">
-              <span class="version-tag">v1.3.0</span>
-              <span class="version-date">Jan 23, 2026</span>
-            </div>
-            <div class="changelog-text">
-              <ul>
-                <li>Interactive quiz with 20+ questions</li>
-                <li>3 game modes: Practice, Timed, Survival</li>
-                <li>12 new fallacy types added</li>
-              </ul>
-            </div>
-          </div>
-          <div class="changelog-item">
-            <div class="changelog-version">
-              <span class="version-tag">v1.2.0</span>
-              <span class="version-date">Jan 23, 2026</span>
-            </div>
-            <div class="changelog-text">
-              <ul>
-                <li>Expanded to 48 fallacy types</li>
-                <li>ASCII art illustrations</li>
-                <li>8 categories with color coding</li>
-              </ul>
-            </div>
-          </div>
-          <div class="changelog-item">
-            <div class="changelog-version">
-              <span class="version-tag">v1.0.0</span>
-              <span class="version-date">Jan 22, 2026</span>
-            </div>
-            <div class="changelog-text">
-              <ul>
-                <li>Initial Fallacy Spotter release</li>
-                <li>12 core fallacy types</li>
-                <li>Truthopedia integration</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <button class="clear-data-btn" onclick="clearAllData()">🗑️ Clear All Local Data</button>
       </div>
       
     </div>
   </main>
 
 <script>
+// ========== CONFIGURATION ==========
+let isOnlineMode = false;
+let cachedUsers = null;
+
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.auth-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -718,11 +665,11 @@ function hideMessage() {
 }
 
 // ========== LOCAL STORAGE USER SYSTEM ==========
-function getUsers() {
+function getLocalUsers() {
   return JSON.parse(localStorage.getItem('fallacySpotter_users') || '[]');
 }
 
-function saveUsers(users) {
+function saveLocalUsers(users) {
   localStorage.setItem('fallacySpotter_users', JSON.stringify(users));
 }
 
@@ -734,6 +681,79 @@ function setCurrentUser(user) {
   localStorage.setItem('fallacySpotter_currentUser', JSON.stringify(user));
 }
 
+// ========== GOOGLE SHEETS CONFIG ==========
+function getUsersApiUrl() {
+  return localStorage.getItem('fallacySpotter_usersApiUrl') || '';
+}
+
+function getUsersFormUrl() {
+  return localStorage.getItem('fallacySpotter_usersFormUrl') || '';
+}
+
+function getUsersFormEntryIds() {
+  return JSON.parse(localStorage.getItem('fallacySpotter_usersFormEntryIds') || '{}');
+}
+
+// ========== CHECK CONNECTION ==========
+async function checkConnection() {
+  const apiUrl = getUsersApiUrl();
+  
+  if (!apiUrl) {
+    setOfflineMode();
+    return;
+  }
+  
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      cachedUsers = data;
+      setOnlineMode(data.length);
+    } else {
+      setOfflineMode();
+    }
+  } catch (err) {
+    console.error('Failed to connect:', err);
+    setOfflineMode();
+  }
+}
+
+function setOnlineMode(userCount) {
+  isOnlineMode = true;
+  
+  document.getElementById('statusBanner').className = 'status-banner online';
+  document.getElementById('statusBanner').innerHTML = '🟢 <strong>Online Mode</strong> — Connected to Google Sheets user database';
+  
+  document.getElementById('statusCard').classList.add('connected');
+  document.getElementById('statusDot').classList.add('connected');
+  document.getElementById('statusText').textContent = 'Connected';
+  document.getElementById('statusDetail').textContent = `${userCount} users in database`;
+  document.getElementById('statusMessage').textContent = 'Your account will sync with the cloud database.';
+  
+  // Hide demo card when online
+  document.getElementById('demoCard').style.display = 'none';
+}
+
+function setOfflineMode() {
+  isOnlineMode = false;
+  
+  document.getElementById('statusBanner').className = 'status-banner offline';
+  document.getElementById('statusBanner').innerHTML = '🔌 <strong>Offline Mode</strong> — Using local browser storage';
+  
+  document.getElementById('statusCard').classList.remove('connected');
+  document.getElementById('statusDot').classList.remove('connected');
+  document.getElementById('statusText').textContent = 'Offline';
+  document.getElementById('statusDetail').textContent = 'Using local storage';
+  document.getElementById('statusMessage').textContent = 'Configure Google Sheets URL in Admin Panel to enable cloud sync.';
+  
+  // Show demo card when offline
+  document.getElementById('demoCard').style.display = 'block';
+  
+  // Create demo users if none exist locally
+  createDemoUsersIfNeeded();
+}
+
 // ========== DEMO LOGIN ==========
 function demoLogin(username, password) {
   document.getElementById('loginEmail').value = username;
@@ -743,97 +763,250 @@ function demoLogin(username, password) {
 
 // ========== CLEAR ALL DATA ==========
 function clearAllData() {
-  if (confirm('⚠️ This will delete ALL users, scores, and game history. Are you sure?')) {
-    // Clear all fallacySpotter keys
+  if (confirm('⚠️ This will delete ALL local users, scores, and game history. Are you sure?')) {
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('fallacySpotter_')) {
         localStorage.removeItem(key);
       }
     });
-    showMessage('All data cleared! Reloading...', 'success');
+    showMessage('All local data cleared! Reloading...', 'success');
     setTimeout(() => location.reload(), 1000);
   }
 }
 
 // ========== LOGIN ==========
-document.getElementById('loginForm').addEventListener('submit', (e) => {
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Signing in...';
   
   const emailOrUsername = document.getElementById('loginEmail').value.trim().toLowerCase();
   const password = document.getElementById('loginPassword').value;
   
-  const users = getUsers();
-  const user = users.find(u => 
-    (u.email.toLowerCase() === emailOrUsername || u.username.toLowerCase() === emailOrUsername) &&
-    u.password === password
-  );
-  
-  if (user) {
-    setCurrentUser(user);
-    showMessage('✅ Login successful! Redirecting...', 'success');
-    setTimeout(() => {
-      window.location.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
-    }, 800);
-  } else {
-    showMessage('❌ Invalid email/username or password', 'error');
+  try {
+    let user = null;
+    
+    if (isOnlineMode && cachedUsers) {
+      // Online: Check against Google Sheets data
+      user = cachedUsers.find(u => 
+        (u.email?.toLowerCase() === emailOrUsername || u.username?.toLowerCase() === emailOrUsername) &&
+        u.password === password
+      );
+      
+      if (user) {
+        // Normalize user object from Google Sheets
+        const normalizedUser = {
+          id: user.id || Date.now(),
+          firstName: user.firstName || user.firstname || user['first name'] || 'User',
+          lastName: user.lastName || user.lastname || user['last name'] || '',
+          username: user.username || emailOrUsername,
+          email: user.email || '',
+          password: user.password,
+          role: user.role || 'user',
+          createdAt: user.createdAt || user.createdat || new Date().toISOString(),
+          stats: {
+            totalScore: parseInt(user.totalScore || user.totalscore || 0),
+            gamesPlayed: parseInt(user.gamesPlayed || user.gamesplayed || 0),
+            correctAnswers: parseInt(user.correctAnswers || user.correctanswers || 0),
+            wrongAnswers: parseInt(user.wrongAnswers || user.wronganswers || 0),
+            bestStreak: parseInt(user.bestStreak || user.beststreak || 0),
+            badges: []
+          }
+        };
+        user = normalizedUser;
+      }
+    } else {
+      // Offline: Check local storage
+      const users = getLocalUsers();
+      user = users.find(u => 
+        (u.email.toLowerCase() === emailOrUsername || u.username.toLowerCase() === emailOrUsername) &&
+        u.password === password
+      );
+    }
+    
+    if (user) {
+      setCurrentUser(user);
+      showMessage('✅ Login successful! Redirecting...', 'success');
+      setTimeout(() => {
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
+      }, 800);
+    } else {
+      showMessage('❌ Invalid email/username or password', 'error');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In';
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    showMessage('❌ Login failed: ' + err.message, 'error');
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Sign In';
   }
 });
 
 // ========== REGISTER ==========
-document.getElementById('registerForm').addEventListener('submit', (e) => {
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  
+  const registerBtn = document.getElementById('registerBtn');
+  registerBtn.disabled = true;
+  registerBtn.textContent = 'Creating account...';
   
   const firstName = document.getElementById('firstName').value.trim();
   const lastName = document.getElementById('lastName').value.trim();
-  const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('registerEmail').value.trim();
+  const username = document.getElementById('username').value.trim().toLowerCase();
+  const email = document.getElementById('registerEmail').value.trim().toLowerCase();
   const password = document.getElementById('registerPassword').value;
   
   if (password.length < 8) {
     showMessage('Password must be at least 8 characters', 'error');
+    registerBtn.disabled = false;
+    registerBtn.textContent = 'Create Account';
     return;
   }
   
-  const users = getUsers();
-  
-  if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-    showMessage('Username already taken', 'error');
-    return;
-  }
-  
-  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-    showMessage('Email already registered', 'error');
-    return;
-  }
-  
-  const newUser = {
-    id: Date.now(),
-    firstName,
-    lastName,
-    username,
-    email,
-    password,
-    createdAt: new Date().toISOString(),
-    role: users.length === 0 ? 'admin' : 'user',
-    stats: {
-      totalScore: 0,
-      gamesPlayed: 0,
-      correctAnswers: 0,
-      wrongAnswers: 0,
-      bestStreak: 0,
-      badges: []
+  try {
+    // Check for existing users
+    if (isOnlineMode && cachedUsers) {
+      if (cachedUsers.find(u => u.username?.toLowerCase() === username)) {
+        showMessage('Username already taken', 'error');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+        return;
+      }
+      if (cachedUsers.find(u => u.email?.toLowerCase() === email)) {
+        showMessage('Email already registered', 'error');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+        return;
+      }
+    } else {
+      const localUsers = getLocalUsers();
+      if (localUsers.find(u => u.username.toLowerCase() === username)) {
+        showMessage('Username already taken', 'error');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+        return;
+      }
+      if (localUsers.find(u => u.email.toLowerCase() === email)) {
+        showMessage('Email already registered', 'error');
+        registerBtn.disabled = false;
+        registerBtn.textContent = 'Create Account';
+        return;
+      }
     }
-  };
-  
-  users.push(newUser);
-  saveUsers(users);
-  setCurrentUser(newUser);
-  
-  showMessage('✅ Account created! Redirecting...', 'success');
-  setTimeout(() => {
-    window.location.href = 'profile.html';
-  }, 800);
+    
+    const newUser = {
+      id: Date.now(),
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      createdAt: new Date().toISOString(),
+      role: 'user',
+      stats: {
+        totalScore: 0,
+        gamesPlayed: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        bestStreak: 0,
+        badges: []
+      }
+    };
+    
+    // Submit to Google Form if online
+    if (isOnlineMode) {
+      const formUrl = getUsersFormUrl();
+      const entryIds = getUsersFormEntryIds();
+      
+      if (formUrl && entryIds.username) {
+        const formData = new FormData();
+        if (entryIds.username) formData.append(entryIds.username, username);
+        if (entryIds.email) formData.append(entryIds.email, email);
+        if (entryIds.password) formData.append(entryIds.password, password);
+        if (entryIds.firstName) formData.append(entryIds.firstName, firstName);
+        if (entryIds.lastName) formData.append(entryIds.lastName, lastName);
+        if (entryIds.role) formData.append(entryIds.role, 'user');
+        if (entryIds.createdAt) formData.append(entryIds.createdAt, new Date().toISOString());
+        
+        try {
+          await fetch(formUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: formData
+          });
+          console.log('✅ User submitted to Google Form');
+        } catch (err) {
+          console.warn('Failed to submit to Google Form:', err);
+        }
+      }
+    }
+    
+    // Also save locally for immediate use
+    const localUsers = getLocalUsers();
+    localUsers.push(newUser);
+    saveLocalUsers(localUsers);
+    
+    setCurrentUser(newUser);
+    
+    showMessage('✅ Account created! Redirecting...', 'success');
+    setTimeout(() => {
+      window.location.href = 'profile.html';
+    }, 800);
+    
+  } catch (err) {
+    console.error('Registration error:', err);
+    showMessage('❌ Registration failed: ' + err.message, 'error');
+    registerBtn.disabled = false;
+    registerBtn.textContent = 'Create Account';
+  }
 });
+
+// ========== CREATE DEMO USERS ==========
+function createDemoUsersIfNeeded() {
+  if (getLocalUsers().length === 0) {
+    const demoUsers = [
+      {
+        id: 1,
+        firstName: 'Admin',
+        lastName: 'User',
+        username: 'admin',
+        email: 'admin@videobate.com',
+        password: 'admin123',
+        createdAt: new Date().toISOString(),
+        role: 'admin',
+        stats: { totalScore: 5000, gamesPlayed: 50, correctAnswers: 400, wrongAnswers: 50, bestStreak: 15, badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👨‍🏫 Quiz Master'] }
+      },
+      {
+        id: 2,
+        firstName: 'Sarah',
+        lastName: 'Logic',
+        username: 'sarahlogic',
+        email: 'sarah@example.com',
+        password: 'password123',
+        createdAt: new Date(Date.now() - 86400000).toISOString(),
+        role: 'user',
+        stats: { totalScore: 3200, gamesPlayed: 35, correctAnswers: 280, wrongAnswers: 70, bestStreak: 12, badges: ['🔥 Hot Streak', '🎮 Regular Player'] }
+      },
+      {
+        id: 3,
+        firstName: 'Mike',
+        lastName: 'Reason',
+        username: 'mikereason',
+        email: 'mike@example.com',
+        password: 'password123',
+        createdAt: new Date(Date.now() - 172800000).toISOString(),
+        role: 'user',
+        stats: { totalScore: 2100, gamesPlayed: 25, correctAnswers: 180, wrongAnswers: 70, bestStreak: 8, badges: ['🎮 Regular Player'] }
+      }
+    ];
+    
+    saveLocalUsers(demoUsers);
+    console.log('✅ Demo users created for offline mode');
+  }
+}
 
 // ========== CHECK IF ALREADY LOGGED IN ==========
 const currentUser = getCurrentUser();
@@ -841,71 +1014,8 @@ if (currentUser) {
   window.location.href = currentUser.role === 'admin' ? 'admin.html' : 'profile.html';
 }
 
-// ========== CREATE DEMO USERS IF NONE EXIST ==========
-if (getUsers().length === 0) {
-  const demoUsers = [
-    {
-      id: 1,
-      firstName: 'Admin',
-      lastName: 'User',
-      username: 'admin',
-      email: 'admin@videobate.com',
-      password: 'admin123',
-      createdAt: new Date().toISOString(),
-      role: 'admin',
-      stats: { totalScore: 5000, gamesPlayed: 50, correctAnswers: 400, wrongAnswers: 50, bestStreak: 15, badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👨‍🏫 Quiz Master'] }
-    },
-    {
-      id: 2,
-      firstName: 'Sarah',
-      lastName: 'Logic',
-      username: 'sarahlogic',
-      email: 'sarah@example.com',
-      password: 'password123',
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-      role: 'user',
-      stats: { totalScore: 3200, gamesPlayed: 35, correctAnswers: 280, wrongAnswers: 70, bestStreak: 12, badges: ['🔥 Hot Streak', '🎮 Regular Player'] }
-    },
-    {
-      id: 3,
-      firstName: 'Mike',
-      lastName: 'Reason',
-      username: 'mikereason',
-      email: 'mike@example.com',
-      password: 'password123',
-      createdAt: new Date(Date.now() - 172800000).toISOString(),
-      role: 'user',
-      stats: { totalScore: 2100, gamesPlayed: 25, correctAnswers: 180, wrongAnswers: 70, bestStreak: 8, badges: ['🎮 Regular Player'] }
-    },
-    {
-      id: 4,
-      firstName: 'Emma',
-      lastName: 'Truth',
-      username: 'emmatruth',
-      email: 'emma@example.com',
-      password: 'password123',
-      createdAt: new Date(Date.now() - 259200000).toISOString(),
-      role: 'user',
-      stats: { totalScore: 1500, gamesPlayed: 18, correctAnswers: 140, wrongAnswers: 40, bestStreak: 10, badges: ['🎯 Sharp Eye'] }
-    },
-    {
-      id: 5,
-      firstName: 'Alex',
-      lastName: 'Skeptic',
-      username: 'alexskeptic',
-      email: 'alex@example.com',
-      password: 'password123',
-      createdAt: new Date(Date.now() - 345600000).toISOString(),
-      role: 'user',
-      stats: { totalScore: 800, gamesPlayed: 10, correctAnswers: 75, wrongAnswers: 25, bestStreak: 6, badges: [] }
-    }
-  ];
-  
-  saveUsers(demoUsers);
-  console.log('✅ Demo users created!');
-  console.log('🔑 Admin: admin / admin123');
-  console.log('👤 Users: sarahlogic, mikereason, emmatruth, alexskeptic / password123');
-}
+// ========== INIT ==========
+checkConnection();
 </script>
 
 </body>

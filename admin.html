@@ -537,6 +537,7 @@
           <li><a href="#" data-tab="questions"><span class="icon">❓</span> Questions</a></li>
           <li><a href="#" data-tab="fallacies"><span class="icon">📚</span> Fallacies</a></li>
           <li><a href="#" data-tab="reports"><span class="icon">📈</span> Reports</a></li>
+          <li><a href="#" data-tab="userdb"><span class="icon">☁️</span> User Database</a></li>
           <li><a href="#" data-tab="global"><span class="icon">🌐</span> Global Leaderboard</a></li>
         </ul>
         
@@ -830,6 +831,174 @@
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+      
+      <!-- USER DATABASE TAB -->
+      <div class="tab-content" id="userdbTab">
+        <div class="top-bar">
+          <h1 class="page-title">☁️ Cloud User Database</h1>
+        </div>
+        
+        <!-- Connection Status -->
+        <div class="card" id="userDbStatusCard">
+          <div class="card-header">
+            <h3 class="card-title">🔌 Connection Status</h3>
+            <button class="btn btn-sm btn-secondary" onclick="testUserDbConnection()">🔄 Test Connection</button>
+          </div>
+          <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--bg-dark); border-radius: 8px;">
+            <div id="userDbStatusDot" style="width: 16px; height: 16px; border-radius: 50%; background: var(--accent-orange);"></div>
+            <div>
+              <div style="font-weight: 600;" id="userDbStatusText">Not Configured</div>
+              <div style="font-size: 0.85rem; color: var(--text-secondary);" id="userDbStatusDetail">Set up Google Sheets API below</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Apps Script URL for Reading Users -->
+        <div class="card" style="border: 2px solid var(--accent-green); background: rgba(34,197,94,0.05);">
+          <div class="card-header">
+            <h3 class="card-title">📚 Read Users (Apps Script API)</h3>
+            <span style="background: var(--accent-green); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">REQUIRED</span>
+          </div>
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            This URL allows the login page to fetch and verify users from your Google Sheet.
+          </p>
+          
+          <div class="form-group">
+            <label class="form-label">Apps Script Web App URL (for reading users)</label>
+            <input type="text" class="form-input" id="usersApiUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+          </div>
+          
+          <button class="btn btn-primary" onclick="saveUsersApiUrl()">💾 Save API URL</button>
+          <span id="usersApiStatus" style="margin-left: 15px;"></span>
+          
+          <details style="margin-top: 20px;">
+            <summary style="cursor: pointer; color: var(--accent-cyan);">📖 Apps Script Code for Users</summary>
+            <div style="background: var(--bg-dark); padding: 20px; border-radius: 8px; margin-top: 15px;">
+              <p style="margin-bottom: 15px; font-size: 0.9rem;">In your Google Sheet, go to <strong>Extensions → Apps Script</strong> and paste:</p>
+              <pre style="background: #000; padding: 15px; border-radius: 8px; font-size: 0.75rem; overflow-x: auto; color: var(--accent-cyan); white-space: pre-wrap;">function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  
+  const users = data.slice(1).map(row => {
+    const user = {};
+    headers.forEach((h, i) => {
+      // Map common header variations
+      if (h.includes('user') && h.includes('name')) user.username = row[i];
+      else if (h === 'username') user.username = row[i];
+      else if (h === 'email') user.email = row[i];
+      else if (h === 'password') user.password = row[i];
+      else if (h.includes('first')) user.firstName = row[i];
+      else if (h.includes('last')) user.lastName = row[i];
+      else if (h === 'role') user.role = row[i];
+      else if (h.includes('created')) user.createdAt = row[i];
+    });
+    return user;
+  }).filter(u => u.username); // Filter empty rows
+  
+  return ContentService
+    .createTextOutput(JSON.stringify(users))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+              <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">Deploy as Web App with "Anyone" access, then paste the URL above.</p>
+            </div>
+          </details>
+        </div>
+        
+        <!-- Google Form for Registration -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📝 Registration Form (Google Form)</h3>
+          </div>
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            New user registrations will be submitted to this Google Form, which saves to your Sheet.
+          </p>
+          
+          <div class="form-group">
+            <label class="form-label">Google Form Response URL</label>
+            <input type="text" class="form-input" id="usersFormUrl" placeholder="https://docs.google.com/forms/d/e/FORM_ID/formResponse">
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Get this from: Form → Send → Link (change /viewform to /formResponse)</p>
+          </div>
+          
+          <details style="margin-bottom: 20px;">
+            <summary style="cursor: pointer; color: var(--accent-cyan);">Entry IDs for Form Fields</summary>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 15px 0;">
+              Create a Google Form with these fields (all Short answer), then find each entry ID from the pre-filled link.
+            </p>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Username Entry ID</label>
+                <input type="text" class="form-input" id="userEntryUsername" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Entry ID</label>
+                <input type="text" class="form-input" id="userEntryEmail" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password Entry ID</label>
+                <input type="text" class="form-input" id="userEntryPassword" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">First Name Entry ID</label>
+                <input type="text" class="form-input" id="userEntryFirstName" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Last Name Entry ID</label>
+                <input type="text" class="form-input" id="userEntryLastName" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Role Entry ID</label>
+                <input type="text" class="form-input" id="userEntryRole" placeholder="entry.123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Created At Entry ID</label>
+                <input type="text" class="form-input" id="userEntryCreatedAt" placeholder="entry.123456789">
+              </div>
+            </div>
+          </details>
+          
+          <button class="btn btn-primary" onclick="saveUsersFormConfig()">💾 Save Form Configuration</button>
+          <span id="usersFormStatus" style="margin-left: 15px;"></span>
+        </div>
+        
+        <!-- Users from Cloud -->
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">👥 Cloud Users</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadCloudUsers()">🔄 Refresh</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="cloudUsersTable">
+                <tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above, then click Refresh</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- Setup Guide -->
+        <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0,212,255,0.05);">
+          <h3 class="card-title" style="color: var(--accent-cyan); margin-bottom: 15px;">📖 Complete Setup Guide</h3>
+          <ol style="color: var(--text-secondary); line-height: 2.2; margin-left: 20px;">
+            <li><strong>Create Google Form</strong> with fields: Username, Email, Password, First Name, Last Name, Role, Created At</li>
+            <li><strong>Link Form to Sheet</strong>: Form → Responses → Create spreadsheet</li>
+            <li><strong>Create Apps Script</strong>: In Sheet, Extensions → Apps Script → paste code above</li>
+            <li><strong>Deploy Script</strong>: Deploy → New deployment → Web app → Anyone can access</li>
+            <li><strong>Get Form Entry IDs</strong>: Form → 3 dots → Get pre-filled link → find entry.XXX values</li>
+            <li><strong>Configure above</strong>: Paste API URL and Form URL + Entry IDs</li>
+            <li><strong>Test</strong>: Click "Test Connection" to verify everything works!</li>
+          </ol>
         </div>
       </div>
       
@@ -1165,6 +1334,7 @@ function switchTab(tabName) {
   if (tabName === 'users') loadUsersTable();
   if (tabName === 'questions') loadQuestionsTable();
   if (tabName === 'reports') loadReports();
+  if (tabName === 'userdb') testUserDbConnection();
 }
 
 // ========== MODAL ==========
@@ -1441,6 +1611,153 @@ function loadReports() {
         <td style="color: var(--accent-red);">${u.stats.wrongAnswers}</td>
         <td>${acc}%</td>
         <td>${u.stats.bestStreak}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ========== USER DATABASE (CLOUD) ==========
+
+// Save Users API URL
+function saveUsersApiUrl() {
+  const url = document.getElementById('usersApiUrl').value.trim();
+  localStorage.setItem('fallacySpotter_usersApiUrl', url);
+  
+  const status = document.getElementById('usersApiStatus');
+  status.textContent = '✅ Saved!';
+  status.style.color = 'var(--accent-green)';
+  setTimeout(() => status.textContent = '', 3000);
+}
+
+// Load Users API URL
+function loadUsersApiUrl() {
+  const url = localStorage.getItem('fallacySpotter_usersApiUrl') || '';
+  document.getElementById('usersApiUrl').value = url;
+}
+
+// Save Users Form Config
+function saveUsersFormConfig() {
+  const url = document.getElementById('usersFormUrl').value.trim();
+  const entryIds = {
+    username: document.getElementById('userEntryUsername').value.trim(),
+    email: document.getElementById('userEntryEmail').value.trim(),
+    password: document.getElementById('userEntryPassword').value.trim(),
+    firstName: document.getElementById('userEntryFirstName').value.trim(),
+    lastName: document.getElementById('userEntryLastName').value.trim(),
+    role: document.getElementById('userEntryRole').value.trim(),
+    createdAt: document.getElementById('userEntryCreatedAt').value.trim()
+  };
+  
+  localStorage.setItem('fallacySpotter_usersFormUrl', url);
+  localStorage.setItem('fallacySpotter_usersFormEntryIds', JSON.stringify(entryIds));
+  
+  const status = document.getElementById('usersFormStatus');
+  status.textContent = '✅ Saved!';
+  status.style.color = 'var(--accent-green)';
+  setTimeout(() => status.textContent = '', 3000);
+}
+
+// Load Users Form Config
+function loadUsersFormConfig() {
+  const url = localStorage.getItem('fallacySpotter_usersFormUrl') || '';
+  const entryIds = JSON.parse(localStorage.getItem('fallacySpotter_usersFormEntryIds') || '{}');
+  
+  document.getElementById('usersFormUrl').value = url;
+  document.getElementById('userEntryUsername').value = entryIds.username || '';
+  document.getElementById('userEntryEmail').value = entryIds.email || '';
+  document.getElementById('userEntryPassword').value = entryIds.password || '';
+  document.getElementById('userEntryFirstName').value = entryIds.firstName || '';
+  document.getElementById('userEntryLastName').value = entryIds.lastName || '';
+  document.getElementById('userEntryRole').value = entryIds.role || '';
+  document.getElementById('userEntryCreatedAt').value = entryIds.createdAt || '';
+}
+
+// Test User DB Connection
+async function testUserDbConnection() {
+  const url = document.getElementById('usersApiUrl').value.trim();
+  
+  if (!url) {
+    document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
+    document.getElementById('userDbStatusText').textContent = 'Not Configured';
+    document.getElementById('userDbStatusDetail').textContent = 'Please enter an API URL first';
+    return;
+  }
+  
+  document.getElementById('userDbStatusDot').style.background = 'var(--accent-orange)';
+  document.getElementById('userDbStatusText').textContent = 'Connecting...';
+  document.getElementById('userDbStatusDetail').textContent = 'Testing connection to Google Sheets';
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      document.getElementById('userDbStatusDot').style.background = 'var(--accent-green)';
+      document.getElementById('userDbStatusText').textContent = 'Connected!';
+      document.getElementById('userDbStatusDetail').textContent = `Found ${data.length} users in database`;
+      
+      // Also load the users table
+      renderCloudUsersTable(data);
+    } else {
+      document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
+      document.getElementById('userDbStatusText').textContent = 'Invalid Response';
+      document.getElementById('userDbStatusDetail').textContent = 'API did not return an array';
+    }
+  } catch (err) {
+    document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
+    document.getElementById('userDbStatusText').textContent = 'Connection Failed';
+    document.getElementById('userDbStatusDetail').textContent = err.message;
+  }
+}
+
+// Load Cloud Users
+async function loadCloudUsers() {
+  const url = localStorage.getItem('fallacySpotter_usersApiUrl');
+  
+  if (!url) {
+    document.getElementById('cloudUsersTable').innerHTML = 
+      '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above first</td></tr>';
+    return;
+  }
+  
+  document.getElementById('cloudUsersTable').innerHTML = 
+    '<tr><td colspan="5" style="text-align: center; color: var(--accent-cyan); padding: 40px;">🔄 Loading...</td></tr>';
+  
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data.length > 0) {
+      renderCloudUsersTable(data);
+    } else {
+      document.getElementById('cloudUsersTable').innerHTML = 
+        '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">No users found in database</td></tr>';
+    }
+  } catch (err) {
+    document.getElementById('cloudUsersTable').innerHTML = 
+      `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 40px;">❌ Error: ${err.message}</td></tr>`;
+  }
+}
+
+// Render Cloud Users Table
+function renderCloudUsersTable(users) {
+  if (users.length === 0) {
+    document.getElementById('cloudUsersTable').innerHTML = 
+      '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">No users in database</td></tr>';
+    return;
+  }
+  
+  document.getElementById('cloudUsersTable').innerHTML = users.map(u => {
+    const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || 'N/A';
+    const created = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A';
+    const role = u.role || 'user';
+    return `
+      <tr>
+        <td><strong>@${u.username || 'unknown'}</strong></td>
+        <td>${u.email || 'N/A'}</td>
+        <td>${name}</td>
+        <td><span class="role-badge ${role}">${role}</span></td>
+        <td>${created}</td>
       </tr>
     `;
   }).join('');
@@ -1814,6 +2131,8 @@ loadDashboard();
 loadGoogleFormConfig();
 loadLiveDataUrl();
 loadGlobalLeaderboard();
+loadUsersApiUrl();
+loadUsersFormConfig();
 </script>
 
 </body>
