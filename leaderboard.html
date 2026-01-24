@@ -342,6 +342,16 @@
       <p>Top fallacy spotters ranked by total score</p>
     </div>
     
+    <!-- Local vs Global Toggle -->
+    <div style="display: flex; justify-content: center; margin-bottom: 30px;">
+      <div style="display: flex; background: var(--bg-card); border-radius: 10px; padding: 5px;">
+        <button class="scope-tab active" data-scope="local" onclick="switchScope('local')" style="padding: 12px 24px; border: none; background: var(--accent-purple); color: white; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">💻 Local Browser</button>
+        <button class="scope-tab" data-scope="global" onclick="switchScope('global')" style="padding: 12px 24px; border: none; background: transparent; color: var(--text-secondary); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">🌐 Global</button>
+      </div>
+    </div>
+    
+    <p id="scopeDesc" style="text-align: center; color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;">Rankings from accounts in this browser only</p>
+    
     <!-- Podium for Top 3 -->
     <div class="podium" id="podium">
       <!-- Populated by JS -->
@@ -384,8 +394,41 @@ if (currentUser) {
 
 // ========== LEADERBOARD ==========
 let currentSort = 'score';
+let currentScope = 'local';
+
+function switchScope(scope) {
+  currentScope = scope;
+  
+  // Update tab styling
+  document.querySelectorAll('.scope-tab').forEach(tab => {
+    if (tab.dataset.scope === scope) {
+      tab.style.background = 'var(--accent-purple)';
+      tab.style.color = 'white';
+      tab.classList.add('active');
+    } else {
+      tab.style.background = 'transparent';
+      tab.style.color = 'var(--text-secondary)';
+      tab.classList.remove('active');
+    }
+  });
+  
+  // Update description
+  document.getElementById('scopeDesc').textContent = scope === 'local' 
+    ? 'Rankings from accounts in this browser only'
+    : 'Global rankings from all players (updated by admin)';
+  
+  loadLeaderboard();
+}
 
 function loadLeaderboard() {
+  if (currentScope === 'global') {
+    loadGlobalLeaderboard();
+  } else {
+    loadLocalLeaderboard();
+  }
+}
+
+function loadLocalLeaderboard() {
   let users = getUsers();
   
   if (users.length === 0) {
@@ -421,6 +464,120 @@ function loadLeaderboard() {
   
   // Render full list
   renderLeaderboard(users);
+}
+
+function loadGlobalLeaderboard() {
+  const data = JSON.parse(localStorage.getItem('fallacySpotter_globalLeaderboard') || '{}');
+  const players = Object.values(data);
+  
+  if (players.length === 0) {
+    document.getElementById('podium').innerHTML = '';
+    document.getElementById('leaderboardList').innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🌐</div>
+        <h3>No Global Data Yet</h3>
+        <p>Global leaderboard is updated by the admin.<br>
+        Play quizzes to submit your scores, then check back later!</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sort by best score (or other criteria)
+  if (currentSort === 'score') {
+    players.sort((a, b) => b.bestScore - a.bestScore);
+  } else if (currentSort === 'accuracy') {
+    players.sort((a, b) => b.bestScore - a.bestScore); // Use best score as proxy
+  } else if (currentSort === 'games') {
+    players.sort((a, b) => b.totalGames - a.totalGames);
+  }
+  
+  // Render podium (top 3)
+  renderGlobalPodium(players.slice(0, 3));
+  
+  // Render full list
+  renderGlobalLeaderboard(players);
+}
+
+function renderGlobalPodium(top3) {
+  if (top3.length < 1) {
+    document.getElementById('podium').innerHTML = '';
+    return;
+  }
+  
+  let html = '';
+  
+  // Second place (left)
+  if (top3[1]) {
+    html += createGlobalPodiumPlace(top3[1], 2, 'second');
+  }
+  
+  // First place (center)
+  if (top3[0]) {
+    html += createGlobalPodiumPlace(top3[0], 1, 'first');
+  }
+  
+  // Third place (right)
+  if (top3[2]) {
+    html += createGlobalPodiumPlace(top3[2], 3, 'third');
+  }
+  
+  document.getElementById('podium').innerHTML = html;
+}
+
+function createGlobalPodiumPlace(player, rank, className) {
+  const initials = player.displayName.substring(0, 2).toUpperCase();
+  return `
+    <div class="podium-place ${className}">
+      <div class="podium-avatar">
+        ${rank === 1 ? '<span class="podium-crown">👑</span>' : ''}
+        ${initials}
+      </div>
+      <div class="podium-name">${player.displayName}</div>
+      <div class="podium-score">${player.bestScore.toLocaleString()} pts</div>
+      <div class="podium-bar">
+        <div class="podium-rank">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGlobalLeaderboard(players) {
+  const html = players.map((player, index) => {
+    const initials = player.displayName.substring(0, 2).toUpperCase();
+    const rank = index + 1;
+    const rankClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : '';
+    const avgScore = player.totalGames > 0 ? Math.round(player.totalScore / player.totalGames) : 0;
+    
+    return `
+      <div class="leaderboard-item">
+        <div class="leaderboard-rank ${rankClass}">${rank}</div>
+        <div class="leaderboard-user">
+          <div class="leaderboard-avatar">${initials}</div>
+          <div>
+            <div class="leaderboard-name">${player.displayName}</div>
+            <div class="leaderboard-username">@${player.username}</div>
+          </div>
+        </div>
+        <div class="leaderboard-stats">
+          <div class="stat-item">
+            <div class="stat-value gold">${player.bestScore.toLocaleString()}</div>
+            <div class="stat-label">Best Score</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value green">${avgScore}</div>
+            <div class="stat-label">Avg Score</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value cyan">${player.totalGames}</div>
+            <div class="stat-label">Games</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('leaderboardList').innerHTML = html;
 }
 
 function renderPodium(top3) {

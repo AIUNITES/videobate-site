@@ -416,6 +416,22 @@
       color: var(--accent-cyan);
     }
     
+    /* Submission Status */
+    .submission-status {
+      margin-top: 15px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .submission-status.success {
+      background: rgba(34,197,94,0.2);
+      color: var(--accent-green);
+    }
+    .submission-status.error {
+      background: rgba(255,215,0,0.2);
+      color: var(--accent-gold);
+    }
+    
     /* Responsive */
     @media (max-width: 600px) {
       .header h1 { font-size: 1.8rem; }
@@ -1219,6 +1235,74 @@ function showResults() {
   
   // Save game results if logged in
   saveGameResults();
+  
+  // Submit to Google Form for global leaderboard
+  submitToGoogleForm();
+}
+
+// ========== GOOGLE FORM SUBMISSION ==========
+function submitToGoogleForm() {
+  // Get user info
+  const user = getCurrentUser();
+  const username = user ? user.username : 'Guest_' + Math.random().toString(36).substring(7);
+  const displayName = user ? (user.firstName + ' ' + user.lastName) : 'Guest Player';
+  
+  // Google Form configuration
+  // SETUP: Create a Google Form with these fields:
+  // 1. Username (Short answer)
+  // 2. Display Name (Short answer)  
+  // 3. Score (Short answer - number)
+  // 4. Correct Answers (Short answer - number)
+  // 5. Wrong Answers (Short answer - number)
+  // 6. Best Streak (Short answer - number)
+  // 7. Game Mode (Short answer)
+  // 8. Timestamp (Short answer)
+  //
+  // After creating the form, get the form ID and entry IDs from the pre-filled link
+  // Replace FORM_ID and entry.XXXXX values below
+  
+  const GOOGLE_FORM_URL = localStorage.getItem('fallacySpotter_googleFormUrl') || '';
+  
+  if (!GOOGLE_FORM_URL) {
+    console.log('Google Form not configured. Results saved locally only.');
+    return;
+  }
+  
+  // Get entry IDs from localStorage (set by admin)
+  const entryIds = JSON.parse(localStorage.getItem('fallacySpotter_formEntryIds') || '{}');
+  
+  // Build form data
+  const formData = new FormData();
+  if (entryIds.username) formData.append(entryIds.username, username);
+  if (entryIds.displayName) formData.append(entryIds.displayName, displayName);
+  if (entryIds.score) formData.append(entryIds.score, state.score);
+  if (entryIds.correct) formData.append(entryIds.correct, state.correct);
+  if (entryIds.wrong) formData.append(entryIds.wrong, state.wrong);
+  if (entryIds.streak) formData.append(entryIds.streak, state.maxStreak);
+  if (entryIds.mode) formData.append(entryIds.mode, state.mode);
+  if (entryIds.timestamp) formData.append(entryIds.timestamp, new Date().toISOString());
+  
+  // Submit via fetch (no-cors mode for Google Forms)
+  fetch(GOOGLE_FORM_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    body: formData
+  }).then(() => {
+    console.log('Score submitted to global leaderboard!');
+    showSubmissionStatus('success');
+  }).catch(err => {
+    console.error('Failed to submit score:', err);
+    showSubmissionStatus('error');
+  });
+}
+
+function showSubmissionStatus(status) {
+  const badge = document.createElement('div');
+  badge.className = 'submission-status ' + status;
+  badge.innerHTML = status === 'success' 
+    ? '✅ Score submitted to global leaderboard!'
+    : '⚠️ Offline mode - score saved locally';
+  document.getElementById('badges').appendChild(badge);
 }
 
 // Timer functions

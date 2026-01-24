@@ -9,15 +9,15 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ### New Files Created
 
-#### reset-password.html - Password Recovery Flow
-- **4-Step Wizard:**
-  1. Enter email/username to find account
-  2. Enter verification code (demo: `123456`)
-  3. Set new password
-  4. Success confirmation
-- User avatar preview when account found
-- Demo mode note explaining localStorage simulation
-- Password saved to localStorage on reset
+#### reset-password.html - Info Page (No Central Database)
+- Explains localStorage limitations
+- Directs users to contact admin for password reset
+- Options: Admin reset, Clear browser data, Create new account
+- Links back to login page
+
+**Why no self-service password reset?**
+> Without a central database/server, there's no email verification possible.
+> All data is in the user's browser only. "Multi-user" = multiple accounts in same browser.
 
 #### settings.html - User Settings Dashboard
 - **5 Settings Tabs:**
@@ -56,6 +56,40 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 ### Updated Files
 - **login.html** - "Forgot password?" now links to reset-password.html
 - **profile.html** - Added "⚙️ Settings" button to quick actions
+- **admin.html** - Added 🔑 password reset button for each user in Users table
+  - Admin can reset any user's password via prompt
+  - Shows username and confirms new password
+
+### localStorage Architecture (Demo Limitations)
+
+**How "Multi-User" Works Without a Server:**
+```
+┌─────────────────────────────────────────────────────┐
+│  Browser A (Tom's Computer)                         │
+│  ┌─────────────────────────────────────────────┐   │
+│  │ localStorage                                │   │
+│  │  • fallacySpotter_users = [admin, sarah...] │   │
+│  │  • fallacySpotter_currentUser = admin       │   │
+│  │  • fallacySpotter_games_123 = [...]         │   │
+│  └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│  Browser B (Different Computer)                     │
+│  ┌─────────────────────────────────────────────┐   │
+│  │ localStorage                                │   │
+│  │  • fallacySpotter_users = [different data!] │   │
+│  │  • (Completely separate from Browser A)     │   │
+│  └─────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+```
+
+**Implications:**
+- Each browser has its own isolated user database
+- "Leaderboard" only shows users from YOUR browser
+- Clearing browser data = losing ALL accounts
+- No cross-device sync possible
+- Password reset requires admin on SAME browser
 
 ### localStorage Keys Used
 | Key | Purpose |
