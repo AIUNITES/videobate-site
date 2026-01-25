@@ -560,12 +560,13 @@
                 </div>
                 <span class="db-loc-badge">Active</span>
               </div>
-              <div class="db-location-card" data-location="github">
+              <div class="db-location-card" data-location="github" id="githubSyncCard">
                 <div class="db-loc-icon">🐙</div>
                 <div class="db-loc-info">
                   <h5>GitHub Sync</h5>
                   <p>AIUNITES/AIUNITES-database-sync</p>
                 </div>
+                <span class="db-loc-badge" id="githubSyncBadge" style="background: var(--accent-orange);">Click to configure</span>
               </div>
             </div>
           </div>
@@ -767,6 +768,22 @@
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
+
+    // Database location cards click handlers
+    document.querySelectorAll('.db-location-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const location = this.dataset.location;
+        if (location === 'github') {
+          // Go to Dashboard and scroll to GitHub settings
+          showSection('dashboard');
+          setTimeout(() => {
+            document.getElementById('githubToken').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('githubToken').focus();
+          }, 100);
+          showToast('Configure your GitHub token below to enable sync', 'info');
+        }
+      });
+    });
 
     // Initialize database
     async function initAdmin() {
@@ -1021,13 +1038,22 @@
     function updateTokenStatus() {
       const status = document.getElementById('tokenStatus');
       const tokenInput = document.getElementById('githubToken');
+      const syncBadge = document.getElementById('githubSyncBadge');
       const hasToken = SQLDatabase.hasGitHubToken();
       
       if (hasToken) {
         status.innerHTML = '<span style="color: var(--accent-green);">✅ Token configured</span>';
         tokenInput.placeholder = '••••••••••••••••';
+        if (syncBadge) {
+          syncBadge.textContent = '✅ Ready';
+          syncBadge.style.background = 'var(--accent-green)';
+        }
       } else {
         status.innerHTML = '<span style="color: var(--accent-orange);">⚠️ No token set - Save to GitHub will prompt for one</span>';
+        if (syncBadge) {
+          syncBadge.textContent = 'Click to configure';
+          syncBadge.style.background = 'var(--accent-orange)';
+        }
       }
     }
     updateTokenStatus();

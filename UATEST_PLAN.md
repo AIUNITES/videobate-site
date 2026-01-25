@@ -77,18 +77,30 @@
 ### 🛠️ Admin Panel (admin.html - Full Page)
 | Feature | Location | Status | Notes |
 |---------|----------|--------|-------|
-| Sidebar Navigation | admin.html | ✅ | Dashboard, Users, Questions, etc. |
-| Dashboard Stats | admin.html | ✅ | Users, Questions, Fallacies, Games |
+| Sidebar Navigation | admin.html | ✅ | Dashboard, SQL Database, Users, Settings |
+| Dashboard Stats | admin.html | ✅ | Total Users, Site Users, DB Status |
+| **GitHub Sync Settings** | admin.html | ✅ | Token input, save/clear buttons |
+| **Token Status Display** | admin.html | ✅ | Shows if token configured |
+| Quick Links | admin.html | ✅ | Fallacy Spotter, Quiz, Homepage, Login Debug |
 | Recent Users Table | admin.html | ✅ | With role badges |
 | Top Players Table | admin.html | ✅ | Score, accuracy, games |
-| User Management | admin.html | ✅ | CRUD operations |
+| User Management | admin.html | ✅ | View all users from all sites |
 | Password Reset (Admin) | admin.html | ✅ | Reset any user's password |
 | Question Bank | admin.html | ✅ | View/manage questions |
 | Fallacy Database | admin.html | ✅ | View all 48 fallacies |
 | Reports Tab | admin.html | ✅ | Analytics overview |
-| **User Database Tab** | admin.html | ✅ | Local + Cloud users merged |
-| **Cloud Sync Toggle** | admin.html | ✅ | CloudDB integration |
-| **Settings Tab** | admin.html | ✅ | CloudDB configuration |
+| **SQL Database Tab** | admin.html | ✅ | Full SQL workspace |
+| **Database Location Cards** | admin.html | ✅ | Browser (Active) + GitHub Sync |
+| **GitHub Sync Card Click** | admin.html | ✅ | Navigates to token settings |
+| **Save to GitHub Button** | admin.html | ✅ | Pushes database to GitHub |
+| **Load from GitHub Button** | admin.html | ✅ | Fetches latest database |
+| **Save to File Button** | admin.html | ✅ | Downloads .db file |
+| **Load .db File** | admin.html | ✅ | Upload database file |
+| **New Database Button** | admin.html | ✅ | Create fresh database |
+| **SQL Query Panel** | admin.html | ✅ | Run queries, view results |
+| **Tables List** | admin.html | ✅ | Click to SELECT * |
+| Settings Tab | admin.html | ✅ | Registration, Game settings |
+| Danger Zone | admin.html | ✅ | Clear cache, Reset all data |
 | Global Leaderboard Link | admin.html | ✅ | External leaderboard |
 
 ### 🏆 Leaderboard (leaderboard.html)
