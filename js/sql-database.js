@@ -6,7 +6,7 @@
  * SHARED DATABASE ARCHITECTURE:
  * - All AIUNITES sites use the same database: AIUNITES/AIUNITES-database-sync/data/app.db
  * - Users are filtered by the 'site' column to separate per-site data
- * - This allows a single database to serve multiple applications
+ * - Passwords are securely hashed using SHA-256
  */
 
 const SQLDatabase = {
@@ -27,6 +27,36 @@ const SQLDatabase = {
     path: 'data/app.db',  // SHARED database for all AIUNITES sites
     token: ''
   },
+  
+  // ==================== PASSWORD HASHING ====================
+  
+  /**
+   * Hash a password using SHA-256
+   * @param {string} password - Plain text password
+   * @returns {Promise<string>} - Hex-encoded hash
+   */
+  async hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+  },
+  
+  /**
+   * Verify a password against a hash
+   * @param {string} password - Plain text password to verify
+   * @param {string} hash - Stored hash to compare against
+   * @returns {Promise<boolean>} - True if password matches
+   */
+  async verifyPassword(password, hash) {
+    // Support both hashed and plain text passwords during transition
+    const hashedInput = await this.hashPassword(password);
+    return hashedInput === hash || password === hash;
+  },
+  
+  // ==================== INITIALIZATION ====================
   
   /**
    * Initialize sql.js and load database
@@ -60,7 +90,7 @@ const SQLDatabase = {
       }
       
       // Ensure users table exists with site column
-      this.ensureUsersTable();
+      await this.ensureUsersTable();
       
       return true;
       
@@ -173,9 +203,9 @@ const SQLDatabase = {
   },
   
   /**
-   * Ensure users table exists with proper schema INCLUDING site column
+   * Ensure users table exists with proper schema (matching DemoTemplate)
    */
-  ensureUsersTable() {
+  async ensureUsersTable() {
     if (!this.db) return;
     
     try {
@@ -183,28 +213,19 @@ const SQLDatabase = {
       const tableExists = this.db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
       
       if (!tableExists.length) {
-        // Create table with site column for multi-site support
-        console.log('[VideoBate-SQL] Creating users table with site column...');
+        // Create table matching DemoTemplate schema
+        console.log('[VideoBate-SQL] Creating users table...');
         this.db.run(`
           CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            site TEXT NOT NULL DEFAULT 'videobate',
-            username TEXT NOT NULL,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            display_name TEXT,
             email TEXT,
-            password TEXT NOT NULL,
-            firstName TEXT,
-            lastName TEXT,
             role TEXT DEFAULT 'user',
-            totalScore INTEGER DEFAULT 0,
-            gamesPlayed INTEGER DEFAULT 0,
-            correctAnswers INTEGER DEFAULT 0,
-            wrongAnswers INTEGER DEFAULT 0,
-            bestStreak INTEGER DEFAULT 0,
-            badges TEXT DEFAULT '[]',
-            createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-            lastLogin TEXT,
-            UNIQUE(site, username),
-            UNIQUE(site, email)
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            last_login TEXT,
+            site TEXT DEFAULT 'videobate'
           )
         `);
       } else {
@@ -214,7 +235,7 @@ const SQLDatabase = {
         
         if (!hasSiteColumn) {
           console.log('[VideoBate-SQL] Adding site column to existing table...');
-          this.db.run("ALTER TABLE users ADD COLUMN site TEXT NOT NULL DEFAULT 'demotemplate'");
+          this.db.run("ALTER TABLE users ADD COLUMN site TEXT DEFAULT 'DemoTemplate'");
         }
       }
       
@@ -224,7 +245,7 @@ const SQLDatabase = {
       
       if (count === 0) {
         console.log('[VideoBate-SQL] Creating default users for site:', this.SITE_ID);
-        this.createDefaultUsers();
+        await this.createDefaultUsers();
       } else {
         console.log('[VideoBate-SQL] Found', count, 'users for site:', this.SITE_ID);
       }
@@ -237,74 +258,45 @@ const SQLDatabase = {
   },
   
   /**
-   * Create default demo users for VideoBate
+   * Create default demo users for VideoBate (with hashed passwords)
    */
-  createDefaultUsers() {
+  async createDefaultUsers() {
     const defaultUsers = [
       {
         username: 'admin',
-        email: 'admin@videobate.com',
         password: 'admin123',
-        firstName: 'Admin',
-        lastName: 'User',
-        role: 'admin',
-        totalScore: 5000,
-        gamesPlayed: 50,
-        correctAnswers: 400,
-        wrongAnswers: 50,
-        bestStreak: 15,
-        badges: JSON.stringify(['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye'])
+        display_name: 'Administrator',
+        email: 'admin@videobate.com',
+        role: 'admin'
       },
       {
         username: 'demo',
-        email: 'demo@videobate.com',
         password: 'demo123',
-        firstName: 'Demo',
-        lastName: 'User',
-        role: 'user',
-        totalScore: 1500,
-        gamesPlayed: 20,
-        correctAnswers: 150,
-        wrongAnswers: 50,
-        bestStreak: 8,
-        badges: JSON.stringify(['🔥 Hot Streak'])
+        display_name: 'Demo User',
+        email: 'demo@videobate.com',
+        role: 'user'
       },
       {
         username: 'sarahlogic',
-        email: 'sarah@example.com',
         password: 'password123',
-        firstName: 'Sarah',
-        lastName: 'Logic',
-        role: 'user',
-        totalScore: 3200,
-        gamesPlayed: 35,
-        correctAnswers: 280,
-        wrongAnswers: 70,
-        bestStreak: 12,
-        badges: JSON.stringify(['🔥 Hot Streak', '🎮 Regular Player'])
+        display_name: 'Sarah Logic',
+        email: 'sarah@example.com',
+        role: 'user'
       }
     ];
     
-    const stmt = this.db.prepare(`
-      INSERT INTO users (site, username, email, password, firstName, lastName, role, 
-        totalScore, gamesPlayed, correctAnswers, wrongAnswers, bestStreak, badges)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    
-    defaultUsers.forEach(user => {
+    for (const user of defaultUsers) {
       try {
-        stmt.run([
-          this.SITE_ID,  // Add site identifier
-          user.username, user.email, user.password, user.firstName, user.lastName,
-          user.role, user.totalScore, user.gamesPlayed, user.correctAnswers,
-          user.wrongAnswers, user.bestStreak, user.badges
-        ]);
+        const hashedPassword = await this.hashPassword(user.password);
+        this.db.run(`
+          INSERT INTO users (username, password_hash, display_name, email, role, site)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `, [user.username, hashedPassword, user.display_name, user.email, user.role, this.SITE_ID]);
       } catch (e) {
         console.warn('[VideoBate-SQL] User exists:', user.username);
       }
-    });
+    }
     
-    stmt.free();
     console.log('[VideoBate-SQL] Default users created for site:', this.SITE_ID);
   },
   
@@ -314,37 +306,37 @@ const SQLDatabase = {
    * Authenticate user by username/email and password (filtered by site)
    * @returns {Object|null} User object or null if invalid
    */
-  authenticateUser(usernameOrEmail, password) {
+  async authenticateUser(usernameOrEmail, password) {
     if (!this.db) {
       console.warn('[VideoBate-SQL] Database not loaded');
       return null;
     }
     
     try {
-      // Filter by site column to only authenticate users for this site
+      // Find user by username or email for this site
       const stmt = this.db.prepare(`
         SELECT * FROM users 
         WHERE site = ?
         AND (LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?))
-        AND password = ?
       `);
       
-      stmt.bind([this.SITE_ID, usernameOrEmail, usernameOrEmail, password]);
+      stmt.bind([this.SITE_ID, usernameOrEmail, usernameOrEmail]);
       
       if (stmt.step()) {
         const row = stmt.getAsObject();
         stmt.free();
         
-        // Update last login
-        this.db.run(`UPDATE users SET lastLogin = datetime('now') WHERE id = ?`, [row.id]);
-        this.autoSave();
+        // Verify password (supports both hashed and plain text during transition)
+        const isValid = await this.verifyPassword(password, row.password_hash);
         
-        // Parse badges JSON
-        try {
-          row.badges = JSON.parse(row.badges || '[]');
-        } catch (e) {
-          row.badges = [];
+        if (!isValid) {
+          console.log('[VideoBate-SQL] Auth failed: invalid password for', usernameOrEmail);
+          return null;
         }
+        
+        // Update last login
+        this.db.run(`UPDATE users SET last_login = datetime('now') WHERE id = ?`, [row.id]);
+        this.autoSave();
         
         console.log('[VideoBate-SQL] Auth successful for:', row.username, '(site:', row.site, ')');
         
@@ -353,23 +345,28 @@ const SQLDatabase = {
           id: row.id,
           username: row.username,
           email: row.email,
-          firstName: row.firstName,
-          lastName: row.lastName,
+          displayName: row.display_name,
+          // Split display_name for backwards compatibility
+          firstName: row.display_name?.split(' ')[0] || '',
+          lastName: row.display_name?.split(' ').slice(1).join(' ') || '',
           role: row.role,
-          createdAt: row.createdAt,
+          createdAt: row.created_at,
+          lastLogin: row.last_login,
+          site: row.site,
+          // Include empty stats for backwards compatibility
           stats: {
-            totalScore: row.totalScore || 0,
-            gamesPlayed: row.gamesPlayed || 0,
-            correctAnswers: row.correctAnswers || 0,
-            wrongAnswers: row.wrongAnswers || 0,
-            bestStreak: row.bestStreak || 0,
-            badges: row.badges
+            totalScore: 0,
+            gamesPlayed: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            bestStreak: 0,
+            badges: []
           }
         };
       }
       
       stmt.free();
-      console.log('[VideoBate-SQL] Auth failed for:', usernameOrEmail, '(site:', this.SITE_ID, ')');
+      console.log('[VideoBate-SQL] Auth failed: user not found', usernameOrEmail, '(site:', this.SITE_ID, ')');
       return null;
       
     } catch (error) {
@@ -395,27 +392,24 @@ const SQLDatabase = {
         const row = stmt.getAsObject();
         stmt.free();
         
-        try {
-          row.badges = JSON.parse(row.badges || '[]');
-        } catch (e) {
-          row.badges = [];
-        }
-        
         return {
           id: row.id,
           username: row.username,
           email: row.email,
-          firstName: row.firstName,
-          lastName: row.lastName,
+          displayName: row.display_name,
+          firstName: row.display_name?.split(' ')[0] || '',
+          lastName: row.display_name?.split(' ').slice(1).join(' ') || '',
           role: row.role,
-          createdAt: row.createdAt,
+          createdAt: row.created_at,
+          lastLogin: row.last_login,
+          site: row.site,
           stats: {
-            totalScore: row.totalScore || 0,
-            gamesPlayed: row.gamesPlayed || 0,
-            correctAnswers: row.correctAnswers || 0,
-            wrongAnswers: row.wrongAnswers || 0,
-            bestStreak: row.bestStreak || 0,
-            badges: row.badges
+            totalScore: 0,
+            gamesPlayed: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            bestStreak: 0,
+            badges: []
           }
         };
       }
@@ -472,9 +466,9 @@ const SQLDatabase = {
   },
   
   /**
-   * Register new user (with site identifier)
+   * Register new user (with site identifier and hashed password)
    */
-  registerUser(userData) {
+  async registerUser(userData) {
     if (!this.db) {
       throw new Error('Database not available');
     }
@@ -490,21 +484,25 @@ const SQLDatabase = {
     }
     
     try {
-      const stmt = this.db.prepare(`
-        INSERT INTO users (site, username, email, password, firstName, lastName, role, badges)
-        VALUES (?, ?, ?, ?, ?, ?, 'user', '[]')
-      `);
+      // Hash the password
+      const hashedPassword = await this.hashPassword(userData.password);
       
-      stmt.run([
-        this.SITE_ID,  // Add site identifier
+      // Create display_name from firstName + lastName or use provided displayName
+      const displayName = userData.displayName || 
+        `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 
+        userData.username;
+      
+      this.db.run(`
+        INSERT INTO users (username, password_hash, display_name, email, role, site)
+        VALUES (?, ?, ?, ?, 'user', ?)
+      `, [
         userData.username.toLowerCase(),
+        hashedPassword,
+        displayName,
         userData.email?.toLowerCase() || '',
-        userData.password,
-        userData.firstName || '',
-        userData.lastName || ''
+        this.SITE_ID
       ]);
       
-      stmt.free();
       this.autoSave();
       
       console.log('[VideoBate-SQL] User registered:', userData.username, 'for site:', this.SITE_ID);
@@ -519,32 +517,6 @@ const SQLDatabase = {
   },
   
   /**
-   * Update user stats (after quiz)
-   */
-  updateUserStats(userId, stats) {
-    if (!this.db) return false;
-    
-    try {
-      this.db.run(`
-        UPDATE users SET
-          totalScore = totalScore + ?,
-          gamesPlayed = gamesPlayed + 1,
-          correctAnswers = correctAnswers + ?,
-          wrongAnswers = wrongAnswers + ?,
-          bestStreak = MAX(bestStreak, ?)
-        WHERE id = ? AND site = ?
-      `, [stats.score, stats.correct, stats.wrong, stats.streak, userId, this.SITE_ID]);
-      
-      this.autoSave();
-      return true;
-      
-    } catch (error) {
-      console.error('[VideoBate-SQL] Update stats error:', error);
-      return false;
-    }
-  },
-  
-  /**
    * Get all users for this site (for leaderboard)
    */
   getAllUsers() {
@@ -554,7 +526,7 @@ const SQLDatabase = {
       const result = this.db.exec(`
         SELECT * FROM users 
         WHERE site = '${this.SITE_ID}'
-        ORDER BY totalScore DESC
+        ORDER BY username ASC
       `);
       
       if (!result.length) return [];
@@ -566,27 +538,24 @@ const SQLDatabase = {
           user[col] = row[i];
         });
         
-        try {
-          user.badges = JSON.parse(user.badges || '[]');
-        } catch (e) {
-          user.badges = [];
-        }
-        
         return {
           id: user.id,
           username: user.username,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
+          displayName: user.display_name,
+          firstName: user.display_name?.split(' ')[0] || '',
+          lastName: user.display_name?.split(' ').slice(1).join(' ') || '',
           role: user.role,
-          createdAt: user.createdAt,
+          createdAt: user.created_at,
+          lastLogin: user.last_login,
+          site: user.site,
           stats: {
-            totalScore: user.totalScore || 0,
-            gamesPlayed: user.gamesPlayed || 0,
-            correctAnswers: user.correctAnswers || 0,
-            wrongAnswers: user.wrongAnswers || 0,
-            bestStreak: user.bestStreak || 0,
-            badges: user.badges
+            totalScore: 0,
+            gamesPlayed: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            bestStreak: 0,
+            badges: []
           }
         };
       });
