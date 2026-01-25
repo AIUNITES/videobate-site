@@ -345,10 +345,26 @@
         <a href="fallacies.html" style="color: var(--accent-gold);">🎯 Fallacy Spotter</a>
         <a href="quiz.html" style="color: var(--accent-cyan);">🧠 Quiz</a>
         <a href="leaderboard.html">🏆 Leaderboard</a>
-        <a href="login.html" class="btn btn-primary">Sign In</a>
+        <a href="login.html" class="btn btn-primary" id="loginNavLink">Sign In</a>
       </div>
     </div>
   </nav>
+
+  <!-- Login state check -->
+  <script>
+    (function() {
+      const user = JSON.parse(localStorage.getItem('fallacySpotter_currentUser') || 'null');
+      if (user) {
+        const loginLink = document.getElementById('loginNavLink');
+        if (loginLink) {
+          const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+          const displayName = user.firstName || user.username || 'User';
+          loginLink.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
+          loginLink.innerHTML = `<span style="margin-right: 6px;">${initials || '👤'}</span>${displayName}`;
+        }
+      }
+    })();
+  </script>
 
   <section class="hero">
     <div class="container">

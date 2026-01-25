@@ -80,11 +80,28 @@
         <a href="quiz.html" style="color: #00d4ff;">🧠 Quiz</a>
         <a href="#how">How It Works</a>
         <a href="#topics">Topics</a>
-        <a href="login.html" style="color: #22c55e;">🔐 Login</a>
+        <a href="login.html" style="color: #22c55e;" id="loginNavLink">🔐 Login</a>
         <a href="#contact" class="btn btn-primary">Join Waitlist</a>
       </div>
     </div>
   </nav>
+
+  <!-- Login state check -->
+  <script>
+    (function() {
+      const user = JSON.parse(localStorage.getItem('fallacySpotter_currentUser') || 'null');
+      if (user) {
+        const loginLink = document.getElementById('loginNavLink');
+        if (loginLink) {
+          const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+          const displayName = user.firstName || user.username || 'User';
+          loginLink.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
+          loginLink.innerHTML = `<span style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-right: 6px;">${initials || '👤'}</span>${displayName}`;
+          loginLink.style.color = '#fff';
+        }
+      }
+    })();
+  </script>
 
   <section class="hero">
     <div class="container">
