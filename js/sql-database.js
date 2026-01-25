@@ -71,22 +71,27 @@ const SQLDatabase = {
       console.log('[VideoBate-SQL] sql.js loaded successfully');
       console.log('[VideoBate-SQL] Site ID:', this.SITE_ID);
       
-      // Try to load saved database from localStorage
-      await this.loadFromStorage();
-      
-      // If no local database AND not on localhost, auto-load from GitHub
-      if (!this.isLoaded && !this.isLocalhost()) {
-        console.log('[VideoBate-SQL] No local database, attempting GitHub auto-load...');
+      // When online (not localhost), ALWAYS try GitHub first for shared database
+      if (!this.isLocalhost()) {
+        console.log('[VideoBate-SQL] Online mode - loading shared database from GitHub...');
         const loaded = await this.autoLoadFromGitHub();
-        if (loaded) {
-          console.log('[VideoBate-SQL] Auto-loaded from GitHub (shared database)');
-        } else {
-          console.log('[VideoBate-SQL] GitHub load failed, creating new database');
+        if (!loaded) {
+          // Fallback to localStorage if GitHub fails
+          console.log('[VideoBate-SQL] GitHub load failed, trying localStorage...');
+          await this.loadFromStorage();
+          if (!this.isLoaded) {
+            console.log('[VideoBate-SQL] No local DB either, creating new database');
+            this.createNewDatabase();
+          }
+        }
+      } else {
+        // Localhost: use localStorage (development mode)
+        console.log('[VideoBate-SQL] Localhost mode - using local database');
+        await this.loadFromStorage();
+        if (!this.isLoaded) {
+          console.log('[VideoBate-SQL] No local DB, creating new database');
           this.createNewDatabase();
         }
-      } else if (!this.isLoaded) {
-        console.log('[VideoBate-SQL] Localhost mode, creating new database');
-        this.createNewDatabase();
       }
       
       // Ensure users table exists with site column
