@@ -222,6 +222,64 @@
 
 ---
 
+## UA Test Results
+
+### Test Session: January 24, 2026 (7:45 PM)
+
+#### Test 1: Login Button Shows Dashboard Instead of Login Page
+| Field | Value |
+|-------|-------|
+| **Issue** | Clicking "Login" from index.html goes to dashboard/profile instead of login page |
+| **Expected** | If logged out: show login.html. If logged in: show profile/admin |
+| **Actual** | **WORKING AS EXPECTED** - Navigation correctly detects login state |
+| **Details** | When logged in as admin, nav shows "AU Admin" with initials badge, links to admin.html |
+| **Status** | ✅ PASS |
+
+#### Test 2: admin/admin123 Shows "Invalid Password"
+| Field | Value |
+|-------|-------|
+| **Issue** | User entered admin/Admin123 and got "Invalid email/username or password" |
+| **Root Cause** | **Case sensitivity** - password stored as "admin123" (lowercase), user entered "Admin123" (capital A) |
+| **Resolution** | Passwords are correctly case-sensitive for security. Entering lowercase "admin123" works |
+| **Test Result** | Logged in successfully with admin/admin123, redirected to admin.html |
+| **Status** | ✅ PASS (user error, not bug) |
+
+#### Test 3: Navigation Login State Detection
+| Field | Value |
+|-------|-------|
+| **Test** | Verify navigation updates based on login state |
+| **Logged Out** | Shows "🔐 Login" link pointing to login.html |
+| **Logged In (User)** | Shows initials badge + first name, links to profile.html |
+| **Logged In (Admin)** | Shows "AU Admin" badge + name, links to admin.html |
+| **Implementation** | JavaScript checks `fallacySpotter_currentUser` in localStorage |
+| **Status** | ✅ PASS |
+
+#### localStorage State at Test Time
+```json
+{
+  "userCount": 4,
+  "users": [
+    { "username": "admin", "password": "admin123", "email": "admin@videobate.com" },
+    { "username": "sarahlogic", "password": "password123", "email": "sarah@example.com" },
+    { "username": "mikereason", "password": "password123", "email": "mike@example.com" },
+    { "username": "cloudtest2026", "password": "password123", "email": "cloudtest@videobate.com" }
+  ]
+}
+```
+
+#### Pages with Login State Detection
+| Page | Has Detection | Status |
+|------|---------------|--------|
+| index.html | ✅ Yes | Shows user name/initials when logged in |
+| fallacies.html | ✅ Yes | Shows user name/initials when logged in |
+| leaderboard.html | ✅ Yes | Updates auth button |
+| login.html | ✅ Yes | Auto-redirects if already logged in |
+| quiz.html | ❌ No nav | Header only, no login link |
+| profile.html | ✅ Yes | Protected page, requires login |
+| admin.html | ✅ Yes | Protected page, requires admin |
+
+---
+
 ## Known Issues / TODO
 
 | Issue | Priority | Status |
