@@ -2,9 +2,11 @@
  * VideoBate SQL Database Manager
  * ==============================
  * Browser-based SQLite database using sql.js
- * - Auto-loads from GitHub on non-localhost
- * - Provides SQL-based user authentication
- * - Falls back to localStorage if database unavailable
+ * 
+ * SHARED DATABASE ARCHITECTURE:
+ * - All AIUNITES sites use the same database: AIUNITES/AIUNITES-database-sync/data/app.db
+ * - Users are filtered by the 'app' column to separate per-site data
+ * - This allows a single database to serve multiple applications
  */
 
 const SQLDatabase = {
@@ -12,14 +14,17 @@ const SQLDatabase = {
   isLoaded: false,
   SQL: null,
   
+  // App identifier for this site (used to filter users)
+  APP_ID: 'videobate',
+  
   // Storage keys
   STORAGE_KEY: 'videobate_sqldb',
   
-  // Default AIUNITES GitHub config (for public read-only access)
+  // SHARED AIUNITES GitHub config (same database for all sites)
   DEFAULT_GITHUB_CONFIG: {
     owner: 'AIUNITES',
     repo: 'AIUNITES-database-sync',
-    path: 'data/videobate.db',  // VideoBate-specific database
+    path: 'data/app.db',  // SHARED database for all AIUNITES sites
     token: ''
   },
   
@@ -34,6 +39,7 @@ const SQLDatabase = {
       });
       
       console.log('[VideoBate-SQL] sql.js loaded successfully');
+      console.log('[VideoBate-SQL] App ID:', this.APP_ID);
       
       // Try to load saved database from localStorage
       await this.loadFromStorage();
@@ -43,7 +49,7 @@ const SQLDatabase = {
         console.log('[VideoBate-SQL] No local database, attempting GitHub auto-load...');
         const loaded = await this.autoLoadFromGitHub();
         if (loaded) {
-          console.log('[VideoBate-SQL] Auto-loaded from GitHub');
+          console.log('[VideoBate-SQL] Auto-loaded from GitHub (shared database)');
         } else {
           console.log('[VideoBate-SQL] GitHub load failed, creating new database');
           this.createNewDatabase();
@@ -53,7 +59,7 @@ const SQLDatabase = {
         this.createNewDatabase();
       }
       
-      // Ensure users table exists
+      // Ensure users table exists with app column
       this.ensureUsersTable();
       
       return true;
@@ -77,14 +83,14 @@ const SQLDatabase = {
   },
   
   /**
-   * Auto-load database from GitHub
+   * Auto-load database from GitHub (shared database)
    */
   async autoLoadFromGitHub() {
     try {
       const config = this.DEFAULT_GITHUB_CONFIG;
       const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${config.path}`;
       
-      console.log('[VideoBate-SQL] Loading from:', apiUrl);
+      console.log('[VideoBate-SQL] Loading shared database from:', apiUrl);
       
       const resp = await fetch(apiUrl);
       
@@ -106,7 +112,7 @@ const SQLDatabase = {
       this.db = new this.SQL.Database(bytes);
       this.isLoaded = true;
       
-      console.log('[VideoBate-SQL] Loaded', bytes.length, 'bytes from GitHub');
+      console.log('[VideoBate-SQL] Loaded shared database:', bytes.length, 'bytes');
       return true;
       
     } catch (error) {
@@ -167,39 +173,60 @@ const SQLDatabase = {
   },
   
   /**
-   * Ensure users table exists with proper schema
+   * Ensure users table exists with proper schema INCLUDING app column
    */
   ensureUsersTable() {
     if (!this.db) return;
     
     try {
-      this.db.run(`
-        CREATE TABLE IF NOT EXISTS users (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          username TEXT UNIQUE NOT NULL,
-          email TEXT UNIQUE,
-          password TEXT NOT NULL,
-          firstName TEXT,
-          lastName TEXT,
-          role TEXT DEFAULT 'user',
-          totalScore INTEGER DEFAULT 0,
-          gamesPlayed INTEGER DEFAULT 0,
-          correctAnswers INTEGER DEFAULT 0,
-          wrongAnswers INTEGER DEFAULT 0,
-          bestStreak INTEGER DEFAULT 0,
-          badges TEXT DEFAULT '[]',
-          createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
-          lastLogin TEXT
-        )
-      `);
+      // Check if table exists
+      const tableExists = this.db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
       
-      // Check if we have any users, if not create defaults
-      const result = this.db.exec("SELECT COUNT(*) FROM users");
+      if (!tableExists.length) {
+        // Create table with app column for multi-site support
+        console.log('[VideoBate-SQL] Creating users table with app column...');
+        this.db.run(`
+          CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            app TEXT NOT NULL DEFAULT 'videobate',
+            username TEXT NOT NULL,
+            email TEXT,
+            password TEXT NOT NULL,
+            firstName TEXT,
+            lastName TEXT,
+            role TEXT DEFAULT 'user',
+            totalScore INTEGER DEFAULT 0,
+            gamesPlayed INTEGER DEFAULT 0,
+            correctAnswers INTEGER DEFAULT 0,
+            wrongAnswers INTEGER DEFAULT 0,
+            bestStreak INTEGER DEFAULT 0,
+            badges TEXT DEFAULT '[]',
+            createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+            lastLogin TEXT,
+            UNIQUE(app, username),
+            UNIQUE(app, email)
+          )
+        `);
+      } else {
+        // Check if app column exists, add if missing
+        const columns = this.db.exec("PRAGMA table_info(users)");
+        const hasAppColumn = columns[0]?.values.some(col => col[1] === 'app');
+        
+        if (!hasAppColumn) {
+          console.log('[VideoBate-SQL] Adding app column to existing table...');
+          this.db.run("ALTER TABLE users ADD COLUMN app TEXT NOT NULL DEFAULT 'demotemplate'");
+        }
+      }
+      
+      // Check if we have any users for THIS app, if not create defaults
+      const result = this.db.exec(`SELECT COUNT(*) FROM users WHERE app = '${this.APP_ID}'`);
       const count = result[0]?.values[0]?.[0] || 0;
       
       if (count === 0) {
-        console.log('[VideoBate-SQL] Creating default users...');
+        console.log('[VideoBate-SQL] Creating default users for app:', this.APP_ID);
         this.createDefaultUsers();
+      } else {
+        console.log('[VideoBate-SQL] Found', count, 'users for app:', this.APP_ID);
       }
       
       this.autoSave();
@@ -210,7 +237,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Create default demo users
+   * Create default demo users for VideoBate
    */
   createDefaultUsers() {
     const defaultUsers = [
@@ -259,14 +286,15 @@ const SQLDatabase = {
     ];
     
     const stmt = this.db.prepare(`
-      INSERT INTO users (username, email, password, firstName, lastName, role, 
+      INSERT INTO users (app, username, email, password, firstName, lastName, role, 
         totalScore, gamesPlayed, correctAnswers, wrongAnswers, bestStreak, badges)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
     defaultUsers.forEach(user => {
       try {
         stmt.run([
+          this.APP_ID,  // Add app identifier
           user.username, user.email, user.password, user.firstName, user.lastName,
           user.role, user.totalScore, user.gamesPlayed, user.correctAnswers,
           user.wrongAnswers, user.bestStreak, user.badges
@@ -277,13 +305,13 @@ const SQLDatabase = {
     });
     
     stmt.free();
-    console.log('[VideoBate-SQL] Default users created');
+    console.log('[VideoBate-SQL] Default users created for app:', this.APP_ID);
   },
   
   // ==================== USER AUTHENTICATION ====================
   
   /**
-   * Authenticate user by username/email and password
+   * Authenticate user by username/email and password (filtered by app)
    * @returns {Object|null} User object or null if invalid
    */
   authenticateUser(usernameOrEmail, password) {
@@ -293,13 +321,15 @@ const SQLDatabase = {
     }
     
     try {
+      // Filter by app column to only authenticate users for this site
       const stmt = this.db.prepare(`
         SELECT * FROM users 
-        WHERE (LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?))
+        WHERE app = ?
+        AND (LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?))
         AND password = ?
       `);
       
-      stmt.bind([usernameOrEmail, usernameOrEmail, password]);
+      stmt.bind([this.APP_ID, usernameOrEmail, usernameOrEmail, password]);
       
       if (stmt.step()) {
         const row = stmt.getAsObject();
@@ -315,6 +345,8 @@ const SQLDatabase = {
         } catch (e) {
           row.badges = [];
         }
+        
+        console.log('[VideoBate-SQL] Auth successful for:', row.username, '(app:', row.app, ')');
         
         // Return user object in the format VideoBate expects
         return {
@@ -337,6 +369,7 @@ const SQLDatabase = {
       }
       
       stmt.free();
+      console.log('[VideoBate-SQL] Auth failed for:', usernameOrEmail, '(app:', this.APP_ID, ')');
       return null;
       
     } catch (error) {
@@ -346,14 +379,17 @@ const SQLDatabase = {
   },
   
   /**
-   * Get user by username
+   * Get user by username (filtered by app)
    */
   getUserByUsername(username) {
     if (!this.db) return null;
     
     try {
-      const stmt = this.db.prepare(`SELECT * FROM users WHERE LOWER(username) = LOWER(?)`);
-      stmt.bind([username]);
+      const stmt = this.db.prepare(`
+        SELECT * FROM users 
+        WHERE app = ? AND LOWER(username) = LOWER(?)
+      `);
+      stmt.bind([this.APP_ID, username]);
       
       if (stmt.step()) {
         const row = stmt.getAsObject();
@@ -394,58 +430,73 @@ const SQLDatabase = {
   },
   
   /**
-   * Check if username exists
+   * Check if username exists (within this app)
    */
   usernameExists(username) {
     if (!this.db) return false;
     
     try {
-      const result = this.db.exec(`SELECT COUNT(*) FROM users WHERE LOWER(username) = LOWER('${username.replace(/'/g, "''")}')`);
-      return (result[0]?.values[0]?.[0] || 0) > 0;
+      const stmt = this.db.prepare(`
+        SELECT COUNT(*) FROM users 
+        WHERE app = ? AND LOWER(username) = LOWER(?)
+      `);
+      stmt.bind([this.APP_ID, username]);
+      stmt.step();
+      const count = stmt.get()[0];
+      stmt.free();
+      return count > 0;
     } catch (error) {
       return false;
     }
   },
   
   /**
-   * Check if email exists
+   * Check if email exists (within this app)
    */
   emailExists(email) {
     if (!this.db) return false;
     
     try {
-      const result = this.db.exec(`SELECT COUNT(*) FROM users WHERE LOWER(email) = LOWER('${email.replace(/'/g, "''")}')`);
-      return (result[0]?.values[0]?.[0] || 0) > 0;
+      const stmt = this.db.prepare(`
+        SELECT COUNT(*) FROM users 
+        WHERE app = ? AND LOWER(email) = LOWER(?)
+      `);
+      stmt.bind([this.APP_ID, email]);
+      stmt.step();
+      const count = stmt.get()[0];
+      stmt.free();
+      return count > 0;
     } catch (error) {
       return false;
     }
   },
   
   /**
-   * Register new user
+   * Register new user (with app identifier)
    */
   registerUser(userData) {
     if (!this.db) {
       throw new Error('Database not available');
     }
     
-    // Check for existing username
+    // Check for existing username within this app
     if (this.usernameExists(userData.username)) {
       throw new Error('Username already taken');
     }
     
-    // Check for existing email
+    // Check for existing email within this app
     if (userData.email && this.emailExists(userData.email)) {
       throw new Error('Email already registered');
     }
     
     try {
       const stmt = this.db.prepare(`
-        INSERT INTO users (username, email, password, firstName, lastName, role, badges)
-        VALUES (?, ?, ?, ?, ?, 'user', '[]')
+        INSERT INTO users (app, username, email, password, firstName, lastName, role, badges)
+        VALUES (?, ?, ?, ?, ?, ?, 'user', '[]')
       `);
       
       stmt.run([
+        this.APP_ID,  // Add app identifier
         userData.username.toLowerCase(),
         userData.email?.toLowerCase() || '',
         userData.password,
@@ -455,6 +506,8 @@ const SQLDatabase = {
       
       stmt.free();
       this.autoSave();
+      
+      console.log('[VideoBate-SQL] User registered:', userData.username, 'for app:', this.APP_ID);
       
       // Return the created user
       return this.getUserByUsername(userData.username);
@@ -479,8 +532,8 @@ const SQLDatabase = {
           correctAnswers = correctAnswers + ?,
           wrongAnswers = wrongAnswers + ?,
           bestStreak = MAX(bestStreak, ?)
-        WHERE id = ?
-      `, [stats.score, stats.correct, stats.wrong, stats.streak, userId]);
+        WHERE id = ? AND app = ?
+      `, [stats.score, stats.correct, stats.wrong, stats.streak, userId, this.APP_ID]);
       
       this.autoSave();
       return true;
@@ -492,14 +545,16 @@ const SQLDatabase = {
   },
   
   /**
-   * Get all users (for leaderboard)
+   * Get all users for this app (for leaderboard)
    */
   getAllUsers() {
     if (!this.db) return [];
     
     try {
       const result = this.db.exec(`
-        SELECT * FROM users ORDER BY totalScore DESC
+        SELECT * FROM users 
+        WHERE app = '${this.APP_ID}'
+        ORDER BY totalScore DESC
       `);
       
       if (!result.length) return [];
@@ -546,11 +601,38 @@ const SQLDatabase = {
    * Get database status
    */
   getStatus() {
-    return {
-      loaded: this.isLoaded,
-      hasDatabase: !!this.db,
-      userCount: this.db ? (this.db.exec("SELECT COUNT(*) FROM users")[0]?.values[0]?.[0] || 0) : 0
-    };
+    if (!this.db) {
+      return {
+        loaded: false,
+        hasDatabase: false,
+        userCount: 0,
+        app: this.APP_ID
+      };
+    }
+    
+    try {
+      const totalResult = this.db.exec("SELECT COUNT(*) FROM users");
+      const totalCount = totalResult[0]?.values[0]?.[0] || 0;
+      
+      const appResult = this.db.exec(`SELECT COUNT(*) FROM users WHERE app = '${this.APP_ID}'`);
+      const appCount = appResult[0]?.values[0]?.[0] || 0;
+      
+      return {
+        loaded: this.isLoaded,
+        hasDatabase: true,
+        userCount: appCount,
+        totalUsers: totalCount,
+        app: this.APP_ID
+      };
+    } catch (error) {
+      return {
+        loaded: this.isLoaded,
+        hasDatabase: !!this.db,
+        userCount: 0,
+        app: this.APP_ID,
+        error: error.message
+      };
+    }
   }
 };
 

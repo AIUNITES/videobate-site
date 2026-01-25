@@ -1053,6 +1053,13 @@ if (currentUser) {
 }
 
 // ========== INIT ==========
+// Initialize SQL Database first (uses shared AIUNITES database)
+initSQLDatabase().then(() => {
+  console.log('[Login] SQL Database initialization complete');
+}).catch(err => {
+  console.warn('[Login] SQL Database init failed, using fallbacks:', err);
+});
+
 checkConnection();
 </script>
 
