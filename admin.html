@@ -517,11 +517,27 @@
           </div>
 
           <div class="card">
+            <h3>🐙 GitHub Sync Settings</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 15px; font-size: 14px;">Save/load database to <code>AIUNITES/AIUNITES-database-sync/data/app.db</code></p>
+            <div class="form-group">
+              <label>GitHub Personal Access Token</label>
+              <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+              <small style="color: var(--text-secondary); display: block; margin-top: 5px;">Needs <code>repo</code> write access. <a href="https://github.com/settings/tokens/new?scopes=repo&description=AIUNITES-database-sync" target="_blank" style="color: var(--accent-cyan);">Create token →</a></small>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" id="saveGithubTokenBtn">Save Token</button>
+              <button class="btn btn-secondary" id="clearGithubTokenBtn">Clear Token</button>
+            </div>
+            <div id="tokenStatus" style="margin-top: 10px; font-size: 13px;"></div>
+          </div>
+
+          <div class="card">
             <h3>🔗 Quick Links</h3>
             <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
               <a href="fallacies.html" class="btn btn-secondary">🎯 Fallacy Spotter</a>
               <a href="quiz.html" class="btn btn-secondary">🧠 Quiz</a>
               <a href="index.html" class="btn btn-secondary">🏠 Homepage</a>
+              <a href="login.html?debug=1" class="btn btn-secondary">🔧 Login Debug</a>
             </div>
           </div>
         </section>
@@ -567,6 +583,7 @@
                   <input type="file" id="loadDbFile" accept=".db,.sqlite,.sqlite3" hidden>
                 </label>
                 <button class="btn btn-secondary" id="saveDbBtn">💾 Save to File</button>
+                <button class="btn btn-secondary" id="saveGitHubBtn">🐙 Save to GitHub</button>
                 <button class="btn btn-secondary" id="loadGitHubBtn">📥 Load from GitHub</button>
               </div>
             </div>
@@ -949,6 +966,31 @@
       }
     });
 
+    document.getElementById('saveGitHubBtn').addEventListener('click', async () => {
+      // Check if token exists
+      let token = localStorage.getItem('github_token');
+      
+      if (!token) {
+        token = prompt('Enter your GitHub Personal Access Token (needs repo write access):');
+        if (!token) {
+          showToast('GitHub token required', 'error');
+          return;
+        }
+        // Save token for future use
+        if (confirm('Save token for future use? (stored in localStorage)')) {
+          SQLDatabase.setGitHubToken(token);
+        }
+      }
+      
+      showToast('Saving to GitHub...', 'info');
+      const saved = await SQLDatabase.saveToGitHub(token);
+      if (saved) {
+        showToast('Database saved to GitHub!', 'success');
+      } else {
+        showToast('Failed to save to GitHub. Check console for details.', 'error');
+      }
+    });
+
     document.getElementById('clearCacheBtn').addEventListener('click', () => {
       if (confirm('Clear local cache? You will need to reload from GitHub.')) {
         localStorage.removeItem(SQLDatabase.STORAGE_KEY);
@@ -974,6 +1016,41 @@
 
     // Init
     initAdmin();
+    
+    // Check and display GitHub token status
+    function updateTokenStatus() {
+      const status = document.getElementById('tokenStatus');
+      const tokenInput = document.getElementById('githubToken');
+      const hasToken = SQLDatabase.hasGitHubToken();
+      
+      if (hasToken) {
+        status.innerHTML = '<span style="color: var(--accent-green);">✅ Token configured</span>';
+        tokenInput.placeholder = '••••••••••••••••';
+      } else {
+        status.innerHTML = '<span style="color: var(--accent-orange);">⚠️ No token set - Save to GitHub will prompt for one</span>';
+      }
+    }
+    updateTokenStatus();
+    
+    document.getElementById('saveGithubTokenBtn').addEventListener('click', () => {
+      const token = document.getElementById('githubToken').value.trim();
+      if (!token) {
+        showToast('Please enter a token', 'error');
+        return;
+      }
+      SQLDatabase.setGitHubToken(token);
+      document.getElementById('githubToken').value = '';
+      updateTokenStatus();
+      showToast('GitHub token saved!', 'success');
+    });
+    
+    document.getElementById('clearGithubTokenBtn').addEventListener('click', () => {
+      if (confirm('Clear saved GitHub token?')) {
+        SQLDatabase.setGitHubToken(null);
+        updateTokenStatus();
+        showToast('Token cleared', 'success');
+      }
+    });
   </script>
 </body>
 </html>

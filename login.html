@@ -214,21 +214,6 @@
       transform: none;
     }
     
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 20px 0;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-    }
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
-    }
-    .divider span { padding: 0 12px; }
-    
     .forgot-link {
       display: block;
       text-align: right;
@@ -384,10 +369,8 @@
       background: var(--accent-red);
       color: white;
     }
-    /* Admin toggle completely hidden - only accessible via ?debug=1 URL parameter */
-    .admin-toggle {
-      display: none;
-    }
+    
+
     
     /* Responsive */
     @media (max-width: 900px) {
@@ -495,7 +478,7 @@
         </form>
       </div>
       
-      <!-- Admin Debug Panel (hidden, toggle with ?debug=1 or admin login) -->
+      <!-- Admin Debug Panel (hidden by default, toggle with link or ?debug=1) -->
       <div class="admin-debug" id="adminDebug">
         <h4>🔧 Admin Debug Info</h4>
         <div class="debug-item">
@@ -512,8 +495,6 @@
         </div>
         <button class="clear-data-btn" onclick="clearAllData()">🗑️ Clear All Local Data</button>
       </div>
-      
-      <!-- Admin debug only accessible via ?debug=1 URL parameter -->
     </div>
     
     <!-- Right: Benefits Info -->
@@ -965,8 +946,10 @@ function createDemoUsersIfNeeded() {
 }
 
 // ========== CHECK IF ALREADY LOGGED IN ==========
+// Skip redirect if debug mode (so admins can view debug panel)
+const isDebugMode = window.location.search.includes('debug=1');
 const currentUser = getCurrentUser();
-if (currentUser) {
+if (currentUser && !isDebugMode) {
   window.location.href = currentUser.role === 'admin' ? 'admin.html' : 'profile.html';
 }
 

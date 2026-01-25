@@ -113,6 +113,104 @@ const SQLDatabase = {
   },
   
   /**
+   * Save database to GitHub (requires token)
+   * @param {string} token - GitHub Personal Access Token with repo write access
+   * @returns {Promise<boolean>} - Success status
+   */
+  async saveToGitHub(token) {
+    if (!this.db) {
+      console.error('[VideoBate-SQL] No database to save');
+      return false;
+    }
+    
+    if (!token) {
+      // Try to get from localStorage
+      token = localStorage.getItem('github_token');
+      if (!token) {
+        console.error('[VideoBate-SQL] No GitHub token provided');
+        return false;
+      }
+    }
+    
+    try {
+      const config = this.DEFAULT_GITHUB_CONFIG;
+      const apiUrl = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${config.path}`;
+      
+      // First, get the current file SHA (required for updates)
+      const getResp = await fetch(apiUrl, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      
+      let sha = null;
+      if (getResp.ok) {
+        const fileData = await getResp.json();
+        sha = fileData.sha;
+      }
+      
+      // Export database to base64
+      const data = this.db.export();
+      const base64 = btoa(String.fromCharCode.apply(null, data));
+      
+      // Prepare the update payload
+      const payload = {
+        message: `Update database from ${this.SITE_ID} - ${new Date().toISOString()}`,
+        content: base64,
+        branch: 'main'
+      };
+      
+      if (sha) {
+        payload.sha = sha;
+      }
+      
+      // Push to GitHub
+      const putResp = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      if (putResp.ok) {
+        console.log('[VideoBate-SQL] ✅ Database saved to GitHub');
+        return true;
+      } else {
+        const error = await putResp.json();
+        console.error('[VideoBate-SQL] GitHub save failed:', error.message);
+        return false;
+      }
+      
+    } catch (error) {
+      console.error('[VideoBate-SQL] GitHub save error:', error);
+      return false;
+    }
+  },
+  
+  /**
+   * Set GitHub token (stored in localStorage)
+   */
+  setGitHubToken(token) {
+    if (token) {
+      localStorage.setItem('github_token', token);
+      console.log('[VideoBate-SQL] GitHub token saved');
+    } else {
+      localStorage.removeItem('github_token');
+    }
+  },
+  
+  /**
+   * Check if GitHub token is configured
+   */
+  hasGitHubToken() {
+    return !!localStorage.getItem('github_token');
+  },
+  
+  /**
    * Auto-load database from GitHub (shared database)
    */
   async autoLoadFromGitHub() {
