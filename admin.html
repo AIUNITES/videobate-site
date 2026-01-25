@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel | Fallacy Spotter - VideoBate</title>
-  <meta name="description" content="Admin dashboard for managing users, questions, and content.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
-  <script src="js/cloud-database.js"></script>
+  <title>Admin Panel - VideoBate</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
   <style>
     :root {
       --bg-dark: #0f0f14;
       --bg-card: #1a1a24;
-      --bg-input: #252535;
+      --bg-card-hover: #252532;
       --text-primary: #ffffff;
       --text-secondary: #a0a0b0;
       --accent-red: #ef4444;
@@ -19,172 +18,163 @@
       --accent-cyan: #00d4ff;
       --accent-green: #22c55e;
       --accent-purple: #8b5cf6;
-      --accent-orange: #f97316;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg-dark);
       color: var(--text-primary);
       min-height: 100vh;
-      line-height: 1.6;
     }
     
-    /* Layout */
-    .admin-layout {
-      display: flex;
-      min-height: 100vh;
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    
+    /* Nav */
+    .nav {
+      background: rgba(15, 15, 20, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 0;
+      position: sticky;
+      top: 36px;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-container { display: flex; justify-content: space-between; align-items: center; }
+    .logo { font-size: 1.4rem; font-weight: 800; color: var(--accent-red); text-decoration: none; }
+    .logo span { color: var(--text-primary); }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.95rem; transition: color 0.3s; }
+    .nav-links a:hover { color: var(--text-primary); }
+    
+    /* User Menu */
+    .user-menu { position: relative; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .user-avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-purple));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+    }
+    .user-dropdown {
+      position: absolute; top: 100%; right: 0;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 8px 0;
+      min-width: 180px;
+      display: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .user-menu:hover .user-dropdown { display: block; }
+    .user-dropdown a {
+      display: block;
+      padding: 10px 16px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .user-dropdown a:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    
+    /* Admin Layout */
+    .admin-container {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 120px);
+      margin-top: 20px;
     }
     
     /* Sidebar */
-    .sidebar {
-      width: 260px;
+    .admin-sidebar {
       background: var(--bg-card);
-      border-right: 1px solid rgba(255,255,255,0.05);
-      padding: 20px 0;
-      position: fixed;
-      height: 100vh;
-      overflow-y: auto;
+      border-radius: 16px;
+      padding: 20px;
+      height: fit-content;
+      position: sticky;
+      top: 100px;
     }
-    .sidebar-header {
-      padding: 0 20px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-      margin-bottom: 20px;
-    }
-    .sidebar-logo {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent-red);
-      text-decoration: none;
-      display: block;
-      margin-bottom: 5px;
-    }
-    .sidebar-logo span { color: var(--text-primary); }
-    .sidebar-subtitle {
-      color: var(--accent-gold);
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-    
-    .sidebar-nav {
-      list-style: none;
-    }
-    .sidebar-nav li a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: var(--text-secondary);
-      text-decoration: none;
-      transition: all 0.3s;
-      border-left: 3px solid transparent;
-    }
-    .sidebar-nav li a:hover {
-      background: rgba(255,255,255,0.03);
-      color: var(--text-primary);
-    }
-    .sidebar-nav li a.active {
-      background: rgba(139,92,246,0.1);
-      color: var(--accent-purple);
-      border-left-color: var(--accent-purple);
-    }
-    .sidebar-nav li a .icon {
-      font-size: 1.2rem;
-    }
-    
-    .sidebar-section {
-      padding: 15px 20px 10px;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
+    .sidebar-title {
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      padding: 0 12px;
     }
-    
-    .sidebar-footer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 15px 20px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-      background: var(--bg-card);
-    }
-    .sidebar-user {
+    .sidebar-nav { display: flex; flex-direction: column; gap: 5px; }
+    .sidebar-nav a {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
     }
-    .sidebar-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .sidebar-user-info {
-      flex: 1;
-    }
-    .sidebar-user-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .sidebar-user-role {
-      color: var(--accent-red);
-      font-size: 0.75rem;
-    }
+    .sidebar-nav a:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+    .sidebar-nav a.active { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+    .sidebar-nav .icon { font-size: 18px; }
     
     /* Main Content */
-    .main-content {
-      flex: 1;
-      margin-left: 260px;
-      padding: 30px;
+    .admin-main {
+      padding: 0 30px;
     }
-    
-    /* Top Bar */
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .admin-header {
       margin-bottom: 30px;
     }
-    .page-title {
-      font-size: 1.8rem;
-      font-weight: 700;
+    .admin-header h1 {
+      font-size: 2rem;
+      margin-bottom: 5px;
     }
-    .top-actions {
+    .admin-header p { color: var(--text-secondary); }
+    
+    /* Tabs */
+    .admin-tabs {
       display: flex;
-      gap: 12px;
+      gap: 5px;
+      margin-bottom: 25px;
+      padding: 5px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      width: fit-content;
     }
+    .admin-tab {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .admin-tab:hover { color: var(--text-primary); }
+    .admin-tab.active { background: var(--accent-red); color: white; }
+    
+    /* Tab Content */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
     
     /* Cards */
     .card {
       background: var(--bg-card);
       border-radius: 16px;
       padding: 25px;
-      border: 1px solid rgba(255,255,255,0.05);
-      margin-bottom: 25px;
-    }
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       margin-bottom: 20px;
+      border: 1px solid rgba(255,255,255,0.05);
     }
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 600;
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 15px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     
-    /* Stats Cards */
+    /* Stats Grid */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -195,2142 +185,792 @@
       background: var(--bg-card);
       border-radius: 16px;
       padding: 25px;
+      text-align: center;
       border: 1px solid rgba(255,255,255,0.05);
     }
-    .stat-card .label {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      margin-bottom: 8px;
-    }
-    .stat-card .value {
-      font-size: 2.2rem;
+    .stat-value {
+      font-size: 2.5rem;
       font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-red), var(--accent-purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
-    .stat-card .value.purple { color: var(--accent-purple); }
-    .stat-card .value.green { color: var(--accent-green); }
-    .stat-card .value.gold { color: var(--accent-gold); }
-    .stat-card .value.cyan { color: var(--accent-cyan); }
-    .stat-card .change {
-      font-size: 0.85rem;
-      margin-top: 8px;
-    }
-    .stat-card .change.up { color: var(--accent-green); }
-    .stat-card .change.down { color: var(--accent-red); }
+    .stat-label { color: var(--text-secondary); margin-top: 5px; }
     
-    /* Table */
-    .table-container {
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 14px 16px;
-      text-align: left;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-    th {
-      color: var(--text-secondary);
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    tr:hover {
-      background: rgba(255,255,255,0.02);
-    }
-    .user-cell {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .user-avatar-sm {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .role-badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .role-badge.admin {
-      background: rgba(239,68,68,0.2);
-      color: var(--accent-red);
-    }
-    .role-badge.user {
-      background: rgba(139,92,246,0.2);
-      color: var(--accent-purple);
-    }
-    
-    /* Buttons */
-    .btn {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-    }
-    .btn-primary {
-      background: var(--accent-purple);
-      color: white;
-    }
-    .btn-primary:hover {
-      background: #7c3aed;
-    }
-    .btn-secondary {
-      background: var(--bg-input);
-      color: var(--text-primary);
-    }
-    .btn-secondary:hover {
-      background: #333;
-    }
-    .btn-danger {
-      background: rgba(239,68,68,0.2);
-      color: var(--accent-red);
-    }
-    .btn-danger:hover {
-      background: var(--accent-red);
-      color: white;
-    }
-    .btn-sm {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-    }
-    
-    /* Action Buttons in Table */
-    .action-btns {
-      display: flex;
-      gap: 8px;
-    }
-    .action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .action-btn.edit {
-      background: rgba(0,212,255,0.2);
-      color: var(--accent-cyan);
-    }
-    .action-btn.edit:hover {
-      background: var(--accent-cyan);
-      color: white;
-    }
-    .action-btn.delete {
-      background: rgba(239,68,68,0.2);
-      color: var(--accent-red);
-    }
-    .action-btn.delete:hover {
-      background: var(--accent-red);
-      color: white;
-    }
-    
-    /* Tabs */
-    .tabs {
-      display: flex;
-      gap: 5px;
-      background: var(--bg-dark);
-      padding: 5px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-    }
-    .tab {
-      padding: 10px 20px;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 8px;
-      transition: all 0.3s;
-    }
-    .tab.active {
-      background: var(--accent-purple);
-      color: white;
-    }
-    .tab:hover:not(.active) {
-      color: var(--text-primary);
-    }
-    
-    /* Tab Content */
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    
-    /* Form */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    .form-label {
+    /* Form Styles */
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
       display: block;
       margin-bottom: 8px;
       color: var(--text-secondary);
-      font-size: 0.9rem;
+      font-size: 14px;
     }
-    .form-input, .form-select, .form-textarea {
+    .form-group input, .form-group select, .form-group textarea {
       width: 100%;
-      padding: 12px 14px;
-      background: var(--bg-input);
-      border: 2px solid transparent;
+      padding: 12px 16px;
+      background: var(--bg-dark);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 8px;
       color: var(--text-primary);
-      font-size: 0.95rem;
-      transition: all 0.3s;
+      font-size: 14px;
     }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
       outline: none;
-      border-color: var(--accent-purple);
-    }
-    .form-textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-    .form-select {
-      cursor: pointer;
+      border-color: var(--accent-red);
     }
     
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .modal-overlay.show {
-      display: flex;
-    }
-    .modal {
-      background: var(--bg-card);
-      border-radius: 16px;
-      padding: 30px;
-      width: 90%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .modal-header {
+    /* Toggle Switch */
+    .toggle-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      padding: 15px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
     }
-    .modal-title {
-      font-size: 1.3rem;
-      font-weight: 700;
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info label { font-weight: 500; margin-bottom: 3px; display: block; }
+    .toggle-info span { font-size: 13px; color: var(--text-secondary); }
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 26px;
     }
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 1.5rem;
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
       cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 26px;
+      transition: 0.3s;
     }
-    .modal-close:hover {
-      color: var(--accent-red);
+    .toggle-slider:before {
+      content: "";
+      position: absolute;
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
     }
-    .modal-footer {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      margin-top: 25px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
+    .toggle input:checked + .toggle-slider { background: var(--accent-green); }
+    .toggle input:checked + .toggle-slider:before { transform: translateX(24px); }
     
-    /* Search & Filter */
-    .search-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .search-input {
-      flex: 1;
-      padding: 12px 16px;
-      background: var(--bg-input);
-      border: 2px solid transparent;
+    /* Buttons */
+    .btn {
+      padding: 12px 24px;
+      border: none;
       border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
     }
-    .search-input:focus {
-      outline: none;
-      border-color: var(--accent-purple);
+    .btn-primary { background: var(--accent-red); color: white; }
+    .btn-primary:hover { background: #dc2626; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text-primary);
+    }
+    .btn-secondary:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+    .btn-danger { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+    .btn-danger:hover { background: var(--accent-red); color: white; }
+    
+    /* Database Location Grid */
+    .db-location-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .db-location-card {
+      background: var(--bg-dark);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .db-location-card:hover { border-color: rgba(255,255,255,0.2); }
+    .db-location-card.active {
+      border-color: var(--accent-green);
+      background: rgba(34,197,94,0.1);
+    }
+    .db-loc-icon { font-size: 24px; margin-bottom: 10px; }
+    .db-loc-info h5 { font-size: 14px; margin-bottom: 5px; }
+    .db-loc-info p { font-size: 12px; color: var(--text-secondary); }
+    .db-loc-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      background: var(--accent-green);
+      color: white;
+      border-radius: 10px;
+      font-size: 11px;
+      margin-top: 10px;
     }
     
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-secondary);
-    }
-    .empty-state .icon {
-      font-size: 4rem;
+    /* SQL Workspace */
+    .sql-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 20px;
-      opacity: 0.5;
+      flex-wrap: wrap;
+      gap: 15px;
     }
-    .empty-state h3 {
-      margin-bottom: 10px;
+    .sql-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sql-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .sql-workspace {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .sql-tables-panel {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 15px;
+    }
+    .sql-query-panel {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 15px;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .panel-header h4 { font-size: 14px; }
+    #sql-query-input {
+      width: 100%;
+      height: 150px;
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 15px;
       color: var(--text-primary);
+      font-family: 'Fira Code', monospace;
+      font-size: 13px;
+      resize: vertical;
     }
+    .query-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      align-items: center;
+    }
+    .sql-results-panel {
+      background: var(--bg-dark);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .results-container {
+      max-height: 300px;
+      overflow: auto;
+    }
+    .sql-results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .sql-results-table th, .sql-results-table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .sql-results-table th { background: var(--bg-card); font-weight: 600; }
+    .tables-list { max-height: 300px; overflow-y: auto; }
+    .table-item {
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .table-item:hover { background: rgba(255,255,255,0.05); }
+    .table-count { color: var(--text-secondary); font-size: 11px; margin-left: auto; }
+    
+    /* Users Table */
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .users-table th, .users-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .users-table th { color: var(--text-secondary); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+    .role-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .role-badge.admin { background: rgba(239,68,68,0.2); color: var(--accent-red); }
+    .role-badge.user { background: rgba(0,212,255,0.2); color: var(--accent-cyan); }
+    
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--bg-card);
+      padding: 15px 25px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      display: none;
+      z-index: 9999;
+    }
+    .toast.show { display: block; animation: slideIn 0.3s; }
+    @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     
     /* Responsive */
-    @media (max-width: 1024px) {
-      .sidebar {
-        transform: translateX(-100%);
-        z-index: 1000;
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      .main-content {
-        margin-left: 0;
-      }
+    @media (max-width: 768px) {
+      .admin-container { grid-template-columns: 1fr; }
+      .admin-sidebar { margin-bottom: 20px; position: static; }
+      .sql-workspace { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
+  <!-- AIUNITES Webring -->
+  <style>.aiunites-bar{position:fixed;top:0;left:0;right:0;z-index:10000;background:linear-gradient(90deg,#0a0a0f,#1a1a2e);border-bottom:1px solid rgba(99,102,241,.3);padding:8px 0;font-size:12px}.aiunites-bar-content{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px;overflow-x:auto;scrollbar-width:none}.aiunites-bar-content::-webkit-scrollbar{display:none}.aiunites-bar a{color:rgba(255,255,255,.7);text-decoration:none;white-space:nowrap;transition:color .2s}.aiunites-bar a:hover{color:#fff}.aiunites-bar-brand{color:#6366f1!important;font-weight:600}body{padding-top:36px!important}</style>
+  <div class="aiunites-bar">
+    <div class="aiunites-bar-content">
+      <a href="https://aiunites.github.io/aiunites-site/" class="aiunites-bar-brand">◆ AIUNITES</a>
+      <span style="color:rgba(255,255,255,.2)">|</span>
+      <a href="https://aiunites.github.io/aizines-app/">AIZines</a>
+      <a href="https://aiunites.github.io/DemoTemplate/">DemoTemplate</a>
+      <a href="https://aiunites.github.io/videobate-site/">VideoBate</a>
+    </div>
+  </div>
 
-  <div class="admin-layout">
-    
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <a href="index.html" class="sidebar-logo">🎬 Video<span>Bate</span></a>
-        <div class="sidebar-subtitle">⚙️ Admin Panel</div>
-      </div>
-      
-      <nav>
-        <ul class="sidebar-nav">
-          <li><a href="#" class="active" data-tab="dashboard"><span class="icon">📊</span> Dashboard</a></li>
-          <li><a href="#" data-tab="users"><span class="icon">👥</span> Users</a></li>
-          <li><a href="#" data-tab="questions"><span class="icon">❓</span> Questions</a></li>
-          <li><a href="#" data-tab="fallacies"><span class="icon">📚</span> Fallacies</a></li>
-          <li><a href="#" data-tab="reports"><span class="icon">📈</span> Reports</a></li>
-          <li><a href="#" data-tab="userdb"><span class="icon">☁️</span> User Database</a></li>
-          <li><a href="#" data-tab="global"><span class="icon">🌐</span> Global Leaderboard</a></li>
-          <li><a href="#" data-tab="settings"><span class="icon">⚙️</span> Settings</a></li>
-        </ul>
-        
-        <div class="sidebar-section">Quick Links</div>
-        <ul class="sidebar-nav">
-          <li><a href="profile.html"><span class="icon">👤</span> My Profile</a></li>
-          <li><a href="quiz.html"><span class="icon">🎮</span> Play Quiz</a></li>
-          <li><a href="fallacies.html"><span class="icon">📖</span> View Site</a></li>
-        </ul>
-      </nav>
-      
-      <div class="sidebar-footer">
-        <div class="sidebar-user">
-          <div class="sidebar-avatar" id="sidebarAvatar">?</div>
-          <div class="sidebar-user-info">
-            <div class="sidebar-user-name" id="sidebarName">Admin</div>
-            <div class="sidebar-user-role">Administrator</div>
+  <nav class="nav">
+    <div class="container nav-container">
+      <a href="index.html" class="logo">🎬 Video<span>Bate</span></a>
+      <div class="nav-links">
+        <a href="fallacies.html">🎯 Fallacy Spotter</a>
+        <a href="quiz.html">🧠 Quiz</a>
+        <div class="user-menu" id="userMenu">
+          <span id="userName">Admin</span>
+          <div class="user-avatar" id="userAvatar">A</div>
+          <div class="user-dropdown">
+            <a href="admin.html">🛡️ Admin Panel</a>
+            <a href="#" id="settingsLink">⚙️ Settings</a>
+            <a href="#" id="logoutLink">🚪 Log Out</a>
           </div>
         </div>
       </div>
-    </aside>
-    
-    <!-- Main Content -->
-    <main class="main-content">
-      
-      <!-- DASHBOARD TAB -->
-      <div class="tab-content active" id="dashboardTab">
-        <div class="top-bar">
-          <h1 class="page-title">📊 Dashboard</h1>
-          <div class="top-actions">
-            <button class="btn btn-secondary" onclick="location.reload()">🔄 Refresh</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="admin-container">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-title">Admin Menu</div>
+        <nav class="sidebar-nav">
+          <a href="#" class="active" data-section="dashboard"><span class="icon">📊</span> Dashboard</a>
+          <a href="#" data-section="database"><span class="icon">🗃️</span> SQL Database</a>
+          <a href="#" data-section="users"><span class="icon">👥</span> Users</a>
+          <a href="#" data-section="settings"><span class="icon">⚙️</span> Settings</a>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="admin-main">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="tab-content active">
+          <div class="admin-header">
+            <h1>🛡️ Admin Dashboard</h1>
+            <p>VideoBate administration and management</p>
           </div>
-        </div>
-        
-        <!-- Stats -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="label">Total Users</div>
-            <div class="value purple" id="totalUsers">0</div>
-            <div class="change up">↑ Active community</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Total Questions</div>
-            <div class="value cyan" id="totalQuestions">25</div>
-            <div class="change">In quiz database</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Fallacy Types</div>
-            <div class="value gold" id="totalFallacies">48</div>
-            <div class="change">Documented</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Games Played</div>
-            <div class="value green" id="totalGames">0</div>
-            <div class="change">All time</div>
-          </div>
-        </div>
-        
-        <!-- Recent Users -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">👥 Recent Users</h3>
-            <button class="btn btn-sm btn-secondary" onclick="switchTab('users')">View All →</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Score</th>
-                  <th>Joined</th>
-                </tr>
-              </thead>
-              <tbody id="recentUsersTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <!-- Quick Stats -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">🏆 Top Players</h3>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>User</th>
-                  <th>Score</th>
-                  <th>Accuracy</th>
-                  <th>Games</th>
-                </tr>
-              </thead>
-              <tbody id="topPlayersTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- USERS TAB -->
-      <div class="tab-content" id="usersTab">
-        <div class="top-bar">
-          <h1 class="page-title">👥 User Management</h1>
-          <div class="top-actions">
-            <button class="btn btn-secondary" onclick="loadUsersTable()" id="syncUsersBtn">🔄 Sync Cloud</button>
-            <button class="btn btn-primary" onclick="openModal('addUserModal')">+ Add User</button>
-          </div>
-        </div>
-        <div id="usersSourceInfo" style="margin-bottom: 20px; padding: 12px 16px; background: var(--bg-card); border-radius: 8px; display: flex; align-items: center; gap: 15px;">
-          <span style="color: var(--text-secondary);">Showing:</span>
-          <span style="background: rgba(139,92,246,0.2); color: var(--accent-purple); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">💾 Local Users</span>
-          <span style="color: var(--text-secondary);">+</span>
-          <span style="background: rgba(0,212,255,0.2); color: var(--accent-cyan); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem;">☁️ Cloud Users</span>
-        </div>
-        
-        <div class="card">
-          <div class="search-bar">
-            <input type="text" class="search-input" id="userSearch" placeholder="Search users by name, email, or username..." oninput="filterUsers()">
-            <select class="form-select" style="width: auto;" id="roleFilter" onchange="filterUsers()">
-              <option value="">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-          
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Role</th>
-                  <th>Score</th>
-                  <th>Games</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="usersTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- QUESTIONS TAB -->
-      <div class="tab-content" id="questionsTab">
-        <div class="top-bar">
-          <h1 class="page-title">❓ Question Bank</h1>
-          <div class="top-actions">
-            <button class="btn btn-primary" onclick="openModal('addQuestionModal')">+ Add Question</button>
-          </div>
-        </div>
-        
-        <div class="card">
-          <div class="search-bar">
-            <input type="text" class="search-input" id="questionSearch" placeholder="Search questions..." oninput="filterQuestions()">
-            <select class="form-select" style="width: auto;" id="difficultyFilter" onchange="filterQuestions()">
-              <option value="">All Difficulties</option>
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-          
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Scenario (Preview)</th>
-                  <th>Answer</th>
-                  <th>Difficulty</th>
-                  <th>Points</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="questionsTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- FALLACIES TAB -->
-      <div class="tab-content" id="fallaciesTab">
-        <div class="top-bar">
-          <h1 class="page-title">📚 Fallacy Database</h1>
-          <div class="top-actions">
-            <button class="btn btn-primary" onclick="openModal('addFallacyModal')">+ Add Fallacy</button>
-            <a href="fallacies.html" class="btn btn-secondary" target="_blank">View Library →</a>
-          </div>
-        </div>
-        
-        <div class="card">
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            The fallacy database is currently stored in the HTML file. To add or edit fallacies, modify the <code>fallacies.html</code> file directly.
-            In a production system, this would be stored in a database.
-          </p>
-          
-          <div class="stats-grid" style="margin-bottom: 0;">
+
+          <div class="stats-grid">
             <div class="stat-card">
-              <div class="label">Total Fallacies</div>
-              <div class="value gold">48</div>
+              <div class="stat-value" id="totalUsers">0</div>
+              <div class="stat-label">Total Users</div>
             </div>
             <div class="stat-card">
-              <div class="label">Categories</div>
-              <div class="value purple">8</div>
+              <div class="stat-value" id="siteUsers">0</div>
+              <div class="stat-label">VideoBate Users</div>
             </div>
             <div class="stat-card">
-              <div class="label">With ASCII Art</div>
-              <div class="value cyan">48</div>
+              <div class="stat-value" id="dbStatus">--</div>
+              <div class="stat-label">Database Status</div>
             </div>
           </div>
-        </div>
-        
-        <!-- Categories List -->
-        <div class="card">
-          <h3 class="card-title" style="margin-bottom: 20px;">📂 Categories</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Icon</th>
-                <th>Category</th>
-                <th>Fallacy Count</th>
-                <th>Color</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>👤</td><td>Attack the Person</td><td>6</td><td><span style="color: #ef4444;">Red</span></td></tr>
-              <tr><td>🐟</td><td>Misdirection</td><td>6</td><td><span style="color: #f97316;">Orange</span></td></tr>
-              <tr><td>🎓</td><td>False Authority</td><td>6</td><td><span style="color: #8b5cf6;">Purple</span></td></tr>
-              <tr><td>🧠</td><td>Logic Errors</td><td>6</td><td><span style="color: #00d4ff;">Cyan</span></td></tr>
-              <tr><td>🎭</td><td>Manipulation</td><td>6</td><td><span style="color: #ec4899;">Pink</span></td></tr>
-              <tr><td>🗳️</td><td>Political Tactics</td><td>6</td><td><span style="color: #22c55e;">Green</span></td></tr>
-              <tr><td>⚔️</td><td>Advanced Debate</td><td>6</td><td><span style="color: #fff;">White</span></td></tr>
-              <tr><td>⚡</td><td>Causation Errors</td><td>6</td><td><span style="color: #f97316;">Orange</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      <!-- REPORTS TAB -->
-      <div class="tab-content" id="reportsTab">
-        <div class="top-bar">
-          <h1 class="page-title">📈 Reports & Analytics</h1>
-          <div class="top-actions">
-            <button class="btn btn-secondary">📥 Export CSV</button>
-          </div>
-        </div>
-        
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="label">Total Score (All Users)</div>
-            <div class="value gold" id="reportTotalScore">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Average Score</div>
-            <div class="value purple" id="reportAvgScore">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Total Correct Answers</div>
-            <div class="value green" id="reportCorrect">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Overall Accuracy</div>
-            <div class="value cyan" id="reportAccuracy">0%</div>
-          </div>
-        </div>
-        
-        <div class="card">
-          <h3 class="card-title" style="margin-bottom: 20px;">📊 User Performance Summary</h3>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Total Score</th>
-                  <th>Games</th>
-                  <th>Correct</th>
-                  <th>Wrong</th>
-                  <th>Accuracy</th>
-                  <th>Best Streak</th>
-                </tr>
-              </thead>
-              <tbody id="reportTable">
-                <!-- Populated by JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- USER DATABASE TAB -->
-      <div class="tab-content" id="userdbTab">
-        <div class="top-bar">
-          <h1 class="page-title">☁️ Cloud User Database</h1>
-        </div>
-        
-        <!-- Connection Status -->
-        <div class="card" id="userDbStatusCard">
-          <div class="card-header">
-            <h3 class="card-title">🔌 Connection Status</h3>
-            <button class="btn btn-sm btn-secondary" onclick="testUserDbConnection()">🔄 Test Connection</button>
-          </div>
-          <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--bg-dark); border-radius: 8px;">
-            <div id="userDbStatusDot" style="width: 16px; height: 16px; border-radius: 50%; background: var(--accent-orange);"></div>
-            <div>
-              <div style="font-weight: 600;" id="userDbStatusText">Not Configured</div>
-              <div style="font-size: 0.85rem; color: var(--text-secondary);" id="userDbStatusDetail">Set up Google Sheets API below</div>
+
+          <div class="card">
+            <h3>🔗 Quick Links</h3>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+              <a href="fallacies.html" class="btn btn-secondary">🎯 Fallacy Spotter</a>
+              <a href="quiz.html" class="btn btn-secondary">🧠 Quiz</a>
+              <a href="index.html" class="btn btn-secondary">🏠 Homepage</a>
             </div>
           </div>
-        </div>
-        
-        <!-- Hardcoded Form Info -->
-        <div class="card" style="border: 1px solid var(--accent-gold); background: rgba(255,215,0,0.05);">
-          <div class="card-header">
-            <h3 class="card-title">📝 Google Form (Hardcoded)</h3>
-            <span style="background: var(--accent-green); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">✅ CONFIGURED</span>
+        </section>
+
+        <!-- Database Section -->
+        <section id="database-section" class="tab-content">
+          <div class="admin-header">
+            <h1>🗃️ SQL Database</h1>
+            <p>Manage the shared AIUNITES database</p>
           </div>
-          <p style="color: var(--text-secondary); margin-bottom: 15px;">
-            The app is configured to use your existing Help/Feedback form with packed data format.
-          </p>
-          <div style="background: var(--bg-dark); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.8rem;">
-            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Form URL:</span> <span style="color: var(--text-secondary);">...1FAIpQLSeQUi49AdTBRjetz5MDFQgMIkm9-vOMb_ARKwYEz41j_Nfiwg...</span></div>
-            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Email:</span> entry.904300305</div>
-            <div style="margin-bottom: 8px;"><span style="color: var(--accent-cyan);">Source:</span> entry.2053726945</div>
-            <div><span style="color: var(--accent-cyan);">Message:</span> entry.1759393763 <span style="color: var(--accent-gold);">← Packed data goes here</span></div>
+
+          <div class="card">
+            <h3>🌐 Database Location</h3>
+            <div class="db-location-grid">
+              <div class="db-location-card active" data-location="browser">
+                <div class="db-loc-icon">💻</div>
+                <div class="db-loc-info">
+                  <h5>Browser</h5>
+                  <p>Stored in localStorage</p>
+                </div>
+                <span class="db-loc-badge">Active</span>
+              </div>
+              <div class="db-location-card" data-location="github">
+                <div class="db-loc-icon">🐙</div>
+                <div class="db-loc-info">
+                  <h5>GitHub Sync</h5>
+                  <p>AIUNITES/AIUNITES-database-sync</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <p style="color: var(--text-secondary); margin-top: 15px; font-size: 0.85rem;">
-            <strong>Data Format:</strong><br>
-            <code style="background: #000; padding: 2px 6px; border-radius: 4px; color: var(--accent-green);">USER|username|email|password|firstName|lastName|role|createdAt</code><br>
-            <code style="background: #000; padding: 2px 6px; border-radius: 4px; color: var(--accent-cyan);">SCORE|username|displayName|score|correct|wrong|streak|mode|timestamp</code>
-          </p>
-        </div>
-        
-        <!-- Apps Script URL for Reading Data -->
-        <div class="card" style="border: 2px solid var(--accent-green); background: rgba(34,197,94,0.05);">
-          <div class="card-header">
-            <h3 class="card-title">📚 Apps Script API URL</h3>
-            <span style="background: var(--accent-green); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 600;">REQUIRED</span>
+
+          <div class="card">
+            <div class="sql-header">
+              <div class="sql-status">
+                <span id="sql-status-icon">⚪</span>
+                <span id="sql-status-text">Checking database...</span>
+              </div>
+              <div class="sql-actions">
+                <button class="btn btn-secondary" id="newDbBtn">➕ New Database</button>
+                <label class="btn btn-secondary" style="cursor: pointer;">
+                  📂 Load .db
+                  <input type="file" id="loadDbFile" accept=".db,.sqlite,.sqlite3" hidden>
+                </label>
+                <button class="btn btn-secondary" id="saveDbBtn">💾 Save to File</button>
+                <button class="btn btn-secondary" id="loadGitHubBtn">📥 Load from GitHub</button>
+              </div>
+            </div>
+
+            <div class="sql-workspace">
+              <div class="sql-tables-panel">
+                <div class="panel-header">
+                  <h4>🗂️ Tables</h4>
+                  <button class="btn btn-secondary" id="refreshTablesBtn" style="padding: 5px 10px; font-size: 12px;">🔄</button>
+                </div>
+                <div class="tables-list" id="tablesList">
+                  <div style="color: var(--text-secondary); font-size: 13px;">No tables</div>
+                </div>
+              </div>
+              <div class="sql-query-panel">
+                <div class="panel-header">
+                  <h4>📝 SQL Query</h4>
+                </div>
+                <textarea id="sql-query-input" placeholder="SELECT * FROM users WHERE site = 'videobate';"></textarea>
+                <div class="query-buttons">
+                  <button class="btn btn-primary" id="runQueryBtn">▶️ Run</button>
+                  <button class="btn btn-secondary" id="clearQueryBtn">Clear</button>
+                  <span id="queryTime" style="color: var(--text-secondary); font-size: 12px;"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="sql-results-panel">
+              <div class="panel-header">
+                <h4>📊 Results</h4>
+                <span id="resultsCount" style="color: var(--text-secondary); font-size: 12px;"></span>
+              </div>
+              <div class="results-container" id="resultsContainer">
+                <div style="color: var(--text-secondary);">Run a query to see results</div>
+              </div>
+            </div>
           </div>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            This URL allows the app to fetch and parse users/scores from your Google Sheet.
-          </p>
-          
-          <div class="form-group">
-            <label class="form-label">Apps Script Web App URL</label>
-            <input type="text" class="form-input" id="usersApiUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
+        </section>
+
+        <!-- Users Section -->
+        <section id="users-section" class="tab-content">
+          <div class="admin-header">
+            <h1>👥 Users</h1>
+            <p>Manage VideoBate users</p>
           </div>
-          
-          <button class="btn btn-primary" onclick="saveUsersApiUrl()">💾 Save API URL</button>
-          <span id="usersApiStatus" style="margin-left: 15px;"></span>
-          
-          <details style="margin-top: 20px;" open>
-            <summary style="cursor: pointer; color: var(--accent-cyan); font-weight: 600;">📖 Apps Script Code (COPY THIS)</summary>
-            <div style="background: var(--bg-dark); padding: 20px; border-radius: 8px; margin-top: 15px;">
-              <p style="margin-bottom: 15px; font-size: 0.9rem;">In your Google Sheet (linked to the form), go to <strong>Extensions → Apps Script</strong> and paste:</p>
-              <pre style="background: #000; padding: 15px; border-radius: 8px; font-size: 0.7rem; overflow-x: auto; color: var(--accent-cyan); white-space: pre-wrap;">function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0].map(h => h.toString().toLowerCase().trim());
-  
-  // Find the message column (contains packed data)
-  const msgIdx = headers.findIndex(h => h.includes('message') || h.includes('feedback'));
-  
-  const users = [];
-  const scores = [];
-  
-  data.slice(1).forEach(row => {
-    const message = msgIdx >= 0 ? row[msgIdx] : '';
-    if (!message || typeof message !== 'string') return;
-    
-    const parts = message.split('|');
-    const type = parts[0];
-    
-    if (type === 'USER' && parts.length >= 8) {
-      users.push({
-        username: parts[1],
-        email: parts[2],
-        password: parts[3],
-        firstName: parts[4],
-        lastName: parts[5],
-        role: parts[6] || 'user',
-        createdAt: parts[7]
+
+          <div class="card">
+            <h3>📋 User List <span id="userCount" style="color: var(--text-secondary); font-size: 14px;">(0 users)</span></h3>
+            <div style="overflow-x: auto; margin-top: 15px;">
+              <table class="users-table" id="usersTable">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Display Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Created</th>
+                    <th>Last Login</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="tab-content">
+          <div class="admin-header">
+            <h1>⚙️ Settings</h1>
+            <p>Configure VideoBate settings</p>
+          </div>
+
+          <div class="card">
+            <h3>🔐 Registration Settings</h3>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label>Allow Public Signup</label>
+                <span>Anyone can create an account</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="publicSignup" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <label>Require Email Verification</label>
+                <span>Users must verify email before access</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="emailVerification">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>🎮 Game Settings</h3>
+            <div class="form-group">
+              <label>Default Quiz Time (seconds)</label>
+              <input type="number" id="quizTime" value="30" min="10" max="120">
+            </div>
+            <div class="form-group">
+              <label>Points per Correct Answer</label>
+              <input type="number" id="pointsCorrect" value="100" min="10" max="1000">
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>🗑️ Danger Zone</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 15px;">These actions cannot be undone.</p>
+            <button class="btn btn-danger" id="clearCacheBtn">Clear Local Cache</button>
+            <button class="btn btn-danger" id="resetDataBtn" style="margin-left: 10px;">Reset All Data</button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+  <script src="js/sql-database.js"></script>
+  <script>
+    // Check auth
+    (function() {
+      const user = JSON.parse(localStorage.getItem('fallacySpotter_currentUser') || 'null');
+      if (!user || user.role !== 'admin') {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Update user display
+      document.getElementById('userName').textContent = user.firstName || user.username || 'Admin';
+      const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
+      document.getElementById('userAvatar').textContent = initials || 'A';
+    })();
+
+    // Logout
+    document.getElementById('logoutLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('fallacySpotter_currentUser');
+      window.location.href = 'login.html';
+    });
+
+    // Settings link
+    document.getElementById('settingsLink').addEventListener('click', function(e) {
+      e.preventDefault();
+      showSection('settings');
+    });
+
+    // Sidebar navigation
+    document.querySelectorAll('.sidebar-nav a').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.dataset.section;
+        showSection(section);
       });
-    } else if (type === 'SCORE' && parts.length >= 9) {
-      scores.push({
-        username: parts[1],
-        displayName: parts[2],
-        score: parseInt(parts[3]) || 0,
-        correct: parseInt(parts[4]) || 0,
-        wrong: parseInt(parts[5]) || 0,
-        streak: parseInt(parts[6]) || 0,
-        mode: parts[7],
-        timestamp: parts[8]
-      });
+    });
+
+    function showSection(section) {
+      document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+      document.querySelector(`.sidebar-nav a[data-section="${section}"]`)?.classList.add('active');
+      
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById(`${section}-section`)?.classList.add('active');
     }
-  });
-  
-  // Return based on ?type= parameter
-  const requestType = e?.parameter?.type || 'users';
-  const result = requestType === 'scores' ? scores : users;
-  
-  return ContentService
-    .createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}</pre>
-              <p style="margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary);">
-                <strong>Deploy:</strong> Click Deploy → New deployment → Web app → "Anyone" can access → Deploy<br>
-                <strong>Copy the URL</strong> and paste it above!
-              </p>
-              <p style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-gold);">
-                <strong>Usage:</strong><br>
-                • <code>?type=users</code> → Returns user accounts<br>
-                • <code>?type=scores</code> → Returns quiz scores
-              </p>
-            </div>
-          </details>
-        </div>
-        
-        <!-- Users from Cloud -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">👥 Cloud Users</h3>
-            <button class="btn btn-sm btn-secondary" onclick="loadCloudUsers()">🔄 Refresh</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody id="cloudUsersTable">
-                <tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above, then click Refresh</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <!-- Cloud Scores -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">🏆 Cloud Scores</h3>
-            <button class="btn btn-sm btn-secondary" onclick="loadCloudScores()">🔄 Refresh</button>
-          </div>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Display Name</th>
-                  <th>Score</th>
-                  <th>Correct</th>
-                  <th>Mode</th>
-                  <th>Timestamp</th>
-                </tr>
-              </thead>
-              <tbody id="cloudScoresTable">
-                <tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above, then click Refresh</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <!-- Setup Guide -->
-        <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0,212,255,0.05);">
-          <h3 class="card-title" style="color: var(--accent-cyan); margin-bottom: 15px;">📖 Quick Setup (3 Steps)</h3>
-          <ol style="color: var(--text-secondary); line-height: 2.2; margin-left: 20px;">
-            <li><strong>Open your Google Sheet</strong> (linked to your Help/Feedback form)</li>
-            <li><strong>Add Apps Script</strong>: Extensions → Apps Script → paste code above → Deploy as Web App</li>
-            <li><strong>Paste URL above</strong> and click "Test Connection"</li>
-          </ol>
-          <p style="margin-top: 15px; padding: 15px; background: rgba(34,197,94,0.1); border-radius: 8px; font-size: 0.9rem;">
-            ✅ <strong>That's it!</strong> Registration and quiz scores will automatically submit to your form, and the API will parse them.
-          </p>
-        </div>
-      </div>
+
+    // Toast
+    function showToast(msg, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.borderColor = type === 'success' ? 'var(--accent-green)' : type === 'error' ? 'var(--accent-red)' : 'var(--accent-cyan)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Initialize database
+    async function initAdmin() {
+      try {
+        await SQLDatabase.init();
+        updateDashboard();
+        refreshTables();
+        loadUsers();
+      } catch (e) {
+        console.error('Init error:', e);
+      }
+    }
+
+    function updateDashboard() {
+      const status = SQLDatabase.getStatus();
+      document.getElementById('totalUsers').textContent = status.totalUsers || 0;
+      document.getElementById('siteUsers').textContent = status.userCount || 0;
+      document.getElementById('dbStatus').textContent = status.loaded ? '✅' : '❌';
       
-      <!-- GLOBAL LEADERBOARD TAB -->
-      <div class="tab-content" id="globalTab">
-        <div class="top-bar">
-          <h1 class="page-title">🌐 Global Leaderboard</h1>
-        </div>
-        
-        <!-- Google Form Setup -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">📝 Google Form Configuration</h3>
-          </div>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            Set up a Google Form to collect quiz results from all players. Results are submitted automatically when players complete a quiz.
-          </p>
-          
-          <div class="form-group">
-            <label class="form-label">Google Form Response URL</label>
-            <input type="text" class="form-input" id="googleFormUrl" placeholder="https://docs.google.com/forms/d/e/FORM_ID/formResponse">
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Get this from: Form → Send → Link (change /viewform to /formResponse)</p>
-          </div>
-          
-          <details style="margin-bottom: 20px;">
-            <summary style="cursor: pointer; color: var(--accent-cyan); margin-bottom: 15px;">Advanced: Entry IDs (click to expand)</summary>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
-              To find entry IDs: Open form → Pre-fill link → Fill in test data → Get link → Look for "entry.XXXXXXX" in URL
-            </p>
-            <div class="form-grid">
-              <div class="form-group">
-                <label class="form-label">Username Entry ID</label>
-                <input type="text" class="form-input" id="entryUsername" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Display Name Entry ID</label>
-                <input type="text" class="form-input" id="entryDisplayName" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Score Entry ID</label>
-                <input type="text" class="form-input" id="entryScore" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Correct Entry ID</label>
-                <input type="text" class="form-input" id="entryCorrect" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Wrong Entry ID</label>
-                <input type="text" class="form-input" id="entryWrong" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Streak Entry ID</label>
-                <input type="text" class="form-input" id="entryStreak" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Mode Entry ID</label>
-                <input type="text" class="form-input" id="entryMode" placeholder="entry.123456789">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Timestamp Entry ID</label>
-                <input type="text" class="form-input" id="entryTimestamp" placeholder="entry.123456789">
-              </div>
-            </div>
-          </details>
-          
-          <button class="btn btn-primary" onclick="saveGoogleFormConfig()">💾 Save Configuration</button>
-          <span id="configStatus" style="margin-left: 15px; color: var(--accent-green);"></span>
-        </div>
-        
-        <!-- LIVE DATA URL - NEW -->
-        <div class="card" style="border: 2px solid var(--accent-green); background: rgba(34,197,94,0.05);">
-          <div class="card-header">
-            <h3 class="card-title">🔄 Live Data URL (Automatic Updates!)</h3>
-          </div>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            <strong style="color: var(--accent-green);">✨ Recommended!</strong> Set up a Google Apps Script web app to serve live leaderboard data. The leaderboard will fetch fresh data automatically - no manual CSV uploads needed!
-          </p>
-          
-          <div class="form-group">
-            <label class="form-label">Apps Script Web App URL</label>
-            <input type="text" class="form-input" id="liveDataUrl" placeholder="https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec">
-            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px;">Deploy your Apps Script as a web app and paste the URL here</p>
-          </div>
-          
-          <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
-            <button class="btn btn-primary" onclick="saveLiveDataUrl()">💾 Save URL</button>
-            <button class="btn btn-secondary" onclick="testLiveDataUrl()">🧪 Test Connection</button>
-            <span id="liveDataStatus" style="margin-left: 10px;"></span>
-          </div>
-          
-          <details>
-            <summary style="cursor: pointer; color: var(--accent-cyan); margin-bottom: 15px;">📖 How to Set Up Google Apps Script</summary>
-            <div style="background: var(--bg-dark); padding: 20px; border-radius: 8px; margin-top: 10px;">
-              <p style="margin-bottom: 15px;"><strong>Step 1:</strong> Open your Google Sheet (linked to Google Form responses)</p>
-              <p style="margin-bottom: 15px;"><strong>Step 2:</strong> Go to Extensions → Apps Script</p>
-              <p style="margin-bottom: 15px;"><strong>Step 3:</strong> Delete existing code and paste this:</p>
-              <pre style="background: #000; padding: 15px; border-radius: 8px; font-size: 0.8rem; overflow-x: auto; color: var(--accent-cyan);"><code>function doGet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0].map(h => h.toString().toLowerCase().trim());
-  
-  const results = data.slice(1).map(row => {
-    return {
-      timestamp: row[headers.indexOf('timestamp')] || new Date().toISOString(),
-      username: row[headers.indexOf('username')] || 'unknown',
-      displayName: row[headers.indexOf('display name')] || row[headers.indexOf('displayname')] || 'Unknown',
-      score: parseInt(row[headers.indexOf('score')]) || 0,
-      correct: parseInt(row[headers.indexOf('correct')] || row[headers.indexOf('correct answers')]) || 0,
-      wrong: parseInt(row[headers.indexOf('wrong')] || row[headers.indexOf('wrong answers')]) || 0,
-      streak: parseInt(row[headers.indexOf('streak')] || row[headers.indexOf('best streak')]) || 0,
-      mode: row[headers.indexOf('mode')] || 'practice'
-    };
-  }).filter(r => r.username !== 'unknown');
-  
-  return ContentService
-    .createTextOutput(JSON.stringify(results))
-    .setMimeType(ContentService.MimeType.JSON);
-}</code></pre>
-              <p style="margin: 15px 0;"><strong>Step 4:</strong> Click Deploy → New deployment</p>
-              <p style="margin-bottom: 15px;"><strong>Step 5:</strong> Select type: "Web app"</p>
-              <p style="margin-bottom: 15px;"><strong>Step 6:</strong> Set "Who has access" to "Anyone"</p>
-              <p style="margin-bottom: 15px;"><strong>Step 7:</strong> Click Deploy and copy the Web app URL</p>
-              <p><strong>Step 8:</strong> Paste the URL above and click Save!</p>
-            </div>
-          </details>
-        </div>
-        
-        <!-- CSV Upload -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">📄 Upload Results CSV</h3>
-          </div>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            Download responses from Google Forms as CSV, then upload here to update the global leaderboard.
-          </p>
-          
-          <div style="border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 40px; text-align: center; margin-bottom: 20px;" id="dropZone">
-            <div style="font-size: 3rem; margin-bottom: 15px;">📁</div>
-            <p style="margin-bottom: 15px;">Drag & drop CSV file here, or click to browse</p>
-            <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleCsvUpload(event)">
-            <button class="btn btn-secondary" onclick="document.getElementById('csvFile').click()">📂 Choose File</button>
-          </div>
-          
-          <div id="uploadStatus" style="display: none; padding: 15px; border-radius: 8px; margin-bottom: 20px;"></div>
-          
-          <details>
-            <summary style="cursor: pointer; color: var(--accent-cyan); margin-bottom: 10px;">Expected CSV Format</summary>
-            <div style="background: var(--bg-dark); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.8rem; overflow-x: auto;">
-              <code>Timestamp,Username,Display Name,Score,Correct,Wrong,Streak,Mode</code><br>
-              <code>2026-01-23T10:30:00Z,johndoe,John Doe,250,8,2,5,practice</code><br>
-              <code>2026-01-23T11:15:00Z,janedoe,Jane Doe,300,10,0,10,timed</code>
-            </div>
-          </details>
-        </div>
-        
-        <!-- Global Leaderboard Display -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">🏆 Global Rankings</h3>
-            <div>
-              <span id="lastUpdated" style="color: var(--text-secondary); font-size: 0.85rem; margin-right: 15px;"></span>
-              <button class="btn btn-sm btn-secondary" onclick="refreshGlobalData()">🔄 Refresh Live</button>
-              <button class="btn btn-sm btn-danger" onclick="clearGlobalLeaderboard()">🗑️ Clear</button>
-            </div>
-          </div>
-          
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Player</th>
-                  <th>Best Score</th>
-                  <th>Total Games</th>
-                  <th>Avg Score</th>
-                  <th>Best Streak</th>
-                  <th>Last Played</th>
-                </tr>
-              </thead>
-              <tbody id="globalLeaderboardTable">
-                <tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">No data yet. Upload a CSV to populate the leaderboard.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <!-- Instructions Card -->
-        <div class="card" style="border: 1px solid var(--accent-cyan); background: rgba(0,212,255,0.05);">
-          <h3 class="card-title" style="color: var(--accent-cyan); margin-bottom: 15px;">📖 How It Works</h3>
-          <ol style="color: var(--text-secondary); line-height: 2; margin-left: 20px;">
-            <li><strong>Create Google Form</strong> with fields: Username, Display Name, Score, Correct, Wrong, Streak, Mode, Timestamp</li>
-            <li><strong>Configure above</strong> with your form's response URL and entry IDs</li>
-            <li><strong>Players complete quizzes</strong> → Results auto-submit to your Google Form</li>
-            <li><strong>Download CSV</strong> from Google Forms (Responses → Download as CSV)</li>
-            <li><strong>Upload CSV here</strong> → Global leaderboard updates!</li>
-          </ol>
-        </div>
-      </div>
+      document.getElementById('sql-status-icon').textContent = status.loaded ? '🟢' : '⚪';
+      document.getElementById('sql-status-text').textContent = status.loaded ? 'Database ready' : 'No database';
+    }
+
+    function refreshTables() {
+      const list = document.getElementById('tablesList');
+      if (!SQLDatabase.db) {
+        list.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">No database loaded</div>';
+        return;
+      }
       
-      <!-- SETTINGS TAB -->
-      <div class="tab-content" id="settingsTab">
-        <div class="top-bar">
-          <h1 class="page-title">⚙️ Settings</h1>
-        </div>
+      try {
+        const result = SQLDatabase.db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+        if (!result.length || !result[0].values.length) {
+          list.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">No tables</div>';
+          return;
+        }
         
-        <!-- Cloud Database Settings (uses CloudDB module) -->
-        <div class="card">
-          <div id="cloudDbSettings"></div>
-        </div>
-        
-        <!-- Site Configuration -->
-        <div class="card">
-          <h3 class="card-title" style="margin-bottom: 20px;">🌐 Site Configuration</h3>
-          <div class="form-group">
-            <label class="form-label">Site Name</label>
-            <input type="text" class="form-input" id="siteName" value="VideoBate" placeholder="Your site name">
-          </div>
-          <button class="btn btn-primary" onclick="saveSiteConfig()">💾 Save Site Config</button>
-        </div>
-        
-        <!-- Data Management -->
-        <div class="card" style="border: 1px solid var(--accent-red);">
-          <h3 class="card-title" style="color: var(--accent-red); margin-bottom: 20px;">⚠️ Data Management</h3>
-          <p style="color: var(--text-secondary); margin-bottom: 20px;">These actions cannot be undone. Use with caution.</p>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <button class="btn btn-secondary" onclick="exportAllData()">📤 Export All Data</button>
-            <button class="btn btn-danger" onclick="clearAllLocalData()">🗑️ Clear Local Data</button>
-          </div>
-        </div>
-      </div>
-      
-    </main>
-  </div>
-  
-  <!-- Add User Modal -->
-  <div class="modal-overlay" id="addUserModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">➕ Add New User</h3>
-        <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
-      </div>
-      <form id="addUserForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">First Name</label>
-            <input type="text" class="form-input" name="firstName" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Last Name</label>
-            <input type="text" class="form-input" name="lastName" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input type="text" class="form-input" name="username" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" name="email" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-input" name="password" required minlength="8">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Role</label>
-          <select class="form-select" name="role">
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Create User</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  
-  <!-- Add Question Modal -->
-  <div class="modal-overlay" id="addQuestionModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3 class="modal-title">➕ Add New Question</h3>
-        <button class="modal-close" onclick="closeModal('addQuestionModal')">&times;</button>
-      </div>
-      <form id="addQuestionForm">
-        <div class="form-group">
-          <label class="form-label">Scenario (HTML allowed)</label>
-          <textarea class="form-textarea" name="scenario" required placeholder='<span class="scenario-speaker">Person:</span> "Quote here..."'></textarea>
-        </div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="form-label">Correct Answer (Code)</label>
-            <input type="text" class="form-input" name="answer" required placeholder="e.g., STRW">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Difficulty</label>
-            <select class="form-select" name="difficulty">
-              <option value="easy">Easy (+10 pts)</option>
-              <option value="medium">Medium (+25 pts)</option>
-              <option value="hard">Hard (+50 pts)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Wrong Options (comma-separated codes)</label>
-          <input type="text" class="form-input" name="wrongOptions" required placeholder="e.g., RHER, FLSD, AUTH">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Explanation</label>
-          <textarea class="form-textarea" name="explanation" required></textarea>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('addQuestionModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add Question</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-<script>
-// ========== USER SYSTEM ==========
-function getUsers() {
-  return JSON.parse(localStorage.getItem('fallacySpotter_users') || '[]');
-}
-
-function saveUsers(users) {
-  localStorage.setItem('fallacySpotter_users', JSON.stringify(users));
-}
-
-function getCurrentUser() {
-  return JSON.parse(localStorage.getItem('fallacySpotter_currentUser') || 'null');
-}
-
-// ========== AUTH CHECK ==========
-const currentUser = getCurrentUser();
-if (!currentUser || currentUser.role !== 'admin') {
-  alert('Access denied. Admin privileges required.');
-  window.location.href = 'login.html';
-}
-
-// Populate sidebar
-document.getElementById('sidebarAvatar').textContent = (currentUser.firstName[0] + currentUser.lastName[0]).toUpperCase();
-document.getElementById('sidebarName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
-
-// ========== TAB SWITCHING ==========
-document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
-  link.addEventListener('click', (e) => {
-    e.preventDefault();
-    switchTab(link.dataset.tab);
-  });
-});
-
-function switchTab(tabName) {
-  // Update sidebar
-  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
-  document.querySelector(`.sidebar-nav a[data-tab="${tabName}"]`)?.classList.add('active');
-  
-  // Update content
-  document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-  document.getElementById(tabName + 'Tab')?.classList.add('active');
-  
-  // Load data for tab
-  if (tabName === 'users') loadUsersTable();
-  if (tabName === 'questions') loadQuestionsTable();
-  if (tabName === 'reports') loadReports();
-  if (tabName === 'userdb') testUserDbConnection();
-}
-
-// ========== MODAL ==========
-function openModal(id) {
-  document.getElementById(id).classList.add('show');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-}
-
-// ========== DASHBOARD ==========
-function loadDashboard() {
-  const users = getUsers();
-  
-  document.getElementById('totalUsers').textContent = users.length;
-  
-  // Calculate total games
-  let totalGames = users.reduce((sum, u) => sum + u.stats.gamesPlayed, 0);
-  document.getElementById('totalGames').textContent = totalGames;
-  
-  // Recent users table
-  const recentUsers = [...users].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-  document.getElementById('recentUsersTable').innerHTML = recentUsers.map(u => `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="user-avatar-sm">${(u.firstName[0] + u.lastName[0]).toUpperCase()}</div>
-          ${u.firstName} ${u.lastName}
-        </div>
-      </td>
-      <td>${u.email}</td>
-      <td><span class="role-badge ${u.role}">${u.role}</span></td>
-      <td>${u.stats.totalScore.toLocaleString()}</td>
-      <td>${new Date(u.createdAt).toLocaleDateString()}</td>
-    </tr>
-  `).join('');
-  
-  // Top players table
-  const topPlayers = [...users].sort((a, b) => b.stats.totalScore - a.stats.totalScore).slice(0, 5);
-  document.getElementById('topPlayersTable').innerHTML = topPlayers.map((u, i) => {
-    const total = u.stats.correctAnswers + u.stats.wrongAnswers;
-    const accuracy = total > 0 ? Math.round((u.stats.correctAnswers / total) * 100) : 0;
-    return `
-      <tr>
-        <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar-sm">${(u.firstName[0] + u.lastName[0]).toUpperCase()}</div>
-            ${u.firstName} ${u.lastName}
-          </div>
-        </td>
-        <td style="color: var(--accent-gold); font-weight: 700;">${u.stats.totalScore.toLocaleString()}</td>
-        <td>${accuracy}%</td>
-        <td>${u.stats.gamesPlayed}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// ========== USERS TABLE ==========
-async function loadUsersTable() {
-  const localUsers = getUsers();
-  const apiUrl = localStorage.getItem('fallacySpotter_usersApiUrl');
-  
-  // Start with local users
-  let allUsers = localUsers.map(u => ({ ...u, source: 'local' }));
-  
-  // Try to fetch cloud users
-  if (apiUrl) {
-    try {
-      const response = await fetch(apiUrl);
-      const cloudUsers = await response.json();
-      
-      if (Array.isArray(cloudUsers)) {
-        // Add cloud users that aren't already in local
-        cloudUsers.forEach(cu => {
-          const exists = allUsers.some(u => 
-            u.username?.toLowerCase() === cu.username?.toLowerCase() ||
-            u.email?.toLowerCase() === cu.email?.toLowerCase()
-          );
-          if (!exists) {
-            allUsers.push({
-              id: 'cloud_' + cu.username,
-              firstName: cu.firstName || '',
-              lastName: cu.lastName || '',
-              username: cu.username,
-              email: cu.email,
-              role: cu.role || 'user',
-              createdAt: cu.createdAt,
-              source: 'cloud',
-              stats: { totalScore: 0, gamesPlayed: 0, correctAnswers: 0, wrongAnswers: 0, bestStreak: 0 }
-            });
-          }
+        let html = '';
+        result[0].values.forEach(([name]) => {
+          let count = 0;
+          try {
+            const c = SQLDatabase.db.exec(`SELECT COUNT(*) FROM "${name}"`);
+            count = c[0]?.values[0]?.[0] || 0;
+          } catch(e) {}
+          html += `<div class="table-item" onclick="selectTable('${name}')">
+            <span>📋</span> ${name} <span class="table-count">${count} rows</span>
+          </div>`;
         });
+        list.innerHTML = html;
+      } catch (e) {
+        list.innerHTML = '<div style="color: var(--text-secondary); font-size: 13px;">Error loading tables</div>';
       }
-    } catch (err) {
-      console.log('Could not fetch cloud users:', err.message);
     }
-  }
-  
-  // Cache for filtering
-  allUsersCache = allUsers;
-  
-  renderUsersTable(allUsers);
-}
 
-function renderUsersTable(users) {
-  document.getElementById('usersTable').innerHTML = users.map(u => {
-    const initials = ((u.firstName?.[0] || '') + (u.lastName?.[0] || '')).toUpperCase() || '?';
-    const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || 'Unknown';
-    const isCloud = u.source === 'cloud';
-    const sourceBadge = isCloud 
-      ? '<span style="background: rgba(0,212,255,0.2); color: var(--accent-cyan); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 8px;">☁️ Cloud</span>'
-      : '<span style="background: rgba(139,92,246,0.2); color: var(--accent-purple); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 8px;">💾 Local</span>';
-    
-    return `
-    <tr>
-      <td>
-        <div class="user-cell">
-          <div class="user-avatar-sm" style="${isCloud ? 'background: linear-gradient(135deg, #00d4ff, #22c55e);' : ''}">${initials}</div>
-          ${name} ${sourceBadge}
-        </div>
-      </td>
-      <td>${u.email || 'N/A'}</td>
-      <td>@${u.username || 'unknown'}</td>
-      <td><span class="role-badge ${u.role}">${u.role}</span></td>
-      <td>${(u.stats?.totalScore || 0).toLocaleString()}</td>
-      <td>${u.stats?.gamesPlayed || 0}</td>
-      <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</td>
-      <td>
-        <div class="action-btns">
-          ${!isCloud ? `<button class="action-btn edit" onclick="resetPassword(${u.id})" title="Reset Password">🔑</button>` : ''}
-          ${!isCloud ? `<button class="action-btn edit" onclick="editUser(${u.id})" title="Edit">✏️</button>` : ''}
-          ${!isCloud ? `<button class="action-btn delete" onclick="deleteUser(${u.id})" title="Delete">🗑️</button>` : ''}
-          ${isCloud ? '<span style="color: var(--text-secondary); font-size: 0.8rem;">Cloud user</span>' : ''}
-        </div>
-      </td>
-    </tr>
-  `;
-  }).join('');
-}
-
-// Store all users for filtering
-let allUsersCache = [];
-
-async function filterUsers() {
-  const search = document.getElementById('userSearch').value.toLowerCase();
-  const role = document.getElementById('roleFilter').value;
-  
-  // If cache is empty, reload
-  if (allUsersCache.length === 0) {
-    await loadUsersTable();
-    return;
-  }
-  
-  let users = [...allUsersCache];
-  
-  if (search) {
-    users = users.filter(u => 
-      (u.firstName || '').toLowerCase().includes(search) ||
-      (u.lastName || '').toLowerCase().includes(search) ||
-      (u.email || '').toLowerCase().includes(search) ||
-      (u.username || '').toLowerCase().includes(search)
-    );
-  }
-  
-  if (role) {
-    users = users.filter(u => u.role === role);
-  }
-  
-  renderUsersTable(users);
-}
-
-function deleteUser(id) {
-  if (!confirm('Are you sure you want to delete this user?')) return;
-  
-  let users = getUsers();
-  users = users.filter(u => u.id !== id);
-  saveUsers(users);
-  loadUsersTable();
-  loadDashboard();
-}
-
-function editUser(id) {
-  alert('Edit user modal - TODO: Implement full edit functionality');
-}
-
-function resetPassword(id) {
-  const users = getUsers();
-  const user = users.find(u => u.id === id);
-  
-  if (!user) {
-    alert('User not found');
-    return;
-  }
-  
-  const newPassword = prompt(`Reset password for ${user.firstName} ${user.lastName} (@${user.username})\n\nEnter new password (min 8 characters):`);
-  
-  if (!newPassword) return;
-  
-  if (newPassword.length < 8) {
-    alert('Password must be at least 8 characters');
-    return;
-  }
-  
-  user.password = newPassword;
-  saveUsers(users);
-  
-  alert(`✅ Password reset successfully!\n\nUsername: ${user.username}\nNew Password: ${newPassword}`);
-}
-
-// ========== ADD USER ==========
-document.getElementById('addUserForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  
-  const form = e.target;
-  const users = getUsers();
-  
-  const newUser = {
-    id: Date.now(),
-    firstName: form.firstName.value.trim(),
-    lastName: form.lastName.value.trim(),
-    username: form.username.value.trim(),
-    email: form.email.value.trim(),
-    password: form.password.value,
-    role: form.role.value,
-    createdAt: new Date().toISOString(),
-    stats: {
-      totalScore: 0,
-      gamesPlayed: 0,
-      correctAnswers: 0,
-      wrongAnswers: 0,
-      bestStreak: 0,
-      badges: []
+    function selectTable(name) {
+      document.getElementById('sql-query-input').value = `SELECT * FROM "${name}" LIMIT 100;`;
+      runQuery();
     }
-  };
-  
-  users.push(newUser);
-  saveUsers(users);
-  
-  closeModal('addUserModal');
-  form.reset();
-  loadUsersTable();
-  loadDashboard();
-  alert('User created successfully!');
-});
 
-// ========== QUESTIONS ==========
-// Demo questions (in production, these would be in a database)
-const questions = [
-  { id: 1, scenario: 'Politician attacks opponent\'s character...', answer: 'CHAR', difficulty: 'easy', points: 10 },
-  { id: 2, scenario: 'Parent uses slippery slope argument...', answer: 'SLIP', difficulty: 'easy', points: 10 },
-  { id: 3, scenario: 'Debater creates straw man...', answer: 'STRW', difficulty: 'easy', points: 10 },
-  { id: 4, scenario: 'Ad uses appeal to authority...', answer: 'AUTH', difficulty: 'easy', points: 10 },
-  { id: 5, scenario: 'Person uses whataboutism...', answer: 'WHAT', difficulty: 'easy', points: 10 },
-  { id: 6, scenario: 'Marketing uses appeal to popularity...', answer: 'POPUL', difficulty: 'easy', points: 10 },
-  { id: 7, scenario: 'Conspiracy theorist uses argument from ignorance...', answer: 'IGNR', difficulty: 'medium', points: 25 },
-  { id: 8, scenario: 'Interviewer asks loaded question...', answer: 'LOAD', difficulty: 'medium', points: 25 },
-  { id: 9, scenario: 'Pundit poisons the well...', answer: 'WELL', difficulty: 'medium', points: 25 },
-  { id: 10, scenario: 'Skeptic uses anecdotal evidence...', answer: 'ANEC', difficulty: 'medium', points: 25 },
-];
-
-function loadQuestionsTable() {
-  renderQuestionsTable(questions);
-}
-
-function renderQuestionsTable(qs) {
-  document.getElementById('questionsTable').innerHTML = qs.map((q, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${q.scenario}</td>
-      <td><code style="background: rgba(0,212,255,0.2); padding: 2px 8px; border-radius: 4px;">${q.answer}</code></td>
-      <td><span class="role-badge" style="background: ${q.difficulty === 'easy' ? 'rgba(34,197,94,0.2)' : q.difficulty === 'medium' ? 'rgba(255,215,0,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${q.difficulty === 'easy' ? '#22c55e' : q.difficulty === 'medium' ? '#ffd700' : '#ef4444'};">${q.difficulty}</span></td>
-      <td>+${q.points}</td>
-      <td>
-        <div class="action-btns">
-          <button class="action-btn edit" title="Edit">✏️</button>
-          <button class="action-btn delete" title="Delete">🗑️</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
-}
-
-function filterQuestions() {
-  const search = document.getElementById('questionSearch').value.toLowerCase();
-  const difficulty = document.getElementById('difficultyFilter').value;
-  
-  let filtered = questions;
-  
-  if (search) {
-    filtered = filtered.filter(q => q.scenario.toLowerCase().includes(search) || q.answer.toLowerCase().includes(search));
-  }
-  
-  if (difficulty) {
-    filtered = filtered.filter(q => q.difficulty === difficulty);
-  }
-  
-  renderQuestionsTable(filtered);
-}
-
-// ========== REPORTS ==========
-function loadReports() {
-  const users = getUsers();
-  
-  let totalScore = 0, totalCorrect = 0, totalWrong = 0;
-  
-  users.forEach(u => {
-    totalScore += u.stats.totalScore;
-    totalCorrect += u.stats.correctAnswers;
-    totalWrong += u.stats.wrongAnswers;
-  });
-  
-  const totalAnswers = totalCorrect + totalWrong;
-  const accuracy = totalAnswers > 0 ? Math.round((totalCorrect / totalAnswers) * 100) : 0;
-  const avgScore = users.length > 0 ? Math.round(totalScore / users.length) : 0;
-  
-  document.getElementById('reportTotalScore').textContent = totalScore.toLocaleString();
-  document.getElementById('reportAvgScore').textContent = avgScore.toLocaleString();
-  document.getElementById('reportCorrect').textContent = totalCorrect.toLocaleString();
-  document.getElementById('reportAccuracy').textContent = accuracy + '%';
-  
-  // Report table
-  document.getElementById('reportTable').innerHTML = users.map(u => {
-    const total = u.stats.correctAnswers + u.stats.wrongAnswers;
-    const acc = total > 0 ? Math.round((u.stats.correctAnswers / total) * 100) : 0;
-    return `
-      <tr>
-        <td>${u.firstName} ${u.lastName}</td>
-        <td style="color: var(--accent-gold);">${u.stats.totalScore.toLocaleString()}</td>
-        <td>${u.stats.gamesPlayed}</td>
-        <td style="color: var(--accent-green);">${u.stats.correctAnswers}</td>
-        <td style="color: var(--accent-red);">${u.stats.wrongAnswers}</td>
-        <td>${acc}%</td>
-        <td>${u.stats.bestStreak}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// ========== USER DATABASE (CLOUD) ==========
-
-// Save Users API URL
-function saveUsersApiUrl() {
-  const url = document.getElementById('usersApiUrl').value.trim();
-  localStorage.setItem('fallacySpotter_usersApiUrl', url);
-  
-  const status = document.getElementById('usersApiStatus');
-  status.textContent = '✅ Saved!';
-  status.style.color = 'var(--accent-green)';
-  setTimeout(() => status.textContent = '', 3000);
-}
-
-// Load Users API URL
-function loadUsersApiUrl() {
-  const url = localStorage.getItem('fallacySpotter_usersApiUrl') || '';
-  document.getElementById('usersApiUrl').value = url;
-}
-
-// Test User DB Connection
-async function testUserDbConnection() {
-  const url = document.getElementById('usersApiUrl').value.trim();
-  
-  if (!url) {
-    document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
-    document.getElementById('userDbStatusText').textContent = 'Not Configured';
-    document.getElementById('userDbStatusDetail').textContent = 'Please enter an API URL first';
-    return;
-  }
-  
-  document.getElementById('userDbStatusDot').style.background = 'var(--accent-orange)';
-  document.getElementById('userDbStatusText').textContent = 'Connecting...';
-  document.getElementById('userDbStatusDetail').textContent = 'Testing connection to Google Sheets';
-  
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (Array.isArray(data)) {
-      document.getElementById('userDbStatusDot').style.background = 'var(--accent-green)';
-      document.getElementById('userDbStatusText').textContent = 'Connected!';
-      document.getElementById('userDbStatusDetail').textContent = `Found ${data.length} users in database`;
+    function loadUsers() {
+      const users = SQLDatabase.getAllUsers();
+      const tbody = document.getElementById('usersTableBody');
+      const count = document.getElementById('userCount');
       
-      // Also load the users table
-      renderCloudUsersTable(data);
-    } else {
-      document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
-      document.getElementById('userDbStatusText').textContent = 'Invalid Response';
-      document.getElementById('userDbStatusDetail').textContent = 'API did not return an array';
-    }
-  } catch (err) {
-    document.getElementById('userDbStatusDot').style.background = 'var(--accent-red)';
-    document.getElementById('userDbStatusText').textContent = 'Connection Failed';
-    document.getElementById('userDbStatusDetail').textContent = err.message;
-  }
-}
-
-// Load Cloud Users
-async function loadCloudUsers() {
-  const url = localStorage.getItem('fallacySpotter_usersApiUrl');
-  
-  if (!url) {
-    document.getElementById('cloudUsersTable').innerHTML = 
-      '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above first</td></tr>';
-    return;
-  }
-  
-  document.getElementById('cloudUsersTable').innerHTML = 
-    '<tr><td colspan="5" style="text-align: center; color: var(--accent-cyan); padding: 40px;">🔄 Loading...</td></tr>';
-  
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (Array.isArray(data) && data.length > 0) {
-      renderCloudUsersTable(data);
-    } else {
-      document.getElementById('cloudUsersTable').innerHTML = 
-        '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">No users found in database</td></tr>';
-    }
-  } catch (err) {
-    document.getElementById('cloudUsersTable').innerHTML = 
-      `<tr><td colspan="5" style="text-align: center; color: var(--accent-red); padding: 40px;">❌ Error: ${err.message}</td></tr>`;
-  }
-}
-
-// Render Cloud Users Table
-function renderCloudUsersTable(users) {
-  if (users.length === 0) {
-    document.getElementById('cloudUsersTable').innerHTML = 
-      '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary); padding: 40px;">No users in database</td></tr>';
-    return;
-  }
-  
-  document.getElementById('cloudUsersTable').innerHTML = users.map(u => {
-    const name = [u.firstName, u.lastName].filter(Boolean).join(' ') || 'N/A';
-    const created = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A';
-    const role = u.role || 'user';
-    return `
-      <tr>
-        <td><strong>@${u.username || 'unknown'}</strong></td>
-        <td>${u.email || 'N/A'}</td>
-        <td>${name}</td>
-        <td><span class="role-badge ${role}">${role}</span></td>
-        <td>${created}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// Load Cloud Scores
-async function loadCloudScores() {
-  const url = localStorage.getItem('fallacySpotter_usersApiUrl');
-  
-  if (!url) {
-    document.getElementById('cloudScoresTable').innerHTML = 
-      '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">Configure API URL above first</td></tr>';
-    return;
-  }
-  
-  document.getElementById('cloudScoresTable').innerHTML = 
-    '<tr><td colspan="6" style="text-align: center; color: var(--accent-cyan); padding: 40px;">🔄 Loading...</td></tr>';
-  
-  try {
-    const response = await fetch(url + '?type=scores');
-    const data = await response.json();
-    
-    if (Array.isArray(data) && data.length > 0) {
-      renderCloudScoresTable(data);
-    } else {
-      document.getElementById('cloudScoresTable').innerHTML = 
-        '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">No scores found in database</td></tr>';
-    }
-  } catch (err) {
-    document.getElementById('cloudScoresTable').innerHTML = 
-      `<tr><td colspan="6" style="text-align: center; color: var(--accent-red); padding: 40px;">❌ Error: ${err.message}</td></tr>`;
-  }
-}
-
-// Render Cloud Scores Table
-function renderCloudScoresTable(scores) {
-  if (scores.length === 0) {
-    document.getElementById('cloudScoresTable').innerHTML = 
-      '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 40px;">No scores in database</td></tr>';
-    return;
-  }
-  
-  // Sort by score descending
-  scores.sort((a, b) => b.score - a.score);
-  
-  document.getElementById('cloudScoresTable').innerHTML = scores.slice(0, 50).map(s => {
-    const timestamp = s.timestamp ? new Date(s.timestamp).toLocaleString() : 'N/A';
-    return `
-      <tr>
-        <td><strong>@${s.username || 'unknown'}</strong></td>
-        <td>${s.displayName || 'N/A'}</td>
-        <td style="color: var(--accent-gold); font-weight: 600;">${s.score}</td>
-        <td>${s.correct}/${s.correct + (s.wrong || 0)}</td>
-        <td><span style="background: var(--bg-dark); padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">${s.mode || 'practice'}</span></td>
-        <td style="font-size: 0.85rem; color: var(--text-secondary);">${timestamp}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// ========== LIVE DATA URL ==========
-
-function saveLiveDataUrl() {
-  const url = document.getElementById('liveDataUrl').value.trim();
-  localStorage.setItem('fallacySpotter_liveDataUrl', url);
-  
-  const status = document.getElementById('liveDataStatus');
-  status.textContent = '✅ Saved!';
-  status.style.color = 'var(--accent-green)';
-  setTimeout(() => status.textContent = '', 3000);
-}
-
-function loadLiveDataUrl() {
-  const url = localStorage.getItem('fallacySpotter_liveDataUrl') || '';
-  document.getElementById('liveDataUrl').value = url;
-}
-
-async function testLiveDataUrl() {
-  const url = document.getElementById('liveDataUrl').value.trim();
-  const status = document.getElementById('liveDataStatus');
-  
-  if (!url) {
-    status.textContent = '❌ Please enter a URL first';
-    status.style.color = 'var(--accent-red)';
-    return;
-  }
-  
-  status.textContent = '🔄 Testing...';
-  status.style.color = 'var(--accent-cyan)';
-  
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (Array.isArray(data)) {
-      status.textContent = `✅ Success! Found ${data.length} game records`;
-      status.style.color = 'var(--accent-green)';
+      count.textContent = `(${users.length} users)`;
       
-      // Preview data in console
-      console.log('Live data preview:', data.slice(0, 5));
-    } else {
-      status.textContent = '⚠️ Response is not an array';
-      status.style.color = 'var(--accent-orange)';
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No users found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.id}</td>
+          <td>${u.username}</td>
+          <td>${u.displayName || '-'}</td>
+          <td>${u.email || '-'}</td>
+          <td><span class="role-badge ${u.role}">${u.role}</span></td>
+          <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '-'}</td>
+          <td>${u.lastLogin ? new Date(u.lastLogin).toLocaleDateString() : '-'}</td>
+        </tr>
+      `).join('');
     }
-  } catch (err) {
-    status.textContent = '❌ Failed to fetch: ' + err.message;
-    status.style.color = 'var(--accent-red)';
-    console.error('Live data test error:', err);
-  }
-}
 
-// ========== GLOBAL LEADERBOARD ==========
+    function runQuery() {
+      const query = document.getElementById('sql-query-input').value.trim();
+      if (!query || !SQLDatabase.db) return;
+      
+      const start = performance.now();
+      try {
+        const results = SQLDatabase.db.exec(query);
+        const time = (performance.now() - start).toFixed(2);
+        document.getElementById('queryTime').textContent = `${time}ms`;
+        
+        displayResults(results);
+        SQLDatabase.autoSave();
+        refreshTables();
+        loadUsers();
+        updateDashboard();
+      } catch (e) {
+        document.getElementById('resultsContainer').innerHTML = `<div style="color: var(--accent-red);">❌ Error: ${e.message}</div>`;
+        document.getElementById('resultsCount').textContent = '';
+      }
+    }
 
-// Save Google Form Configuration
-function saveGoogleFormConfig() {
-  const url = document.getElementById('googleFormUrl').value.trim();
-  
-  const entryIds = {
-    username: document.getElementById('entryUsername').value.trim(),
-    displayName: document.getElementById('entryDisplayName').value.trim(),
-    score: document.getElementById('entryScore').value.trim(),
-    correct: document.getElementById('entryCorrect').value.trim(),
-    wrong: document.getElementById('entryWrong').value.trim(),
-    streak: document.getElementById('entryStreak').value.trim(),
-    mode: document.getElementById('entryMode').value.trim(),
-    timestamp: document.getElementById('entryTimestamp').value.trim()
-  };
-  
-  localStorage.setItem('fallacySpotter_googleFormUrl', url);
-  localStorage.setItem('fallacySpotter_formEntryIds', JSON.stringify(entryIds));
-  
-  document.getElementById('configStatus').textContent = '✅ Saved!';
-  setTimeout(() => document.getElementById('configStatus').textContent = '', 3000);
-}
+    function displayResults(results) {
+      const container = document.getElementById('resultsContainer');
+      const count = document.getElementById('resultsCount');
+      
+      if (!results.length) {
+        container.innerHTML = '<div style="color: var(--accent-green);">✅ Query executed (no results)</div>';
+        count.textContent = '';
+        return;
+      }
+      
+      let total = 0;
+      let html = '';
+      results.forEach(r => {
+        total += r.values.length;
+        html += '<table class="sql-results-table"><thead><tr>';
+        r.columns.forEach(c => html += `<th>${c}</th>`);
+        html += '</tr></thead><tbody>';
+        r.values.forEach(row => {
+          html += '<tr>';
+          row.forEach(cell => html += `<td>${cell === null ? '<em style="color: var(--text-secondary);">NULL</em>' : cell}</td>`);
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+      });
+      
+      container.innerHTML = html;
+      count.textContent = `${total} row${total !== 1 ? 's' : ''}`;
+    }
 
-// Load Google Form Configuration
-function loadGoogleFormConfig() {
-  const url = localStorage.getItem('fallacySpotter_googleFormUrl') || '';
-  const entryIds = JSON.parse(localStorage.getItem('fallacySpotter_formEntryIds') || '{}');
-  
-  document.getElementById('googleFormUrl').value = url;
-  document.getElementById('entryUsername').value = entryIds.username || '';
-  document.getElementById('entryDisplayName').value = entryIds.displayName || '';
-  document.getElementById('entryScore').value = entryIds.score || '';
-  document.getElementById('entryCorrect').value = entryIds.correct || '';
-  document.getElementById('entryWrong').value = entryIds.wrong || '';
-  document.getElementById('entryStreak').value = entryIds.streak || '';
-  document.getElementById('entryMode').value = entryIds.mode || '';
-  document.getElementById('entryTimestamp').value = entryIds.timestamp || '';
-}
-
-// CSV Upload Handler
-function handleCsvUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const csv = e.target.result;
-    parseCsvAndUpdateLeaderboard(csv);
-  };
-  reader.readAsText(file);
-}
-
-// Parse CSV and Update Leaderboard
-function parseCsvAndUpdateLeaderboard(csv) {
-  const lines = csv.split('\n').filter(line => line.trim());
-  if (lines.length < 2) {
-    showUploadStatus('error', 'CSV file is empty or invalid');
-    return;
-  }
-  
-  // Parse header to find column indices
-  const header = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
-  
-  const cols = {
-    timestamp: findColumnIndex(header, ['timestamp', 'date', 'time']),
-    username: findColumnIndex(header, ['username', 'user', 'name']),
-    displayName: findColumnIndex(header, ['display name', 'displayname', 'full name', 'fullname']),
-    score: findColumnIndex(header, ['score', 'points']),
-    correct: findColumnIndex(header, ['correct', 'correct answers']),
-    wrong: findColumnIndex(header, ['wrong', 'wrong answers', 'incorrect']),
-    streak: findColumnIndex(header, ['streak', 'best streak']),
-    mode: findColumnIndex(header, ['mode', 'game mode'])
-  };
-  
-  // Parse data rows
-  const games = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCSVLine(lines[i]);
-    if (values.length < 3) continue;
-    
-    games.push({
-      timestamp: cols.timestamp >= 0 ? values[cols.timestamp] : new Date().toISOString(),
-      username: cols.username >= 0 ? values[cols.username] : 'Unknown',
-      displayName: cols.displayName >= 0 ? values[cols.displayName] : values[cols.username] || 'Unknown',
-      score: cols.score >= 0 ? parseInt(values[cols.score]) || 0 : 0,
-      correct: cols.correct >= 0 ? parseInt(values[cols.correct]) || 0 : 0,
-      wrong: cols.wrong >= 0 ? parseInt(values[cols.wrong]) || 0 : 0,
-      streak: cols.streak >= 0 ? parseInt(values[cols.streak]) || 0 : 0,
-      mode: cols.mode >= 0 ? values[cols.mode] : 'practice'
+    // Event listeners
+    document.getElementById('runQueryBtn').addEventListener('click', runQuery);
+    document.getElementById('clearQueryBtn').addEventListener('click', () => {
+      document.getElementById('sql-query-input').value = '';
     });
-  }
-  
-  if (games.length === 0) {
-    showUploadStatus('error', 'No valid game data found in CSV');
-    return;
-  }
-  
-  // Aggregate by username
-  const playerStats = {};
-  games.forEach(game => {
-    const key = game.username.toLowerCase();
-    if (!playerStats[key]) {
-      playerStats[key] = {
-        username: game.username,
-        displayName: game.displayName,
-        totalScore: 0,
-        totalGames: 0,
-        bestScore: 0,
-        bestStreak: 0,
-        lastPlayed: game.timestamp
-      };
-    }
-    
-    playerStats[key].totalScore += game.score;
-    playerStats[key].totalGames++;
-    if (game.score > playerStats[key].bestScore) playerStats[key].bestScore = game.score;
-    if (game.streak > playerStats[key].bestStreak) playerStats[key].bestStreak = game.streak;
-    if (new Date(game.timestamp) > new Date(playerStats[key].lastPlayed)) {
-      playerStats[key].lastPlayed = game.timestamp;
-    }
-  });
-  
-  // Save to localStorage
-  localStorage.setItem('fallacySpotter_globalLeaderboard', JSON.stringify(playerStats));
-  localStorage.setItem('fallacySpotter_globalLeaderboardUpdated', new Date().toISOString());
-  
-  showUploadStatus('success', `✅ Imported ${games.length} games from ${Object.keys(playerStats).length} players!`);
-  loadGlobalLeaderboard();
-}
+    document.getElementById('refreshTablesBtn').addEventListener('click', refreshTables);
 
-// Helper: Parse CSV Line (handles quoted values)
-function parseCSVLine(line) {
-  const result = [];
-  let current = '';
-  let inQuotes = false;
-  
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
-      result.push(current.trim());
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current.trim());
-  return result;
-}
-
-// Helper: Find column index by possible names
-function findColumnIndex(header, possibleNames) {
-  for (const name of possibleNames) {
-    const idx = header.indexOf(name);
-    if (idx >= 0) return idx;
-  }
-  return -1;
-}
-
-// Show upload status
-function showUploadStatus(type, message) {
-  const el = document.getElementById('uploadStatus');
-  el.style.display = 'block';
-  el.style.background = type === 'success' ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)';
-  el.style.color = type === 'success' ? 'var(--accent-green)' : 'var(--accent-red)';
-  el.textContent = message;
-}
-
-// Load Global Leaderboard
-function loadGlobalLeaderboard() {
-  const data = JSON.parse(localStorage.getItem('fallacySpotter_globalLeaderboard') || '{}');
-  const updated = localStorage.getItem('fallacySpotter_globalLeaderboardUpdated');
-  
-  if (updated) {
-    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date(updated).toLocaleString();
-  }
-  
-  const players = Object.values(data).sort((a, b) => b.bestScore - a.bestScore);
-  
-  if (players.length === 0) {
-    document.getElementById('globalLeaderboardTable').innerHTML = 
-      '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 40px;">No data yet. Upload a CSV to populate the leaderboard.</td></tr>';
-    return;
-  }
-  
-  document.getElementById('globalLeaderboardTable').innerHTML = players.map((p, i) => {
-    const avgScore = Math.round(p.totalScore / p.totalGames);
-    return `
-      <tr>
-        <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
-        <td>
-          <div class="user-cell">
-            <div class="user-avatar-sm">${p.displayName.substring(0, 2).toUpperCase()}</div>
-            <div>
-              <div>${p.displayName}</div>
-              <div style="font-size: 0.8rem; color: var(--text-secondary)">@${p.username}</div>
-            </div>
-          </div>
-        </td>
-        <td style="color: var(--accent-gold); font-weight: 700;">${p.bestScore}</td>
-        <td>${p.totalGames}</td>
-        <td>${avgScore}</td>
-        <td>${p.bestStreak} 🔥</td>
-        <td style="font-size: 0.85rem;">${new Date(p.lastPlayed).toLocaleDateString()}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// Clear Global Leaderboard
-function clearGlobalLeaderboard() {
-  if (!confirm('Are you sure you want to clear all global leaderboard data?')) return;
-  
-  localStorage.removeItem('fallacySpotter_globalLeaderboard');
-  localStorage.removeItem('fallacySpotter_globalLeaderboardUpdated');
-  loadGlobalLeaderboard();
-  showUploadStatus('success', 'Leaderboard cleared!');
-}
-
-// Refresh global data from live URL
-async function refreshGlobalData() {
-  const url = localStorage.getItem('fallacySpotter_liveDataUrl');
-  if (!url) {
-    showUploadStatus('error', 'No Live Data URL configured. Set one up above!');
-    return;
-  }
-  
-  showUploadStatus('success', '🔄 Fetching live data...');
-  
-  try {
-    const response = await fetch(url);
-    const games = await response.json();
-    
-    if (!Array.isArray(games)) {
-      showUploadStatus('error', 'Invalid response from server');
-      return;
-    }
-    
-    // Aggregate by username
-    const playerStats = {};
-    games.forEach(game => {
-      const key = (game.username || 'unknown').toLowerCase();
-      if (key === 'unknown') return;
-      
-      if (!playerStats[key]) {
-        playerStats[key] = {
-          username: game.username,
-          displayName: game.displayName || game.username,
-          totalScore: 0,
-          totalGames: 0,
-          bestScore: 0,
-          bestStreak: 0,
-          lastPlayed: game.timestamp
-        };
-      }
-      
-      const score = parseInt(game.score) || 0;
-      const streak = parseInt(game.streak) || 0;
-      
-      playerStats[key].totalScore += score;
-      playerStats[key].totalGames++;
-      if (score > playerStats[key].bestScore) playerStats[key].bestScore = score;
-      if (streak > playerStats[key].bestStreak) playerStats[key].bestStreak = streak;
-      if (new Date(game.timestamp) > new Date(playerStats[key].lastPlayed)) {
-        playerStats[key].lastPlayed = game.timestamp;
+    document.getElementById('newDbBtn').addEventListener('click', () => {
+      if (confirm('Create new empty database? This will clear current data.')) {
+        SQLDatabase.createNewDatabase();
+        SQLDatabase.ensureUsersTable();
+        updateDashboard();
+        refreshTables();
+        loadUsers();
+        showToast('New database created', 'success');
       }
     });
-    
-    // Save to localStorage
-    localStorage.setItem('fallacySpotter_globalLeaderboard', JSON.stringify(playerStats));
-    localStorage.setItem('fallacySpotter_globalLeaderboardUpdated', new Date().toISOString());
-    
-    showUploadStatus('success', `✅ Refreshed! ${games.length} games from ${Object.keys(playerStats).length} players`);
-    loadGlobalLeaderboard();
-    
-  } catch (err) {
-    showUploadStatus('error', 'Failed to fetch: ' + err.message);
-  }
-}
 
-// Drag and Drop support
-const dropZone = document.getElementById('dropZone');
-if (dropZone) {
-  dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = 'var(--accent-cyan)';
-    dropZone.style.background = 'rgba(0,212,255,0.1)';
-  });
-  
-  dropZone.addEventListener('dragleave', () => {
-    dropZone.style.borderColor = 'rgba(255,255,255,0.2)';
-    dropZone.style.background = 'transparent';
-  });
-  
-  dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.style.borderColor = 'rgba(255,255,255,0.2)';
-    dropZone.style.background = 'transparent';
-    
-    const file = e.dataTransfer.files[0];
-    if (file && file.name.endsWith('.csv')) {
-      const reader = new FileReader();
-      reader.onload = (ev) => parseCsvAndUpdateLeaderboard(ev.target.result);
-      reader.readAsText(file);
-    } else {
-      showUploadStatus('error', 'Please upload a CSV file');
-    }
-  });
-}
+    document.getElementById('loadDbFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const buffer = await file.arrayBuffer();
+      const data = new Uint8Array(buffer);
+      SQLDatabase.db = new SQLDatabase.SQL.Database(data);
+      SQLDatabase.isLoaded = true;
+      SQLDatabase.autoSave();
+      updateDashboard();
+      refreshTables();
+      loadUsers();
+      showToast('Database loaded: ' + file.name, 'success');
+    });
 
-// ========== INIT ==========
-loadDashboard();
-loadGoogleFormConfig();
-loadLiveDataUrl();
-loadGlobalLeaderboard();
-loadUsersApiUrl();
+    document.getElementById('saveDbBtn').addEventListener('click', () => {
+      if (!SQLDatabase.db) {
+        showToast('No database to save', 'error');
+        return;
+      }
+      const data = SQLDatabase.db.export();
+      const blob = new Blob([data], { type: 'application/x-sqlite3' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `videobate_${Date.now()}.db`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Database saved', 'success');
+    });
 
-// Initialize CloudDB and render settings panel
-if (typeof CloudDB !== 'undefined') {
-  CloudDB.init({ siteName: 'VideoBate' });
-  CloudDB.renderAdminPanel('cloudDbSettings');
-}
+    document.getElementById('loadGitHubBtn').addEventListener('click', async () => {
+      showToast('Loading from GitHub...', 'info');
+      const loaded = await SQLDatabase.autoLoadFromGitHub();
+      if (loaded) {
+        await SQLDatabase.ensureUsersTable();
+        updateDashboard();
+        refreshTables();
+        loadUsers();
+        showToast('Loaded from GitHub!', 'success');
+      } else {
+        showToast('Could not load from GitHub', 'error');
+      }
+    });
 
-// ========== SETTINGS TAB ==========
-function saveSiteConfig() {
-  const siteName = document.getElementById('siteName').value.trim();
-  localStorage.setItem('aiunites_siteName', siteName);
-  if (typeof CloudDB !== 'undefined') {
-    CloudDB.config.siteName = siteName;
-  }
-  alert('✅ Site configuration saved!');
-}
+    document.getElementById('clearCacheBtn').addEventListener('click', () => {
+      if (confirm('Clear local cache? You will need to reload from GitHub.')) {
+        localStorage.removeItem(SQLDatabase.STORAGE_KEY);
+        showToast('Cache cleared', 'success');
+      }
+    });
 
-function exportAllData() {
-  const data = {
-    users: getUsers(),
-    globalLeaderboard: JSON.parse(localStorage.getItem('fallacySpotter_globalLeaderboard') || '{}'),
-    settings: {
-      googleFormUrl: localStorage.getItem('fallacySpotter_googleFormUrl'),
-      usersApiUrl: localStorage.getItem('fallacySpotter_usersApiUrl'),
-      liveDataUrl: localStorage.getItem('fallacySpotter_liveDataUrl'),
-      cloudEnabled: localStorage.getItem('aiunites_clouddb_enabled'),
-      cloudApiUrl: localStorage.getItem('aiunites_clouddb_apiUrl')
-    },
-    exportedAt: new Date().toISOString()
-  };
-  
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `videobate-backup-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    document.getElementById('resetDataBtn').addEventListener('click', () => {
+      if (confirm('Reset ALL data? This cannot be undone!')) {
+        localStorage.clear();
+        showToast('All data cleared. Reloading...', 'success');
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
 
-function clearAllLocalData() {
-  if (!confirm('⚠️ Are you sure you want to clear ALL local data?\n\nThis includes:\n- All users\n- Leaderboard data\n- Settings\n\nThis cannot be undone!')) return;
-  if (!confirm('🚨 FINAL WARNING: This will delete everything. Continue?')) return;
-  
-  const keysToRemove = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key.startsWith('fallacySpotter_') || key.startsWith('aiunites_')) {
-      keysToRemove.push(key);
-    }
-  }
-  keysToRemove.forEach(key => localStorage.removeItem(key));
-  
-  alert('✅ All local data cleared. Reloading page...');
-  location.reload();
-}
-</script>
+    // Keyboard shortcut
+    document.getElementById('sql-query-input').addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        runQuery();
+      }
+    });
 
+    // Init
+    initAdmin();
+  </script>
 </body>
 </html>
