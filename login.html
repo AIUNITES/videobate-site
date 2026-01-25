@@ -6,6 +6,9 @@
   <title>Login / Register | Fallacy Spotter - VideoBate</title>
   <meta name="description" content="Create an account or sign in to track your progress, compete on leaderboards, and earn badges.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
+  <!-- SQL.js for SQLite database -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+  <script src="js/sql-database.js"></script>
   <style>
     :root {
       --bg-dark: #0f0f14;
@@ -629,6 +632,37 @@
 // ========== CONFIGURATION ==========
 let isOnlineMode = false;
 let cachedUsers = null;
+let sqlDbReady = false;
+
+// ========== SQL DATABASE INITIALIZATION ==========
+async function initSQLDatabase() {
+  try {
+    if (typeof SQLDatabase !== 'undefined') {
+      const success = await SQLDatabase.init();
+      if (success) {
+        sqlDbReady = true;
+        const status = SQLDatabase.getStatus();
+        console.log('[Login] SQL Database ready:', status);
+        
+        // Update status banner
+        document.getElementById('statusBanner').className = 'status-banner online';
+        document.getElementById('statusBanner').innerHTML = '🗄️ <strong>SQL Database Mode</strong> — Using SQLite database (' + status.userCount + ' users)';
+        
+        // Update connection status
+        document.getElementById('statusCard').classList.add('connected');
+        document.getElementById('statusDot').classList.add('connected');
+        document.getElementById('statusText').textContent = 'Database Ready';
+        document.getElementById('statusDetail').textContent = status.userCount + ' users in SQL database';
+        document.getElementById('statusMessage').textContent = 'Authentication uses SQLite database.';
+        
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error('[Login] SQL Database init error:', error);
+  }
+  return false;
+}
 
 // ========== TAB SWITCHING ==========
 document.querySelectorAll('.auth-tab').forEach(tab => {
@@ -785,8 +819,18 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     let user = null;
     
-    if (isOnlineMode && cachedUsers) {
-      // Online: Check against Google Sheets data
+    // PRIORITY 1: Try SQL Database authentication
+    if (sqlDbReady && typeof SQLDatabase !== 'undefined') {
+      console.log('[Login] Attempting SQL database authentication...');
+      user = SQLDatabase.authenticateUser(emailOrUsername, password);
+      if (user) {
+        console.log('[Login] ✅ SQL Database auth successful:', user.username);
+      }
+    }
+    
+    // PRIORITY 2: Fall back to Google Sheets (if online mode)
+    if (!user && isOnlineMode && cachedUsers) {
+      console.log('[Login] Trying Google Sheets cache...');
       user = cachedUsers.find(u => 
         (u.email?.toLowerCase() === emailOrUsername || u.username?.toLowerCase() === emailOrUsername) &&
         u.password === password
@@ -794,7 +838,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
       
       if (user) {
         // Normalize user object from Google Sheets
-        const normalizedUser = {
+        user = {
           id: user.id || Date.now(),
           firstName: user.firstName || user.firstname || user['first name'] || 'User',
           lastName: user.lastName || user.lastname || user['last name'] || '',
@@ -812,15 +856,21 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             badges: []
           }
         };
-        user = normalizedUser;
+        console.log('[Login] ✅ Google Sheets auth successful');
       }
-    } else {
-      // Offline: Check local storage
+    }
+    
+    // PRIORITY 3: Fall back to localStorage
+    if (!user) {
+      console.log('[Login] Trying localStorage...');
       const users = getLocalUsers();
       user = users.find(u => 
-        (u.email.toLowerCase() === emailOrUsername || u.username.toLowerCase() === emailOrUsername) &&
+        (u.email?.toLowerCase() === emailOrUsername || u.username?.toLowerCase() === emailOrUsername) &&
         u.password === password
       );
+      if (user) {
+        console.log('[Login] ✅ localStorage auth successful');
+      }
     }
     
     if (user) {
