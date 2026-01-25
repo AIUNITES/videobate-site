@@ -5,7 +5,7 @@
  * 
  * SHARED DATABASE ARCHITECTURE:
  * - All AIUNITES sites use the same database: AIUNITES/AIUNITES-database-sync/data/app.db
- * - Users are filtered by the 'app' column to separate per-site data
+ * - Users are filtered by the 'site' column to separate per-site data
  * - This allows a single database to serve multiple applications
  */
 
@@ -14,8 +14,8 @@ const SQLDatabase = {
   isLoaded: false,
   SQL: null,
   
-  // App identifier for this site (used to filter users)
-  APP_ID: 'videobate',
+  // Site identifier (used to filter users in shared database)
+  SITE_ID: 'videobate',
   
   // Storage keys
   STORAGE_KEY: 'videobate_sqldb',
@@ -39,7 +39,7 @@ const SQLDatabase = {
       });
       
       console.log('[VideoBate-SQL] sql.js loaded successfully');
-      console.log('[VideoBate-SQL] App ID:', this.APP_ID);
+      console.log('[VideoBate-SQL] Site ID:', this.SITE_ID);
       
       // Try to load saved database from localStorage
       await this.loadFromStorage();
@@ -59,7 +59,7 @@ const SQLDatabase = {
         this.createNewDatabase();
       }
       
-      // Ensure users table exists with app column
+      // Ensure users table exists with site column
       this.ensureUsersTable();
       
       return true;
@@ -173,7 +173,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Ensure users table exists with proper schema INCLUDING app column
+   * Ensure users table exists with proper schema INCLUDING site column
    */
   ensureUsersTable() {
     if (!this.db) return;
@@ -183,12 +183,12 @@ const SQLDatabase = {
       const tableExists = this.db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
       
       if (!tableExists.length) {
-        // Create table with app column for multi-site support
-        console.log('[VideoBate-SQL] Creating users table with app column...');
+        // Create table with site column for multi-site support
+        console.log('[VideoBate-SQL] Creating users table with site column...');
         this.db.run(`
           CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            app TEXT NOT NULL DEFAULT 'videobate',
+            site TEXT NOT NULL DEFAULT 'videobate',
             username TEXT NOT NULL,
             email TEXT,
             password TEXT NOT NULL,
@@ -203,30 +203,30 @@ const SQLDatabase = {
             badges TEXT DEFAULT '[]',
             createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
             lastLogin TEXT,
-            UNIQUE(app, username),
-            UNIQUE(app, email)
+            UNIQUE(site, username),
+            UNIQUE(site, email)
           )
         `);
       } else {
-        // Check if app column exists, add if missing
+        // Check if site column exists, add if missing
         const columns = this.db.exec("PRAGMA table_info(users)");
-        const hasAppColumn = columns[0]?.values.some(col => col[1] === 'app');
+        const hasSiteColumn = columns[0]?.values.some(col => col[1] === 'site');
         
-        if (!hasAppColumn) {
-          console.log('[VideoBate-SQL] Adding app column to existing table...');
-          this.db.run("ALTER TABLE users ADD COLUMN app TEXT NOT NULL DEFAULT 'demotemplate'");
+        if (!hasSiteColumn) {
+          console.log('[VideoBate-SQL] Adding site column to existing table...');
+          this.db.run("ALTER TABLE users ADD COLUMN site TEXT NOT NULL DEFAULT 'demotemplate'");
         }
       }
       
-      // Check if we have any users for THIS app, if not create defaults
-      const result = this.db.exec(`SELECT COUNT(*) FROM users WHERE app = '${this.APP_ID}'`);
+      // Check if we have any users for THIS site, if not create defaults
+      const result = this.db.exec(`SELECT COUNT(*) FROM users WHERE site = '${this.SITE_ID}'`);
       const count = result[0]?.values[0]?.[0] || 0;
       
       if (count === 0) {
-        console.log('[VideoBate-SQL] Creating default users for app:', this.APP_ID);
+        console.log('[VideoBate-SQL] Creating default users for site:', this.SITE_ID);
         this.createDefaultUsers();
       } else {
-        console.log('[VideoBate-SQL] Found', count, 'users for app:', this.APP_ID);
+        console.log('[VideoBate-SQL] Found', count, 'users for site:', this.SITE_ID);
       }
       
       this.autoSave();
@@ -286,7 +286,7 @@ const SQLDatabase = {
     ];
     
     const stmt = this.db.prepare(`
-      INSERT INTO users (app, username, email, password, firstName, lastName, role, 
+      INSERT INTO users (site, username, email, password, firstName, lastName, role, 
         totalScore, gamesPlayed, correctAnswers, wrongAnswers, bestStreak, badges)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
@@ -294,7 +294,7 @@ const SQLDatabase = {
     defaultUsers.forEach(user => {
       try {
         stmt.run([
-          this.APP_ID,  // Add app identifier
+          this.SITE_ID,  // Add site identifier
           user.username, user.email, user.password, user.firstName, user.lastName,
           user.role, user.totalScore, user.gamesPlayed, user.correctAnswers,
           user.wrongAnswers, user.bestStreak, user.badges
@@ -305,13 +305,13 @@ const SQLDatabase = {
     });
     
     stmt.free();
-    console.log('[VideoBate-SQL] Default users created for app:', this.APP_ID);
+    console.log('[VideoBate-SQL] Default users created for site:', this.SITE_ID);
   },
   
   // ==================== USER AUTHENTICATION ====================
   
   /**
-   * Authenticate user by username/email and password (filtered by app)
+   * Authenticate user by username/email and password (filtered by site)
    * @returns {Object|null} User object or null if invalid
    */
   authenticateUser(usernameOrEmail, password) {
@@ -321,15 +321,15 @@ const SQLDatabase = {
     }
     
     try {
-      // Filter by app column to only authenticate users for this site
+      // Filter by site column to only authenticate users for this site
       const stmt = this.db.prepare(`
         SELECT * FROM users 
-        WHERE app = ?
+        WHERE site = ?
         AND (LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?))
         AND password = ?
       `);
       
-      stmt.bind([this.APP_ID, usernameOrEmail, usernameOrEmail, password]);
+      stmt.bind([this.SITE_ID, usernameOrEmail, usernameOrEmail, password]);
       
       if (stmt.step()) {
         const row = stmt.getAsObject();
@@ -346,7 +346,7 @@ const SQLDatabase = {
           row.badges = [];
         }
         
-        console.log('[VideoBate-SQL] Auth successful for:', row.username, '(app:', row.app, ')');
+        console.log('[VideoBate-SQL] Auth successful for:', row.username, '(site:', row.site, ')');
         
         // Return user object in the format VideoBate expects
         return {
@@ -369,7 +369,7 @@ const SQLDatabase = {
       }
       
       stmt.free();
-      console.log('[VideoBate-SQL] Auth failed for:', usernameOrEmail, '(app:', this.APP_ID, ')');
+      console.log('[VideoBate-SQL] Auth failed for:', usernameOrEmail, '(site:', this.SITE_ID, ')');
       return null;
       
     } catch (error) {
@@ -379,7 +379,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Get user by username (filtered by app)
+   * Get user by username (filtered by site)
    */
   getUserByUsername(username) {
     if (!this.db) return null;
@@ -387,9 +387,9 @@ const SQLDatabase = {
     try {
       const stmt = this.db.prepare(`
         SELECT * FROM users 
-        WHERE app = ? AND LOWER(username) = LOWER(?)
+        WHERE site = ? AND LOWER(username) = LOWER(?)
       `);
-      stmt.bind([this.APP_ID, username]);
+      stmt.bind([this.SITE_ID, username]);
       
       if (stmt.step()) {
         const row = stmt.getAsObject();
@@ -430,7 +430,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Check if username exists (within this app)
+   * Check if username exists (within this site)
    */
   usernameExists(username) {
     if (!this.db) return false;
@@ -438,9 +438,9 @@ const SQLDatabase = {
     try {
       const stmt = this.db.prepare(`
         SELECT COUNT(*) FROM users 
-        WHERE app = ? AND LOWER(username) = LOWER(?)
+        WHERE site = ? AND LOWER(username) = LOWER(?)
       `);
-      stmt.bind([this.APP_ID, username]);
+      stmt.bind([this.SITE_ID, username]);
       stmt.step();
       const count = stmt.get()[0];
       stmt.free();
@@ -451,7 +451,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Check if email exists (within this app)
+   * Check if email exists (within this site)
    */
   emailExists(email) {
     if (!this.db) return false;
@@ -459,9 +459,9 @@ const SQLDatabase = {
     try {
       const stmt = this.db.prepare(`
         SELECT COUNT(*) FROM users 
-        WHERE app = ? AND LOWER(email) = LOWER(?)
+        WHERE site = ? AND LOWER(email) = LOWER(?)
       `);
-      stmt.bind([this.APP_ID, email]);
+      stmt.bind([this.SITE_ID, email]);
       stmt.step();
       const count = stmt.get()[0];
       stmt.free();
@@ -472,31 +472,31 @@ const SQLDatabase = {
   },
   
   /**
-   * Register new user (with app identifier)
+   * Register new user (with site identifier)
    */
   registerUser(userData) {
     if (!this.db) {
       throw new Error('Database not available');
     }
     
-    // Check for existing username within this app
+    // Check for existing username within this site
     if (this.usernameExists(userData.username)) {
       throw new Error('Username already taken');
     }
     
-    // Check for existing email within this app
+    // Check for existing email within this site
     if (userData.email && this.emailExists(userData.email)) {
       throw new Error('Email already registered');
     }
     
     try {
       const stmt = this.db.prepare(`
-        INSERT INTO users (app, username, email, password, firstName, lastName, role, badges)
+        INSERT INTO users (site, username, email, password, firstName, lastName, role, badges)
         VALUES (?, ?, ?, ?, ?, ?, 'user', '[]')
       `);
       
       stmt.run([
-        this.APP_ID,  // Add app identifier
+        this.SITE_ID,  // Add site identifier
         userData.username.toLowerCase(),
         userData.email?.toLowerCase() || '',
         userData.password,
@@ -507,7 +507,7 @@ const SQLDatabase = {
       stmt.free();
       this.autoSave();
       
-      console.log('[VideoBate-SQL] User registered:', userData.username, 'for app:', this.APP_ID);
+      console.log('[VideoBate-SQL] User registered:', userData.username, 'for site:', this.SITE_ID);
       
       // Return the created user
       return this.getUserByUsername(userData.username);
@@ -532,8 +532,8 @@ const SQLDatabase = {
           correctAnswers = correctAnswers + ?,
           wrongAnswers = wrongAnswers + ?,
           bestStreak = MAX(bestStreak, ?)
-        WHERE id = ? AND app = ?
-      `, [stats.score, stats.correct, stats.wrong, stats.streak, userId, this.APP_ID]);
+        WHERE id = ? AND site = ?
+      `, [stats.score, stats.correct, stats.wrong, stats.streak, userId, this.SITE_ID]);
       
       this.autoSave();
       return true;
@@ -545,7 +545,7 @@ const SQLDatabase = {
   },
   
   /**
-   * Get all users for this app (for leaderboard)
+   * Get all users for this site (for leaderboard)
    */
   getAllUsers() {
     if (!this.db) return [];
@@ -553,7 +553,7 @@ const SQLDatabase = {
     try {
       const result = this.db.exec(`
         SELECT * FROM users 
-        WHERE app = '${this.APP_ID}'
+        WHERE site = '${this.SITE_ID}'
         ORDER BY totalScore DESC
       `);
       
@@ -606,7 +606,7 @@ const SQLDatabase = {
         loaded: false,
         hasDatabase: false,
         userCount: 0,
-        app: this.APP_ID
+        site: this.SITE_ID
       };
     }
     
@@ -614,22 +614,22 @@ const SQLDatabase = {
       const totalResult = this.db.exec("SELECT COUNT(*) FROM users");
       const totalCount = totalResult[0]?.values[0]?.[0] || 0;
       
-      const appResult = this.db.exec(`SELECT COUNT(*) FROM users WHERE app = '${this.APP_ID}'`);
-      const appCount = appResult[0]?.values[0]?.[0] || 0;
+      const siteResult = this.db.exec(`SELECT COUNT(*) FROM users WHERE site = '${this.SITE_ID}'`);
+      const siteCount = siteResult[0]?.values[0]?.[0] || 0;
       
       return {
         loaded: this.isLoaded,
         hasDatabase: true,
-        userCount: appCount,
+        userCount: siteCount,
         totalUsers: totalCount,
-        app: this.APP_ID
+        site: this.SITE_ID
       };
     } catch (error) {
       return {
         loaded: this.isLoaded,
         hasDatabase: !!this.db,
         userCount: 0,
-        app: this.APP_ID,
+        site: this.SITE_ID,
         error: error.message
       };
     }
