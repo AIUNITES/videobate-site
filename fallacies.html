@@ -359,8 +359,54 @@
         if (loginLink) {
           const initials = (user.firstName?.[0] || '') + (user.lastName?.[0] || '');
           const displayName = user.firstName || user.username || 'User';
-          loginLink.href = user.role === 'admin' ? 'admin.html' : 'profile.html';
-          loginLink.innerHTML = `<span style="margin-right: 6px;">${initials || '👤'}</span>${displayName}`;
+          
+          // Create user menu dropdown
+          const userMenu = document.createElement('div');
+          userMenu.style.cssText = 'position: relative; display: inline-block;';
+          userMenu.innerHTML = `
+            <a href="#" style="color: #fff; display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: var(--accent-red); border-radius: 8px;" id="userMenuBtn">
+              <span style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700;">${initials || '👤'}</span>
+              ${displayName}
+            </a>
+            <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: #1a1a24; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 0; min-width: 160px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 1000; margin-top: 5px;">
+              ${user.role === 'admin' ? '<a href="admin.html" style="display: block; padding: 10px 16px; color: #a0a0b0; text-decoration: none;">🛡️ Admin Panel</a>' : ''}
+              <a href="#" id="navSettingsLink" style="display: block; padding: 10px 16px; color: #a0a0b0; text-decoration: none;">⚙️ Settings</a>
+              <a href="#" id="navLogoutLink" style="display: block; padding: 10px 16px; color: #a0a0b0; text-decoration: none;">🚪 Log Out</a>
+            </div>
+          `;
+          loginLink.replaceWith(userMenu);
+          
+          // Toggle dropdown
+          document.getElementById('userMenuBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+          });
+          
+          // Close dropdown on outside click
+          document.addEventListener('click', function(e) {
+            if (!e.target.closest('#userMenuBtn') && !e.target.closest('#userDropdown')) {
+              const dropdown = document.getElementById('userDropdown');
+              if (dropdown) dropdown.style.display = 'none';
+            }
+          });
+          
+          // Logout
+          document.getElementById('navLogoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('fallacySpotter_currentUser');
+            window.location.reload();
+          });
+          
+          // Settings
+          document.getElementById('navSettingsLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (user.role === 'admin') {
+              window.location.href = 'admin.html#settings';
+            } else {
+              alert('Settings page coming soon!');
+            }
+          });
         }
       }
     })();
