@@ -7,8 +7,8 @@
 | **Repository** | videobate-site |
 | **Live URL** | https://aiunites.github.io/videobate-site/ |
 | **Local Path** | C:/Users/Tom/Documents/GitHub/videobate-site |
-| **Last Updated** | January 24, 2026 |
-| **Version** | 1.0.0 |
+| **Last Updated** | January 25, 2026 |
+| **Version** | 1.1.0 |
 
 ---
 
@@ -225,6 +225,30 @@
 - [ ] Cloud sync toggle works
 - [ ] Export all data works
 
+### SQL Database Tests (Admin Panel)
+- [ ] SQL Database tab loads correctly
+- [ ] Database Location cards display (Browser active, GitHub Sync)
+- [ ] New Database creates empty db
+- [ ] Load .db file works
+- [ ] Save to File downloads .db
+- [ ] Tables list shows after data loads
+- [ ] Click table runs SELECT *
+- [ ] Run custom SQL query
+- [ ] Query results display in table
+- [ ] Query time displays
+
+### GitHub Sync Tests (Admin Panel)
+- [ ] GitHub Sync Settings card displays in Dashboard
+- [ ] Token input and save/clear buttons work
+- [ ] Token status shows ✅ or ⚠️ correctly
+- [ ] GitHub Sync card in Database Location is clickable
+- [ ] Clicking GitHub Sync card navigates to Dashboard token settings
+- [ ] Save to GitHub button prompts for token if not saved
+- [ ] Save to GitHub pushes to AIUNITES/AIUNITES-database-sync
+- [ ] Load from GitHub fetches shared database
+- [ ] Auto-load from GitHub works on live site
+- [ ] Login Debug quick link works (?debug=1 param)
+
 ### Leaderboard Tests
 - [ ] Top 3 podium displays
 - [ ] Full list loads
@@ -309,8 +333,9 @@
 |---------|------|---------|
 | 1.0.0 | Jan 24, 2026 | Initial release with all features |
 | 1.0.1 | Jan 24, 2026 | Added Settings/Admin modals to profile.html |
+| 1.1.0 | Jan 25, 2026 | Added GitHub Sync for shared AIUNITES database, admin panel improvements, login debug access |
 
 ---
 
-*Last tested: January 24, 2026*
+*Last tested: January 25, 2026*
 *Tested by: Claude AI Assistant*
