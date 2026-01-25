@@ -822,7 +822,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     // PRIORITY 1: Try SQL Database authentication
     if (sqlDbReady && typeof SQLDatabase !== 'undefined') {
       console.log('[Login] Attempting SQL database authentication...');
-      user = SQLDatabase.authenticateUser(emailOrUsername, password);
+      user = await SQLDatabase.authenticateUser(emailOrUsername, password);
       if (user) {
         console.log('[Login] ✅ SQL Database auth successful:', user.username);
       }

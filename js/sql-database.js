@@ -567,6 +567,55 @@ const SQLDatabase = {
   },
   
   /**
+   * Get ALL users from ALL sites (for admin panel)
+   */
+  getAllUsersAllSites() {
+    if (!this.db) return [];
+    
+    try {
+      const result = this.db.exec(`
+        SELECT * FROM users 
+        ORDER BY site ASC, username ASC
+      `);
+      
+      if (!result.length) return [];
+      
+      const columns = result[0].columns;
+      return result[0].values.map(row => {
+        const user = {};
+        columns.forEach((col, i) => {
+          user[col] = row[i];
+        });
+        
+        return {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          displayName: user.display_name,
+          firstName: user.display_name?.split(' ')[0] || '',
+          lastName: user.display_name?.split(' ').slice(1).join(' ') || '',
+          role: user.role,
+          createdAt: user.created_at,
+          lastLogin: user.last_login,
+          site: user.site,
+          stats: {
+            totalScore: 0,
+            gamesPlayed: 0,
+            correctAnswers: 0,
+            wrongAnswers: 0,
+            bestStreak: 0,
+            badges: []
+          }
+        };
+      });
+      
+    } catch (error) {
+      console.error('[VideoBate-SQL] getAllUsers error:', error);
+      return [];
+    }
+  },
+  
+  /**
    * Get database status
    */
   getStatus() {

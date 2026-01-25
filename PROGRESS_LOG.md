@@ -5,6 +5,50 @@ VideoBate - Live Video Debate Platform with integrated critical thinking tools.
 
 ---
 
+## Session 9: Admin Panel & Navigation Bug Fixes (January 25, 2026)
+
+### Created: `admin.html`
+
+Full admin panel with:
+- **Dashboard**: Stats display, quick links
+- **SQL Database**: Database selector, query interface, GitHub sync
+- **Users**: User management table with role badges
+- **Settings**: Registration settings, game settings, danger zone
+- Sidebar navigation with icons
+- Admin-only access check
+- User dropdown menu
+
+### Updated Navigation
+
+- **index.html**: Added user dropdown with Admin Panel link
+- **fallacies.html**: Added user dropdown with Admin Panel link
+
+### Bug Fix: Login Not Saving User
+
+**Problem**: After logging in, profile.html showed "Guest" and "Loading..." instead of the admin user data.
+
+**Root Cause**: `SQLDatabase.authenticateUser()` is an `async` function but was being called without `await` in login.html. This caused a Promise object to be saved to localStorage instead of the actual user data.
+
+**Fix**: Changed line in login.html from:
+```javascript
+user = SQLDatabase.authenticateUser(emailOrUsername, password);
+```
+To:
+```javascript
+user = await SQLDatabase.authenticateUser(emailOrUsername, password);
+```
+
+### Files Modified
+
+| File | Changes |
+|------|--------|
+| `admin.html` | **NEW** - Complete admin panel |
+| `index.html` | Added user dropdown menu with Admin link |
+| `fallacies.html` | Added user dropdown menu with Admin link |
+| `login.html` | Fixed async/await bug in SQL authentication |
+
+---
+
 ## Session 8: Reusable Cloud Database Module (January 24, 2026)
 
 ### Created: `js/cloud-database.js`

@@ -610,7 +610,7 @@
         <section id="users-section" class="tab-content">
           <div class="admin-header">
             <h1>👥 Users</h1>
-            <p>Manage VideoBate users</p>
+            <p>All users from ALL AIUNITES sites (shared database)</p>
           </div>
 
           <div class="card">
@@ -620,6 +620,7 @@
                 <thead>
                   <tr>
                     <th>ID</th>
+                    <th>Site</th>
                     <th>Username</th>
                     <th>Display Name</th>
                     <th>Email</th>
@@ -629,7 +630,7 @@
                   </tr>
                 </thead>
                 <tbody id="usersTableBody">
-                  <tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">Loading...</td></tr>
+                  <tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">Loading...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -809,20 +810,22 @@
     }
 
     function loadUsers() {
-      const users = SQLDatabase.getAllUsers();
+      // Use getAllUsersAllSites to show users from ALL sites
+      const users = SQLDatabase.getAllUsersAllSites ? SQLDatabase.getAllUsersAllSites() : SQLDatabase.getAllUsers();
       const tbody = document.getElementById('usersTableBody');
       const count = document.getElementById('userCount');
       
-      count.textContent = `(${users.length} users)`;
+      count.textContent = `(${users.length} users from all sites)`;
       
       if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-secondary);">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-secondary);">No users found</td></tr>';
         return;
       }
       
       tbody.innerHTML = users.map(u => `
         <tr>
           <td>${u.id}</td>
+          <td><span class="role-badge" style="background: ${u.site === 'videobate' ? 'rgba(239,68,68,0.2)' : 'rgba(139,92,246,0.2)'}; color: ${u.site === 'videobate' ? 'var(--accent-red)' : 'var(--accent-purple)'}">${u.site || 'unknown'}</span></td>
           <td>${u.username}</td>
           <td>${u.displayName || '-'}</td>
           <td>${u.email || '-'}</td>
