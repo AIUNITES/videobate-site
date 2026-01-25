@@ -61,27 +61,13 @@
     }
     .header-links a:hover { color: var(--accent-cyan); }
     
-    /* Status Banner */
-    .status-banner {
-      padding: 10px 20px;
-      text-align: center;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
-    .status-banner.online {
-      background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
-    }
-    .status-banner.offline {
-      background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-    }
-    
     /* Main Layout */
     .main {
       flex: 1;
       display: flex;
       padding: 30px 20px;
       gap: 30px;
-      max-width: 1200px;
+      max-width: 1000px;
       margin: 0 auto;
       width: 100%;
     }
@@ -270,14 +256,9 @@
       border: 1px solid var(--accent-green);
       color: var(--accent-green);
     }
-    .message.info {
-      background: rgba(0,212,255,0.15);
-      border: 1px solid var(--accent-cyan);
-      color: var(--accent-cyan);
-    }
     .message.show { display: block; }
     
-    /* Right Column - Demo & Info */
+    /* Right Column - Benefits */
     .info-column {
       flex: 1;
       display: flex;
@@ -299,118 +280,93 @@
       gap: 8px;
     }
     
-    /* Connection Status Card */
-    .status-card {
+    /* Benefits Card */
+    .benefits-card {
+      border: 1px solid var(--accent-purple);
+      background: rgba(139,92,246,0.05);
+    }
+    .benefits-card h3 { color: var(--accent-purple); }
+    
+    .benefit-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .benefit-item:last-child { border-bottom: none; }
+    .benefit-icon {
+      font-size: 1.5rem;
+      min-width: 36px;
+      text-align: center;
+    }
+    .benefit-text h4 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+    .benefit-text p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    
+    /* Guest Card */
+    .guest-card {
       border: 1px solid var(--accent-cyan);
       background: rgba(0,212,255,0.05);
+      text-align: center;
     }
-    .status-card.connected {
-      border-color: var(--accent-green);
-      background: rgba(34,197,94,0.05);
+    .guest-card h3 { 
+      color: var(--accent-cyan);
+      justify-content: center;
     }
-    .status-card h3 { color: var(--accent-cyan); }
-    .status-card.connected h3 { color: var(--accent-green); }
-    
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 15px;
-      background: var(--bg-dark);
-      border-radius: 8px;
+    .guest-card p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
       margin-bottom: 15px;
     }
-    .status-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--accent-orange);
-      animation: pulse 2s infinite;
-    }
-    .status-dot.connected {
-      background: var(--accent-green);
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    /* Demo Login */
-    .demo-card {
-      border: 1px solid var(--accent-gold);
-      background: rgba(255,215,0,0.05);
-    }
-    .demo-card h3 { color: var(--accent-gold); }
-    
-    .demo-accounts {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .demo-account {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 15px;
-      background: var(--bg-dark);
+    .guest-btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: transparent;
+      border: 2px solid var(--accent-cyan);
+      color: var(--accent-cyan);
       border-radius: 8px;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .demo-account-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .demo-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-    }
-    .demo-avatar.admin { background: var(--accent-red); }
-    .demo-avatar.user { background: var(--accent-purple); }
-    .demo-name { font-weight: 600; font-size: 0.9rem; }
-    .demo-role {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
-    .demo-btn {
-      padding: 8px 16px;
-      background: var(--accent-gold);
-      color: #000;
-      border: none;
-      border-radius: 6px;
+      text-decoration: none;
       font-weight: 600;
-      font-size: 0.8rem;
-      cursor: pointer;
       transition: all 0.3s;
     }
-    .demo-btn:hover {
-      background: #ffed4a;
-      transform: translateY(-1px);
+    .guest-btn:hover {
+      background: var(--accent-cyan);
+      color: var(--bg-dark);
     }
     
-    /* Storage Info */
-    .storage-info {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
+    /* Admin Debug Panel (hidden by default) */
+    .admin-debug {
+      display: none;
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid var(--accent-red);
+      border-radius: 12px;
     }
-    .storage-item {
+    .admin-debug.show { display: block; }
+    .admin-debug h4 {
+      color: var(--accent-red);
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+    .debug-item {
       display: flex;
       justify-content: space-between;
       padding: 8px 0;
       border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8rem;
     }
-    .storage-item:last-child { border-bottom: none; }
-    .storage-key { color: var(--accent-cyan); font-size: 0.8rem; }
-    .storage-desc { color: var(--text-secondary); font-size: 0.8rem; }
-    
-    /* Clear Data */
+    .debug-item:last-child { border-bottom: none; }
+    .debug-key { color: var(--accent-cyan); }
+    .debug-value { color: var(--text-secondary); }
     .clear-data-btn {
       background: rgba(239,68,68,0.2);
       color: var(--accent-red);
@@ -422,10 +378,15 @@
       font-weight: 600;
       transition: all 0.3s;
       width: 100%;
+      margin-top: 15px;
     }
     .clear-data-btn:hover {
       background: var(--accent-red);
       color: white;
+    }
+    /* Admin toggle completely hidden - only accessible via ?debug=1 URL parameter */
+    .admin-toggle {
+      display: none;
     }
     
     /* Responsive */
@@ -441,11 +402,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Status Banner -->
-  <div class="status-banner offline" id="statusBanner">
-    🔌 <strong>Offline Mode</strong> — Using local browser storage. Configure Google Sheets in Admin Panel for cloud sync.
-  </div>
 
   <header class="header">
     <a href="index.html" class="logo">🎬 Video<span>Bate</span></a>
@@ -497,12 +453,6 @@
           </div>
           
           <button type="submit" class="btn btn-primary" id="loginBtn">Sign In</button>
-          
-          <div class="divider"><span>or</span></div>
-          
-          <a href="quiz.html" style="display: block; text-align: center; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">
-            Continue as Guest →
-          </a>
         </form>
         
         <!-- REGISTER FORM -->
@@ -544,85 +494,69 @@
           <button type="submit" class="btn btn-primary" id="registerBtn">Create Account</button>
         </form>
       </div>
-    </div>
-    
-    <!-- Right: Info -->
-    <div class="info-column">
       
-      <!-- Connection Status -->
-      <div class="info-card status-card" id="statusCard">
-        <h3>🔌 Connection Status</h3>
-        <div class="status-indicator">
-          <div class="status-dot" id="statusDot"></div>
-          <div>
-            <div style="font-weight: 600;" id="statusText">Checking...</div>
-            <div style="font-size: 0.8rem; color: var(--text-secondary);" id="statusDetail">Connecting to user database</div>
-          </div>
+      <!-- Admin Debug Panel (hidden, toggle with ?debug=1 or admin login) -->
+      <div class="admin-debug" id="adminDebug">
+        <h4>🔧 Admin Debug Info</h4>
+        <div class="debug-item">
+          <span class="debug-key">Database Status</span>
+          <span class="debug-value" id="debugDbStatus">Checking...</span>
         </div>
-        <p style="font-size: 0.85rem; color: var(--text-secondary);" id="statusMessage">
-          Checking connection to Google Sheets...
-        </p>
-      </div>
-      
-      <!-- Demo Quick Login (only shown when offline) -->
-      <div class="info-card demo-card" id="demoCard">
-        <h3>⚡ Quick Demo Login</h3>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 15px;">
-          Try the app instantly with pre-made accounts:
-        </p>
-        <div class="demo-accounts">
-          <div class="demo-account">
-            <div class="demo-account-info">
-              <div class="demo-avatar admin">👑</div>
-              <div>
-                <div class="demo-name">Admin User</div>
-                <div class="demo-role">admin / admin123</div>
-              </div>
-            </div>
-            <button class="demo-btn" onclick="demoLogin('admin', 'admin123')">Login</button>
-          </div>
-          <div class="demo-account">
-            <div class="demo-account-info">
-              <div class="demo-avatar user">SL</div>
-              <div>
-                <div class="demo-name">Sarah Logic</div>
-                <div class="demo-role">sarahlogic / password123</div>
-              </div>
-            </div>
-            <button class="demo-btn" onclick="demoLogin('sarahlogic', 'password123')">Login</button>
-          </div>
+        <div class="debug-item">
+          <span class="debug-key">User Count</span>
+          <span class="debug-value" id="debugUserCount">-</span>
         </div>
-      </div>
-      
-      <!-- How It Works -->
-      <div class="info-card">
-        <h3>🔧 How It Works</h3>
-        <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.8;">
-          <p><strong style="color: var(--accent-green);">🟢 Online Mode:</strong><br>
-          Users stored in Google Sheets. Register/login syncs with cloud.</p>
-          <p style="margin-top: 12px;"><strong style="color: var(--accent-orange);">🟠 Offline Mode:</strong><br>
-          Users stored in browser localStorage. Data is device-specific.</p>
-          <p style="margin-top: 12px;"><strong style="color: var(--accent-cyan);">💡 Tip:</strong><br>
-          Admin can configure Google Sheets in the Admin Panel → User Database tab.</p>
-        </div>
-      </div>
-      
-      <!-- Storage Info -->
-      <div class="info-card" id="storage">
-        <h3>💾 Local Storage Keys</h3>
-        <div class="storage-item">
-          <span class="storage-key">fallacySpotter_users</span>
-          <span class="storage-desc">User accounts (offline)</span>
-        </div>
-        <div class="storage-item">
-          <span class="storage-key">fallacySpotter_currentUser</span>
-          <span class="storage-desc">Current session</span>
-        </div>
-        <div class="storage-item">
-          <span class="storage-key">fallacySpotter_usersApiUrl</span>
-          <span class="storage-desc">Google Sheets API URL</span>
+        <div class="debug-item">
+          <span class="debug-key">Storage Mode</span>
+          <span class="debug-value" id="debugStorageMode">-</span>
         </div>
         <button class="clear-data-btn" onclick="clearAllData()">🗑️ Clear All Local Data</button>
+      </div>
+      
+      <!-- Admin debug only accessible via ?debug=1 URL parameter -->
+    </div>
+    
+    <!-- Right: Benefits Info -->
+    <div class="info-column">
+      
+      <!-- Benefits of Signing Up -->
+      <div class="info-card benefits-card">
+        <h3>✨ Why Create an Account?</h3>
+        <div class="benefit-item">
+          <span class="benefit-icon">📊</span>
+          <div class="benefit-text">
+            <h4>Track Your Progress</h4>
+            <p>See your stats, accuracy rate, and improvement over time</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🏆</span>
+          <div class="benefit-text">
+            <h4>Compete on Leaderboards</h4>
+            <p>Climb the ranks and see how you compare to others</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🎖️</span>
+          <div class="benefit-text">
+            <h4>Earn Badges</h4>
+            <p>Unlock achievements as you master fallacy detection</p>
+          </div>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">💾</span>
+          <div class="benefit-text">
+            <h4>Save Your Progress</h4>
+            <p>Pick up where you left off on any device</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Play as Guest -->
+      <div class="info-card guest-card">
+        <h3>🎮 Just Want to Play?</h3>
+        <p>No account needed to try the quiz. Jump right in and test your skills!</p>
+        <a href="quiz.html" class="guest-btn">Play as Guest →</a>
       </div>
       
     </div>
@@ -644,16 +578,10 @@ async function initSQLDatabase() {
         const status = SQLDatabase.getStatus();
         console.log('[Login] SQL Database ready:', status);
         
-        // Update status banner
-        document.getElementById('statusBanner').className = 'status-banner online';
-        document.getElementById('statusBanner').innerHTML = '🗄️ <strong>SQL Database Mode</strong> — Using SQLite database (' + status.userCount + ' users)';
-        
-        // Update connection status
-        document.getElementById('statusCard').classList.add('connected');
-        document.getElementById('statusDot').classList.add('connected');
-        document.getElementById('statusText').textContent = 'Database Ready';
-        document.getElementById('statusDetail').textContent = status.userCount + ' users in SQL database';
-        document.getElementById('statusMessage').textContent = 'Authentication uses SQLite database.';
+        // Update debug panel
+        document.getElementById('debugDbStatus').textContent = '✅ Connected';
+        document.getElementById('debugUserCount').textContent = status.userCount + ' users';
+        document.getElementById('debugStorageMode').textContent = 'SQLite Database';
         
         return true;
       }
@@ -661,7 +589,23 @@ async function initSQLDatabase() {
   } catch (error) {
     console.error('[Login] SQL Database init error:', error);
   }
+  
+  // Update debug panel for offline mode
+  document.getElementById('debugDbStatus').textContent = '📴 Offline';
+  document.getElementById('debugStorageMode').textContent = 'localStorage';
+  
   return false;
+}
+
+// ========== ADMIN DEBUG TOGGLE ==========
+function toggleAdminDebug() {
+  const panel = document.getElementById('adminDebug');
+  panel.classList.toggle('show');
+}
+
+// Check URL for debug param
+if (window.location.search.includes('debug=1')) {
+  document.getElementById('adminDebug').classList.add('show');
 }
 
 // ========== TAB SWITCHING ==========
@@ -752,44 +696,18 @@ async function checkConnection() {
 
 function setOnlineMode(userCount) {
   isOnlineMode = true;
-  
-  document.getElementById('statusBanner').className = 'status-banner online';
-  document.getElementById('statusBanner').innerHTML = '🟢 <strong>Online Mode</strong> — Connected to Google Sheets user database';
-  
-  document.getElementById('statusCard').classList.add('connected');
-  document.getElementById('statusDot').classList.add('connected');
-  document.getElementById('statusText').textContent = 'Connected';
-  document.getElementById('statusDetail').textContent = `${userCount} users in database`;
-  document.getElementById('statusMessage').textContent = 'Your account will sync with the cloud database.';
-  
-  // Hide demo card when online
-  document.getElementById('demoCard').style.display = 'none';
+  document.getElementById('debugDbStatus').textContent = '✅ Google Sheets';
+  document.getElementById('debugUserCount').textContent = userCount + ' users';
+  document.getElementById('debugStorageMode').textContent = 'Google Sheets';
 }
 
 function setOfflineMode() {
   isOnlineMode = false;
-  
-  document.getElementById('statusBanner').className = 'status-banner offline';
-  document.getElementById('statusBanner').innerHTML = '🔌 <strong>Offline Mode</strong> — Using local browser storage';
-  
-  document.getElementById('statusCard').classList.remove('connected');
-  document.getElementById('statusDot').classList.remove('connected');
-  document.getElementById('statusText').textContent = 'Offline';
-  document.getElementById('statusDetail').textContent = 'Using local storage';
-  document.getElementById('statusMessage').textContent = 'Configure Google Sheets URL in Admin Panel to enable cloud sync.';
-  
-  // Show demo card when offline
-  document.getElementById('demoCard').style.display = 'block';
+  const localUsers = getLocalUsers();
+  document.getElementById('debugUserCount').textContent = localUsers.length + ' local users';
   
   // Create demo users if none exist locally
   createDemoUsersIfNeeded();
-}
-
-// ========== DEMO LOGIN ==========
-function demoLogin(username, password) {
-  document.getElementById('loginEmail').value = username;
-  document.getElementById('loginPassword').value = password;
-  document.getElementById('loginForm').dispatchEvent(new Event('submit'));
 }
 
 // ========== CLEAR ALL DATA ==========
