@@ -362,26 +362,33 @@ const SQLDatabase = {
   
   /**
    * Create default demo users for VideoBate (with hashed passwords)
-   * NOTE: These credentials are visible in source code.
-   * For static sites, "auth" is UX, not security.
+   * Admin comes from local-users.js (gitignored) if present
+   * Demo user is public and always created
    */
   async createDefaultUsers() {
-    const defaultUsers = [
-      {
-        username: 'admin',
-        password: 'admin',  // Visible in source - demo site only
-        display_name: 'Administrator',
-        email: 'admin@videobate.com',
+    const defaultUsers = [];
+    
+    // Admin user from LOCAL_USERS (js/local-users.js - gitignored)
+    if (typeof LOCAL_USERS !== 'undefined' && LOCAL_USERS.admin) {
+      const admin = LOCAL_USERS.admin;
+      defaultUsers.push({
+        username: admin.username,
+        password: admin.password,
+        display_name: admin.displayName || 'Administrator',
+        email: admin.email || 'admin@videobate.com',
         role: 'admin'
-      },
-      {
-        username: 'demo',
-        password: 'demo',  // Intentionally simple - PUBLIC demo
-        display_name: 'Demo User',
-        email: 'demo@videobate.com',
-        role: 'user'
-      }
-    ];
+      });
+      console.log('[VideoBate-SQL] Admin loaded from local-users.js');
+    }
+    
+    // Demo user (always created - public)
+    defaultUsers.push({
+      username: 'demo',
+      password: 'demo',
+      display_name: 'Demo User',
+      email: 'demo@videobate.com',
+      role: 'user'
+    });
     
     for (const user of defaultUsers) {
       try {
