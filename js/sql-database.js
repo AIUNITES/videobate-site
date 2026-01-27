@@ -362,24 +362,23 @@ const SQLDatabase = {
   
   /**
    * Create default demo users for VideoBate (with hashed passwords)
-   * NOTE: These are LOCAL fallback users only. For shared access, use GitHub sync database.
-   * Admin accounts should primarily come from AIUNITES-database-sync/init-data.sql
+   * NOTE: These credentials are visible in source code.
+   * For static sites, "auth" is UX, not security.
    */
   async createDefaultUsers() {
     const defaultUsers = [
-      // No local admin - admin should come from GitHub sync database
       {
-        username: 'demo',
-        password: 'VbDemo2026!Play',
-        display_name: 'Demo User',
-        email: 'demo@videobate.com',
-        role: 'user'
+        username: 'admin',
+        password: 'admin',  // Visible in source - demo site only
+        display_name: 'Administrator',
+        email: 'admin@videobate.com',
+        role: 'admin'
       },
       {
-        username: 'sarahlogic',
-        password: 'SarahVb!2026',
-        display_name: 'Sarah Logic',
-        email: 'sarah@example.com',
+        username: 'demo',
+        password: 'demo',  // Intentionally simple - PUBLIC demo
+        display_name: 'Demo User',
+        email: 'demo@videobate.com',
         role: 'user'
       }
     ];
