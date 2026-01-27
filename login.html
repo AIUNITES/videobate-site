@@ -902,19 +902,20 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
 });
 
 // ========== CREATE DEMO USERS ==========
+// NOTE: Demo users are created with secure passwords - users should use GitHub sync database for real auth
 function createDemoUsersIfNeeded() {
   if (getLocalUsers().length === 0) {
     const demoUsers = [
       {
         id: 1,
-        firstName: 'Admin',
-        lastName: 'User',
-        username: 'admin',
-        email: 'admin@videobate.com',
-        password: 'admin123',
+        firstName: 'Demo',
+        lastName: 'Player',
+        username: 'demoplayer',
+        email: 'demo@videobate.com',
+        password: 'VbDemo2026!Play',
         createdAt: new Date().toISOString(),
-        role: 'admin',
-        stats: { totalScore: 5000, gamesPlayed: 50, correctAnswers: 400, wrongAnswers: 50, bestStreak: 15, badges: ['🏆 Perfect Score', '🔥 Hot Streak', '🎯 Sharp Eye', '👨‍🏫 Quiz Master'] }
+        role: 'user',
+        stats: { totalScore: 1500, gamesPlayed: 20, correctAnswers: 150, wrongAnswers: 50, bestStreak: 8, badges: ['🔥 Hot Streak'] }
       },
       {
         id: 2,
@@ -922,7 +923,7 @@ function createDemoUsersIfNeeded() {
         lastName: 'Logic',
         username: 'sarahlogic',
         email: 'sarah@example.com',
-        password: 'password123',
+        password: 'SarahTest!2026',
         createdAt: new Date(Date.now() - 86400000).toISOString(),
         role: 'user',
         stats: { totalScore: 3200, gamesPlayed: 35, correctAnswers: 280, wrongAnswers: 70, bestStreak: 12, badges: ['🔥 Hot Streak', '🎮 Regular Player'] }
@@ -933,15 +934,15 @@ function createDemoUsersIfNeeded() {
         lastName: 'Reason',
         username: 'mikereason',
         email: 'mike@example.com',
-        password: 'password123',
+        password: 'MikeTest!2026',
         createdAt: new Date(Date.now() - 172800000).toISOString(),
         role: 'user',
         stats: { totalScore: 2100, gamesPlayed: 25, correctAnswers: 180, wrongAnswers: 70, bestStreak: 8, badges: ['🎮 Regular Player'] }
       }
     ];
-    
+    // NOTE: Admin accounts should only come from GitHub sync database, not local demo users
     saveLocalUsers(demoUsers);
-    console.log('✅ Demo users created for offline mode');
+    console.log('✅ Demo users created for offline mode (no admin - use GitHub sync for admin access)');
   }
 }
 
