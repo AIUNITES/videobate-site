@@ -327,15 +327,25 @@
 
 ---
 
+## Legal Compliance Tests
+- [ ] Single footer displayed (no duplicates)
+- [ ] Footer disclaimer text visible
+- [ ] Footer copyright with AIUNITES link
+- [ ] Privacy Policy link → aiunites-site/legal.html#privacy
+- [ ] Terms of Service link → aiunites-site/legal.html#terms
+
+---
+
 ## Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2.0 | Feb 15, 2026 | Legal compliance: centralized legal.html, removed dup footer, updated all legal links |
 | 1.0.0 | Jan 24, 2026 | Initial release with all features |
 | 1.0.1 | Jan 24, 2026 | Added Settings/Admin modals to profile.html |
 | 1.1.0 | Jan 25, 2026 | Added GitHub Sync for shared AIUNITES database, admin panel improvements, login debug access |
 
 ---
 
-*Last tested: January 25, 2026*
+*Last tested: February 15, 2026*
 *Tested by: Claude AI Assistant*
