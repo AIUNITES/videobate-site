@@ -1,7 +1,53 @@
 # VideoBate Development Progress Log
 
+## Intellectual Property
+Original concept, creative direction, and fallacy classification system by Tom Sansone. Development assisted by Claude AI (Anthropic). All intellectual property belongs to AIUNITES.
+
 ## Project Overview
 VideoBate - Live Video Debate Platform with integrated critical thinking tools.
+
+---
+
+## Session 10: Remove Demo Banner & Site Reframe (February 24, 2026)
+
+### Problem
+Site presented as "Demo / Pre-Launch Preview" with waitlist-only CTAs, making it look unfinished. Truthopedia links pointed to someone else's YouTube playlist. "How It Works" and "Topics" sections referenced unreleased video debate features.
+
+### Changes: index.html
+- **Hero badge**: ~~🚧 Demo / Pre-Launch Preview~~ → 🎯 Fallacy Spotter & Quiz — Play Free Now
+- **Hero text**: Rewritten to focus on Fallacy Spotter and Quiz (live features)
+- **Hero CTAs**: ~~Join the Waitlist / See How It Works~~ → 🎯 Play Fallacy Spotter / 🧠 Take the Quiz
+- **Hero stats**: ~~50+ Debate Topics / 2min / Live~~ → 25+ Fallacies to Learn / Free Play Now / Live Leaderboards
+- **Nav**: Removed "How It Works" and "Topics" links. Added 🏆 Leaderboard. Changed "Join Waitlist" button → "Play Now"
+- **Features grid**: Reordered — Fallacy Spotter, Quiz, Leaderboard first with green LIVE badges; Structured Rounds, Topic Matching, AI Moderation, Audience Voting, Fact Checking marked COMING SOON (dimmed)
+- **Removed sections**: "How It Works" (3-step debate flow) and "Topics" (debate topic cards) — both referenced unreleased video debate platform
+- **CTA section**: ~~"Ready to Debate?"~~ → "Ready to Sharpen Your Thinking?" with Play + Get Notified buttons
+- **Waitlist section**: ~~"Get Early Access / Join the Waitlist"~~ → "Coming Soon / Live Video Debates"
+- **Footer**: Removed ~~⚠️ This is a demo/concept site. The platform is not yet live.~~ Updated footer links to Fallacy Spotter, Quiz, Leaderboard
+
+### Changes: fallacies.html
+- **Hero CTA**: Removed 📺 Truthopedia button (linked to external YouTube playlist)
+- **Bottom CTA**: ~~"Join the waitlist" + Truthopedia~~ → "Take the Quiz" + "View Leaderboard"
+- **Footer**: Removed #Truthopedia hashtag, added Quiz link
+
+### Changes: PROGRESS_LOG.md
+- Added IP ownership statement: "Original concept and creative direction by Tom Sansone. Development assisted by Claude AI (Anthropic). All intellectual property belongs to AIUNITES."
+
+### AIUNITES Infrastructure
+- Created `SESSION_CHECKLIST.md` in GitHub root — standardized session start/end workflow
+- Updated `CLAUDE.md` — Development Workflow section rewritten with Session Start/End instructions referencing SESSION_CHECKLIST.md
+
+### Files Modified
+| File | Changes |
+|------|---------|
+| `index.html` | Hero, nav, features, CTA, waitlist, footer — full reframe |
+| `fallacies.html` | Removed 3 Truthopedia references, updated CTAs |
+| `PROGRESS_LOG.md` | Added IP statement, this session entry |
+
+### Files Created (AIUNITES root)
+| File | Purpose |
+|------|---------|
+| `SESSION_CHECKLIST.md` | Standardized session start/end checklist |
 
 ---
 

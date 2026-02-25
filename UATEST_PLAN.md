@@ -7,8 +7,8 @@
 | **Repository** | videobate-site |
 | **Live URL** | https://aiunites.github.io/videobate-site/ |
 | **Local Path** | C:/Users/Tom/Documents/GitHub/videobate-site |
-| **Last Updated** | January 25, 2026 |
-| **Version** | 1.1.0 |
+| **Last Updated** | February 24, 2026 |
+| **Version** | 1.3.0 |
 
 ---
 
@@ -140,6 +140,19 @@
 | Loading States | Multiple | ✅ | Spinners, messages |
 | Error Handling | Multiple | ✅ | User-friendly errors |
 | AIUNITES Webring | index.html | ✅ | Top navigation bar |
+| LIVE/COMING SOON badges | index.html | ✅ | Features grid shows status |
+
+### ❌ Deprecated/Removed (v1.3.0)
+| Feature | Location | Status | Notes |
+|---------|----------|--------|-------|
+| Demo/Pre-Launch Banner | index.html | ❌ Removed | Was "🚧 Demo / Pre-Launch Preview" |
+| "Not yet live" disclaimer | index.html footer | ❌ Removed | Was "⚠️ This is a demo/concept site" |
+| How It Works section | index.html | ❌ Removed | 3-step video debate flow — unreleased feature |
+| Topics section | index.html | ❌ Removed | Debate topic cards — unreleased feature |
+| Truthopedia button (hero) | fallacies.html | ❌ Removed | Linked to external YouTube playlist |
+| Truthopedia button (CTA) | fallacies.html | ❌ Removed | Linked to external YouTube playlist |
+| Truthopedia hashtag (footer) | fallacies.html | ❌ Removed | #Truthopedia reference |
+| "Join Waitlist" nav button | index.html | ❌ Removed | Replaced with "Play Now" |
 
 ---
 
@@ -324,6 +337,8 @@
 | Add user dropdown to fallacies.html | Medium | 🔲 TODO |
 | Add modals to other pages | Medium | 🔲 TODO |
 | Cloud sync error handling | Low | 🔲 TODO |
+| Build text-based 1v1 debate MVP | High | 🔲 TODO |
+| Video debate platform (WebRTC) | Low | 🔲 FUTURE |
 
 ---
 
@@ -340,6 +355,7 @@
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | Feb 24, 2026 | Removed demo banner, reframed site around live features (Fallacy Spotter, Quiz, Leaderboard). Removed Truthopedia links, How It Works section, Topics section. Updated nav and footer. Added IP ownership to PROGRESS_LOG. |
 | 1.2.0 | Feb 15, 2026 | Legal compliance: centralized legal.html, removed dup footer, updated all legal links |
 | 1.0.0 | Jan 24, 2026 | Initial release with all features |
 | 1.0.1 | Jan 24, 2026 | Added Settings/Admin modals to profile.html |
@@ -347,5 +363,5 @@
 
 ---
 
-*Last tested: February 15, 2026*
+*Last tested: February 24, 2026*
 *Tested by: Claude AI Assistant*
