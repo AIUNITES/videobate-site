@@ -69,8 +69,8 @@
   <nav class="nav">
     <div class="container nav-container">
       <a href="#" class="logo">🎬 Video<span>Bate</span></a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
+      <div class="nav-links" id="vb-nav">
+        <a href="#features" onclick="vbClose()">Features</a>
         <a href="compare.html" style="color:#ffd700;font-weight:600">⚖️ Both Sides</a>
         <a href="fallacies.html" style="color: #ffd700;">🎯 Fallacy Spotter</a>
         <a href="quiz.html" style="color: #00d4ff;">🧠 Quiz</a>
@@ -78,8 +78,10 @@
         <a href="login.html" style="color: #22c55e;" id="loginNavLink">🔐 Login</a>
         <a href="fallacies.html" class="btn btn-primary">Play Now</a>
       </div>
+      <button class="nav-hamburger" id="vb-hbg" aria-label="Menu" onclick="this.classList.toggle('open');document.getElementById('vb-nav').classList.toggle('open')"><span></span><span></span><span></span></button>
     </div>
   </nav>
+  <script>function vbClose(){document.getElementById('vb-nav').classList.remove('open');document.getElementById('vb-hbg').classList.remove('open');}</script>
 
   <!-- Login state check -->
   <script>
